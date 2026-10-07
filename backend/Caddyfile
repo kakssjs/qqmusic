@@ -1,0 +1,17 @@
+{
+  admin 127.0.0.1:2019
+}
+https://123.56.102.46 {
+  tls {
+    issuer acme https://acme-v02.api.letsencrypt.org/directory {
+      profile shortlived
+    }
+  }
+  @api path /api/*
+  handle @api {
+    reverse_proxy 127.0.0.1:8080
+  }
+  handle {
+    respond "Melo API" 200
+  }
+}
