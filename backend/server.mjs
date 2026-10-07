@@ -29,7 +29,7 @@ export function createMeloServer(options={}) {
     if(total.seconds)events.push({id:'listening-total',type:'listening',payload:{seconds:total.seconds},createdAt:total.first_at});
     return events;
   }
-  async function body(req){let bytes=0,text=''; for await(const chunk of req){bytes+=chunk.length;if(bytes>12000)fail(413,'输入太长。');text+=chunk.toString();}try{return JSON.parse(text||'{}');}catch{fail(400,'输入格式无效。');}}
+  async function body(req){let bytes=0;const chunks=[]; for await(const chunk of req){bytes+=chunk.length;if(bytes>12000)fail(413,'输入太长。');chunks.push(chunk);}try{return JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');}catch{fail(400,'输入格式无效。');}}
   function text(value,max){if(typeof value!=='string'||!value.trim()||value.length>max)fail(400,`请输入1至${max}字。`);return value.trim();}
   async function ai(messages,json=false){
     if(!key)fail(503,'AI 模型尚未配置，请先记录心情或聆听音乐。');

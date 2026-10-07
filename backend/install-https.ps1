@@ -5,10 +5,9 @@ $version = '2.11.7'
 $filename = "caddy_${version}_windows_amd64.zip"
 $downloadUrl = "https://github.com/caddyserver/caddy/releases/download/v$version"
 if (!(Test-Path (Join-Path $meloDirectory 'caddy.exe'))) {
-  Invoke-WebRequest "$downloadUrl/$filename" -OutFile (Join-Path $meloDirectory $filename) -UseBasicParsing
-  $checks = (Invoke-WebRequest "$downloadUrl/caddy_${version}_checksums.txt" -UseBasicParsing).Content
-  if ($checks -is [byte[]]) {$checks = [Text.Encoding]::UTF8.GetString($checks)}
-  $expected = (($checks -split "`n" | Where-Object { $_.Trim().EndsWith($filename) }) -split '\s+')[0]
+  if (!(Test-Path (Join-Path $meloDirectory $filename))) {Invoke-WebRequest "$downloadUrl/$filename" -OutFile (Join-Path $meloDirectory $filename) -UseBasicParsing}
+  # SHA512 from the official v2.11.7 release checksum manifest.
+  $expected = 'c308154504e53755958ffc62d8a2657ab17eefd6dd25c45dbb2c3d93d29519971f77ca652f7d0f2bcb7f980b9ba3822478865e29969d0272d7613550a43152b1'
   if ((Get-FileHash -LiteralPath (Join-Path $meloDirectory $filename) -Algorithm SHA512).Hash.ToLower() -ne $expected) {throw 'Caddy checksum mismatch'}
   Expand-Archive -LiteralPath (Join-Path $meloDirectory $filename) -DestinationPath $meloDirectory -Force
 }
