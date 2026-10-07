@@ -1553,7 +1553,7 @@
   letter-spacing: -0.055em;
   margin: 20px 0 0;
 }
-.music-world .your-music-story > p:not(.world-fineprint) {
+.music-world .journey-story-copy > p:not(.world-fineprint) {
   font-size: 16px;
   color: var(--world-copy);
   line-height: 1.9;
@@ -2292,7 +2292,7 @@
   .music-world .your-music-story {
     margin-top: 40px;
   }
-  .music-world .your-music-story > p:not(.world-fineprint) {
+  .music-world .journey-story-copy > p:not(.world-fineprint) {
     font-size: 17px;
     line-height: 1.9;
     margin: 21px 0 25px;
@@ -2554,7 +2554,7 @@
     margin-top: 26px;
     border-radius: 21px;
   }
-.music-world .your-music-story > p:not(.world-fineprint) {
+.music-world .journey-story-copy > p:not(.world-fineprint) {
     font-size: 15px;
     line-height: 1.85;
     margin: 15px 0 21px;
