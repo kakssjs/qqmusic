@@ -19,6 +19,7 @@ export type MeloRecord = {
   };
   createdAt: string;
 };
+export type AIConnectionState = "checking" | "configured" | "unconfigured" | "offline";
 export const moods = [
   ["calm", "平静"],
   ["tired", "疲惫"],
@@ -31,6 +32,7 @@ export function useLiveMelo() {
   const [records, setRecords] = useState<MeloRecord[]>([]);
   const [ready, setReady] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [connectionState, setConnectionState] = useState<AIConnectionState>("checking");
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState("");
@@ -64,6 +66,8 @@ export function useLiveMelo() {
     return () => clearTimeout(timer);
   }, [status]);
   async function load() {
+    setConnectionState("checking");
+    setError("");
     try {
       const r = await fetch("/api/session");
       const data = (await r.json()) as {
@@ -75,7 +79,10 @@ export function useLiveMelo() {
       setRecords(data.events);
       setReady(true);
       setConnected(data.aiConnected);
+      setConnectionState(data.aiConnected ? "configured" : "unconfigured");
     } catch (e) {
+      setConnected(false);
+      setConnectionState("offline");
       setError((e as Error).message);
     }
   }
@@ -274,6 +281,7 @@ export function useLiveMelo() {
     records,
     ready,
     connected,
+    connectionState,
     error,
     setError,
     status,

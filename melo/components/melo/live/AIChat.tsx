@@ -51,7 +51,25 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             <div>
               <span className="world-live-dot" />
               <strong>Melo</strong>
-              <small>{melo.connected ? "正在这里，听你说" : "正在连接…"}</small>
+              {melo.connectionState === "offline" ? (
+                <button
+                  type="button"
+                  className="connection-retry chat-connection-retry"
+                  onClick={() => void melo.load()}
+                  aria-label="AI 服务连接失败，点击重试"
+                  aria-live="polite"
+                >
+                  连接失败 · 重试
+                </button>
+              ) : (
+                <small role="status" aria-live="polite">
+                  {melo.connectionState === "checking"
+                    ? "正在连接…"
+                    : melo.connectionState === "unconfigured"
+                      ? "AI 服务尚未配置"
+                      : "正在这里，听你说"}
+                </small>
+              )}
             </div>
             <span>Just between us</span>
           </div>
@@ -141,13 +159,23 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             />
             <button
               aria-label="发送给 Melo"
-              disabled={!!melo.busy || !melo.ready || !melo.chatDraft.trim()}
+              disabled={
+                !!melo.busy ||
+                !melo.ready ||
+                !melo.connected ||
+                !melo.chatDraft.trim()
+              }
             >
               <ArrowUp size={21} />
             </button>
           </form>
           <p className="live-chat-note">
-            只属于你的对话空间 <span>Shift + Enter 换行</span>
+            {melo.connectionState === "unconfigured"
+              ? "AI 服务尚未配置；你仍可体验情绪选择与音乐。"
+              : melo.connectionState === "offline"
+                ? "AI 服务暂时连接不上；可点击上方重试，或继续听音乐。"
+                : "只属于你的对话空间"}
+            {melo.connected && <span>Shift + Enter 换行</span>}
           </p>
         </div>
       </div>

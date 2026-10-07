@@ -51,6 +51,29 @@
   letter-spacing: 0.12em;
   color: #9884a9;
 }
+.connection-retry {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.connection-retry:hover {
+  color: #f5f0fa;
+}
+.connection-retry:focus-visible {
+  outline: 2px solid #c8ff32;
+  outline-offset: 3px;
+}
+.live-connect.connection-retry {
+  border-radius: 999px;
+  background: #2b2111;
+  color: #f2d18b;
+  letter-spacing: 0.04em;
+  padding: 6px 8px;
+}
 .live-menu {
   display: none;
 }

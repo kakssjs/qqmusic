@@ -83,6 +83,10 @@
 .melo-menu-panel .menu-connection {
   color: #7fffa1;
 }
+.melo-menu-panel .menu-connection.connection-retry {
+  background: #302313;
+  color: #ffe0a3;
+}
 .live-toast.success {
   background: #0c170fee;
   border-color: #7fffa12b;
@@ -494,6 +498,12 @@
 .music-world .conversation-heading > span {
   font-size: 11px;
   color: var(--world-muted);
+}
+.music-world .conversation-heading .chat-connection-retry {
+  background: transparent;
+  color: var(--world-muted);
+  font-size: 11px;
+  padding: 0;
 }
 .music-world .live-chat-messages {
   height: 420px;

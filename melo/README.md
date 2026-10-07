@@ -6,7 +6,7 @@ AI虚拟音乐伙伴。让音乐听懂你的情绪。
 
 首页人物使用 `mascot/melo-reference-cutout.png`，保留参考图的歪头、伸手姿势和立体脸部，移除平面 SVG 五官。默认为参考图的 wink。其余表情与自动眨眼复用 `painted-heads.png` 的局部绘制五官，通过 PaintedExpression 进行渐变；身体、头发与服装保持同一基础资源，不再拼接头身。两份资源由内置 imagegen 根据选定参考图提取和制作，原资源保留。
 
-`cloud-ice-scene.png` 由内置 imagegen 对参考图移除文字、人物和音乐装饰后生成，恢复玻璃冰面、薄雾、反光和门的空间关系。原 `hero-clouds.mp4` 继续作为灰蓝流云动态层播放，通过遮罩避免出现两个不同的门；新增人物倒影。移动端保持人物与地面可见。
+首屏和推荐唱片使用 `cloud-ice-scene.webp`，由内置 imagegen 生成的原始 PNG 已保存在仓库根目录 `assets/cloud-ice-scene-source.png`。WebP 保持原画面尺寸，约减少 92% 体积。原 `hero-clouds.mp4` 继续作为灰蓝流云动态层播放；减少动态效果或开启省流量/慢速网络时保留静态场景，不请求背景视频。
 
 MusicCompanion 支持漂浮、摇摆、叶片摆动、眨眼、音乐律动以及点击打招呼。Hover 暂停漂浮便于点击，点击后显示短暂跳跃与星光。系统减少动态效果时关闭这些动画，保留点击和表情选择。
 

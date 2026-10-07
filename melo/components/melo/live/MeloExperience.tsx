@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { MotionConfig } from "framer-motion";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -13,7 +13,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "../../ui/sheet";
-import { useLiveMelo } from "./useLiveMelo";
+import { useLiveMelo, type AIConnectionState } from "./useLiveMelo";
 import { MeloHero } from "../MeloHero";
 import { AIChat } from "./AIChat";
 import { EmotionAnalysis } from "./EmotionAnalysis";
@@ -28,6 +28,43 @@ const nav = [
   ["记忆", "memory"],
   ["旅程", "journey"],
 ];
+function ConnectionStatus({
+  state,
+  className,
+  onRetry,
+  style,
+}: {
+  state: AIConnectionState;
+  className: string;
+  onRetry: () => void;
+  style?: CSSProperties;
+}) {
+  const labels: Record<AIConnectionState, string> = {
+    checking: "连接中…",
+    configured: "AGNES AI",
+    unconfigured: "AI 未配置",
+    offline: "连接失败 · 重试",
+  };
+  if (state === "offline") {
+    return (
+      <button
+        type="button"
+        className={`${className} connection-retry`}
+        onClick={onRetry}
+        aria-label="AI 服务连接失败，点击重试"
+        aria-live="polite"
+        style={style}
+      >
+        {labels[state]}
+      </button>
+    );
+  }
+  return (
+    <span className={className} role="status" aria-live="polite" style={style}>
+      {labels[state]}
+    </span>
+  );
+}
 export default function MeloExperience() {
   const melo = useLiveMelo();
   const root = useRef<HTMLDivElement>(null);
@@ -145,9 +182,11 @@ export default function MeloExperience() {
               {noMotion ? "静态" : "动态"}
               <i />
             </button>
-            <span className="live-connect">
-              {melo.connected ? "AGNES AI" : "CONNECTING"}
-            </span>
+            <ConnectionStatus
+              state={melo.connectionState}
+              className="live-connect"
+              onRetry={() => void melo.load()}
+            />
             <Sheet open={menu} onOpenChange={setMenu}>
               <SheetTrigger asChild>
                 <button
@@ -207,12 +246,12 @@ export default function MeloExperience() {
                     </a>
                   ))}
                 </nav>
-                <span
+                <ConnectionStatus
+                  state={melo.connectionState}
                   className="menu-connection"
+                  onRetry={() => void melo.load()}
                   style={{ transitionDelay: menu ? "320ms" : "0ms" }}
-                >
-                  {melo.connected ? "AGNES AI" : "CONNECTING"}
-                </span>
+                />
               </SheetContent>
             </Sheet>
           </div>

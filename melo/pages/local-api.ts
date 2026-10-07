@@ -11,6 +11,9 @@ export function backendAddress() {
     const url=new URL(apiBase);
     if(url.protocol!=='https:')throw new Error('后端需要有效的 HTTPS 地址。');
     return url.origin;
+  }).catch(error=>{
+    configuration=undefined;
+    throw error;
   });
   return configuration;
 }

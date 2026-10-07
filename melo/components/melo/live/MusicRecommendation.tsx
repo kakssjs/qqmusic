@@ -38,7 +38,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
         </div>
         <div className="record-cover">
           <img
-            src="/cloud-ice-scene.png"
+            src="/cloud-ice-scene.webp"
             alt={a.song.name + "：蓝灰云海与薄荷色光线"}
             loading="lazy"
           />
