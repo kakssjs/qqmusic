@@ -16,7 +16,7 @@ $sourceUrl = 'https://raw.githubusercontent.com/kakssjs/qqmusic/main/backend/ser
 Invoke-WebRequest $sourceUrl -OutFile (Join-Path $meloDirectory 'server.mjs') -UseBasicParsing
 $config = Join-Path $meloDirectory '.env'
 if (!(Test-Path -LiteralPath $config)) {
-  "HOST=127.0.0.1`nPORT=8080`nDATA_DIR=$($meloDirectory.Replace('\','/'))/data`nALLOWED_ORIGINS=https://kakssjs.github.io,https://melo-qqmusic.vercel.app`nAI_BASE_URL=https://apihub.agnes-ai.com/v1`nAI_MODEL=agnes-3.0-flash`n" | Set-Content -LiteralPath $config -Encoding UTF8
+  "HOST=127.0.0.1`nPORT=8080`nDATA_DIR=$($meloDirectory.Replace('\','/'))/data`nALLOWED_ORIGINS=https://kakssjs.github.io,https://melo-qqmusic.vercel.app,http://127.0.0.1:4173,http://localhost:4173`nAI_BASE_URL=https://apihub.agnes-ai.com/v1`nAI_MODEL=agnes-3.0-flash`n" | Set-Content -LiteralPath $config -Encoding UTF8
 }
 $nodePath = Join-Path $meloDirectory "node-$nodeRelease-win-x64\node.exe"
 $action = New-ScheduledTaskAction -Execute $nodePath -Argument "--env-file=`"$config`" `"$(Join-Path $meloDirectory 'server.mjs')`"" -WorkingDirectory $meloDirectory

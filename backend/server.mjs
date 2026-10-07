@@ -10,7 +10,7 @@ export function createMeloServer(options={}) {
   const directory=options.directory||process.env.DATA_DIR||'./data'; mkdirSync(directory,{recursive:true});
   const db=new DatabaseSync(path.join(directory,'melo.sqlite'));
   db.exec('PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY,created_at TEXT NOT NULL); CREATE TABLE IF NOT EXISTS events(id TEXT NOT NULL,user_id TEXT NOT NULL,type TEXT NOT NULL,payload TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(user_id,id)); CREATE INDEX IF NOT EXISTS events_user_time ON events(user_id,created_at);');
-  const origins=new Set((process.env.ALLOWED_ORIGINS||'https://kakssjs.github.io,https://melo-qqmusic.vercel.app').split(',').map(x=>x.trim()));
+  const origins=new Set((process.env.ALLOWED_ORIGINS||'https://kakssjs.github.io,https://melo-qqmusic.vercel.app,http://127.0.0.1:4173,http://localhost:4173').split(',').map(x=>x.trim()));
   const key=options.aiKey??process.env.AGNES_API_KEY;
   const base=(options.aiBase||process.env.AI_BASE_URL||'https://apihub.agnes-ai.com/v1').replace(/\/$/,'');
   const model=options.aiModel||process.env.AI_MODEL||'agnes-3.0-flash';
