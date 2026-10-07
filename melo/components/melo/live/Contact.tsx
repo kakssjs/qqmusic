@@ -5,7 +5,7 @@ export function Contact() {
         <div className="ending-aura" aria-hidden="true" />
         <div className="ending-portrait reveal">
           <img
-            src="/mascot/melo-reference-cutout.png"
+            src="/mascot/melo-reference-cutout.webp"
             alt="Melo 向你伸出手，邀请你一起听下一首歌"
             loading="lazy"
           />

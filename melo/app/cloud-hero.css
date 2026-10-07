@@ -21,6 +21,38 @@
 .identity-character{width:min(100cqw,66.666667cqh);aspect-ratio:1024/1536;transform:translateX(var(--head-x)) rotate(var(--head-tilt));transition:transform .5s ease-in-out}
 .canonical-character-art{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
 .painted-face-placement{position:absolute;left:17.96875%;top:-1.953125%;width:49.807%;height:33.20475%;pointer-events:none}
+.melo-identity-art{position:relative;display:block;width:100%;height:100%;isolation:isolate}
+.melo-identity-art>.canonical-character-art{display:block;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none}
+.painted-face-placement{transform-origin:50% 55%;animation:expression-face-in .32s cubic-bezier(.2,.72,.24,1) both}
+.painted-face-placement[data-blink=true]{animation:none}
+@keyframes expression-face-in{from{opacity:.35;scale:.985}to{opacity:1;scale:1}}
+.expression-picker{background:rgba(12,16,13,.62);backdrop-filter:blur(18px);border-color:rgba(255,255,255,.08)}
+.picker-heading{gap:10px}
+.picker-current{display:flex;align-items:center;gap:8px;flex:none}
+.picker-current .expression-avatar{width:34px;height:34px;flex:none}
+.picker-current>span:last-child{display:flex;flex-direction:column;gap:2px;text-align:left}
+.picker-current small{font-size:8px;line-height:1;color:#a7b7a1}
+.picker-current strong{font-size:11px;line-height:1.1;font-weight:550;color:#e5efe1}
+.picker-prompt{margin-left:auto;color:#bacdb1}
+.expression-option .expression-avatar{transition:transform .2s ease,box-shadow .2s,border-color .2s}
+.expression-option:hover .expression-avatar,.expression-option:focus-visible .expression-avatar{transform:scale(1.06)}
+.expression-option:focus-visible{outline:2px solid #c8fc71;outline-offset:4px;border-radius:10px}
+.expression-option[aria-pressed=true] .expression-avatar{border-color:#c8ff32}
+.melo-character[data-busy=true] .character-float{animation-duration:3.8s,7s}
+.together-melo-window{overflow:hidden}
+.together-melo-art{height:auto;aspect-ratio:750/1080}
+@media(max-width:760px){
+ .cloud-hero .expression-picker{background:rgba(12,16,13,.78);backdrop-filter:blur(18px);border-color:rgba(255,255,255,.12);padding-bottom:calc(14px + env(safe-area-inset-bottom));}
+ .picker-heading{align-items:center}
+ .picker-prompt{display:none}
+ .picker-current .expression-avatar{width:38px;height:38px}
+ .picker-current strong{font-size:12px}
+ .expression-option:hover .expression-avatar{transform:none}
+}
+@media(prefers-reduced-motion:reduce){.painted-face-placement{animation:none!important}.expression-option .expression-avatar{transition:none!important}}
+.melo-identity-art[data-reduced=true] .painted-face-placement{animation:none!important}
+.expression-picker[data-reduced=true] .expression-avatar{transition:none!important}
+.expression-picker[data-reduced=true] .expression-option:hover .expression-avatar,.expression-picker[data-reduced=true] .expression-option:focus-visible .expression-avatar{transform:none}
 .painted-expression{width:100%;height:100%;overflow:visible}
 .character-reflection{position:absolute;left:0;top:99.8%;width:100%;height:100%;object-fit:contain;transform:scaleY(-1);opacity:.22;filter:blur(1.5px);mask-image:linear-gradient(180deg,#000,transparent 19%);pointer-events:none}
 .expression-avatar.painted-avatar>.painted-thumbnail{position:absolute;inset:-7%;width:114%;height:114%}

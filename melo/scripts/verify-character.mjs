@@ -1,42 +1,76 @@
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+const screenshotDir = 'D:/chatgpt/qqmusic/melo-validation';
+fs.mkdirSync(screenshotDir, { recursive: true });
 const require = createRequire(import.meta.url);
 const { chromium } = require('C:/Users/kakssjs/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const siteUrl = process.env.MELO_TEST_URL || 'http://127.0.0.1:5173/';
+const mockLocalMemory = async page => {
+  await page.route('**/melo-backend.json', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({apiBase:'https://mock.melo.local'})}));
+  await page.route('https://mock.melo.local/**', async route => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const cors = {'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,DELETE,OPTIONS','access-control-allow-headers':'Content-Type,X-Melo-Session'};
+    if (request.method() === 'OPTIONS') return route.fulfill({status:204,headers:cors});
+    if (url.pathname === '/api/session') {
+      if (!request.headers()['x-melo-session']) return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify({token:'a'.repeat(64)})});
+      if (request.method() === 'GET') return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify({events:[],aiConnected:true})});
+      if (request.method() === 'POST') {
+        const input = request.postDataJSON();
+        return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify({event:{...input,createdAt:new Date().toISOString()}})});
+      }
+      if (request.method() === 'DELETE') return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify({ok:true})});
+    }
+    return route.continue();
+  });
+};
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', e => { if (e.type()==='error') errors.push(e.text()); });
-  await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle' });
+  await mockLocalMemory(page);
+  await page.goto(siteUrl, { waitUntil: 'networkidle' });
   await page.locator('.melo-character').waitFor({ timeout: 10000 });
   assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'wink');
   assert.equal(await page.locator('.expression-picker').count(), 0);
-  assert.equal(await page.locator('.canonical-character-art').count(),1);
+  assert.equal(await page.locator('.character-float .canonical-character-art').count(),1);
   assert.equal(await page.locator('.character-features svg').count(),0);
   const proportions = 'reference artwork preserved';
+  assert.equal(await page.locator('.character-float .canonical-character-art').evaluate(el => el.currentSrc.endsWith('.webp')), true);
   assert(await page.locator('.character-float').evaluate(el => el.getAnimations().length > 0));
   await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.blinking === 'true', { timeout: 9000 });
   await page.mouse.move(1380, 140);
   await page.waitForTimeout(350);
   assert.notEqual(await page.locator('.identity-character').evaluate(el => el.style.getPropertyValue('--head-x')), '0px');
   await page.getByRole('button', { name: '看看 Melo 的心情 ✦' }).click();
+  const characterBounds = await page.locator('.melo-character').boundingBox();
   for (const [id, label] of [['happy','开心'],['wink','俏皮'],['surprise','惊喜'],['listen','沉浸'],['calm','温柔'],['love','比心'],['care','关心']]) {
     await page.getByRole('button', { name: `选择${label}表情` }).click();
     await page.waitForTimeout(600);
     assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), id);
+    assert.equal(await page.locator('.melo-identity-art').first().getAttribute('data-expression'), id);
     assert.equal(await page.getByRole('button', { name: `选择${label}表情` }).getAttribute('aria-pressed'), 'true');
+    assert.equal(await page.locator('.picker-current strong').innerText(), label);
+    const currentBounds = await page.locator('.melo-character').boundingBox();
+    for (const key of ['x','y','width','height']) assert(Math.abs(currentBounds[key]-characterBounds[key])<1, `${label} must not shift character ${key}`);
   }
-  await page.screenshot({ path: 'D:/chatgpt/qqmusic/melo-character-desktop.png' });
+  for (const label of ['开心','俏皮','惊喜','沉浸','温柔','比心','关心','俏皮','开心','关心']) {
+    await page.getByRole('button', { name: `选择${label}表情` }).click();
+  }
+  assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'care');
+  assert.equal(await page.locator('.character-float .painted-expression').getAttribute('data-expression'), 'care');
+  await page.screenshot({ path: `${screenshotDir}/melo-character-desktop.png` });
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('.expression-picker').count(), 0);
   await page.getByRole('button', { name: '看看 Melo 的心情 ✦' }).click();
   await page.getByRole('button', { name: '选择开心表情' }).click();
   await page.keyboard.press('Escape');
   await page.waitForTimeout(600);
-  await page.screenshot({ path: 'D:/chatgpt/qqmusic/melo-character-home.png' });
-  await page.getByRole('button', { name: '与 Melo 互动，眨个眼' }).click();
+  await page.screenshot({ path: `${screenshotDir}/melo-character-home.png` });
+  await page.getByRole('button', { name: /Melo 当前是.*表情；点击让她变成俏皮/ }).click();
   assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'wink');
   const bot=await page.getByRole('button',{name:'和音乐精灵打个招呼'}).boundingBox();
   await page.mouse.move(bot.x+bot.width/2,bot.y+bot.height/2);
@@ -48,36 +82,84 @@ try {
   await page.getByRole('button', { name: '播放陪伴音乐' }).click();
   await page.waitForTimeout(500);
   assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'listen');
+  await page.getByRole('button', { name: '看看 Melo 的心情 ✦' }).click();
+  await page.getByRole('button', { name: '选择关心表情' }).click();
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: '暂停陪伴音乐' }).click();
   await page.waitForTimeout(300);
+  assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'care');
+  await page.getByRole('link', { name: '情绪', exact: true }).click();
+  await page.route('**/api/emotion', route => route.request().method()==='OPTIONS' ? route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'Content-Type,X-Melo-Session'}}) : route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:'application/json',body:JSON.stringify({mood:'bright',reason:'今天的好心情适合一首明亮的歌。',values:[10,15,88]})}));
+  await page.getByLabel('此刻，你感觉怎么样？').fill('我刚完成一件很开心的事。');
+  await page.getByRole('button', { name: '让 Melo 听懂' }).click();
+  await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.expression === 'happy');
+  await page.getByRole('button', { name: '记住这一刻' }).click();
+  await page.waitForFunction(() => document.querySelector('.memory-node') !== null);
+  await page.getByRole('link', { name: '音乐', exact: true }).click();
+  await page.getByRole('button', { name: '收藏当前音乐' }).click();
+  await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.expression === 'love');
+  assert.equal(await page.getByRole('button', { name: '收藏当前音乐' }).getAttribute('aria-pressed'), 'true');
+  await page.getByRole('link', { name: '旅程', exact: true }).click();
+  await page.route('**/api/story', route => route.request().method()==='OPTIONS' ? route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'Content-Type,X-Melo-Session'}}) : route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:'application/json',body:JSON.stringify({event:{id:'test-story',type:'story',payload:{story:'一段验证用的旋律故事。'},createdAt:new Date().toISOString()}})}));
+  await page.getByRole('button', { name: '生成我的音乐故事' }).click();
+  await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.expression === 'surprise');
   await page.getByRole('link', { name: '开始和 Melo 聊聊', exact: true }).click();
-  assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'calm');
+  assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'listen');
+  let releaseChat;
+  const chatGate = new Promise(resolve => { releaseChat = resolve; });
+  await page.route('**/api/chat', async route => {
+    if (route.request().method()==='OPTIONS') return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'Content-Type,X-Melo-Session'}});
+    await chatGate;
+    await route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:'application/json',body:JSON.stringify({reply:'好呀，这个笑话送给你。'})});
+  });
+  await page.getByLabel('给 Melo 的消息').fill('哈哈，给我讲个笑话。');
+  await page.getByRole('button', { name: '发送给 Melo' }).click();
+  await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.expression === 'listen' && document.querySelector('.melo-character')?.dataset.busy === 'true');
+  assert.equal(await page.locator('.together-melo-art').getAttribute('data-expression'), 'listen');
+  releaseChat();
+  await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.expression === 'wink' && document.querySelector('.melo-character')?.dataset.busy === 'false');
+  assert.equal(await page.locator('.together-melo-art').getAttribute('data-expression'), 'wink');
+  await page.locator('.wordmark').first().click();
+  assert.equal(await page.locator('.melo-character').getAttribute('data-expression'), 'wink');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(400);
   assert.equal(await page.locator('.melo-character').getAttribute('data-reduced'), 'true');
   assert.equal(await page.locator('.character-float').evaluate(el => el.getAnimations().length), 0);
+  const tablet = await browser.newPage({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+  tablet.on('pageerror', e => errors.push(e.message));
+  await mockLocalMemory(tablet);
+  await tablet.goto(siteUrl, { waitUntil: 'networkidle' });
+  await tablet.getByRole('button', { name: '看看 Melo 的心情 ✦' }).click();
+  await tablet.getByRole('button', { name: '选择惊喜表情' }).click();
+  assert.equal(await tablet.locator('.melo-character').getAttribute('data-expression'), 'surprise');
+  assert((await tablet.evaluate(() => document.documentElement.scrollWidth)) <= 1024);
+  await tablet.screenshot({ path: `${screenshotDir}/melo-character-tablet.png` });
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   mobile.on('pageerror', e => errors.push(e.message));
   mobile.on('console', e => { if (e.type()==='error') errors.push(e.text()); });
-  await mobile.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle' });
+  await mockLocalMemory(mobile);
+  await mobile.goto(siteUrl, { waitUntil: 'networkidle' });
   await mobile.locator('.melo-character').waitFor();
   await mobile.getByRole('button', { name: '看看 Melo 的心情 ✦' }).click();
   const bounds = await mobile.locator('.expression-picker').boundingBox();
   assert(bounds.x >= 0 && bounds.x + bounds.width <= 391);
+  assert.equal(await mobile.locator('.expression-picker').evaluate(el=>getComputedStyle(el).position), 'fixed');
+  const noticeBounds = await mobile.locator('.pages-notice').boundingBox();
+  assert(noticeBounds.y + noticeBounds.height < bounds.y || noticeBounds.y > bounds.y + bounds.height, 'Mobile status notice must not overlap the expression sheet');
   for (const label of ['开心','俏皮','惊喜','沉浸','温柔','比心','关心']) {
     await mobile.getByRole('button', { name: `选择${label}表情` }).click();
   }
   assert.equal(await mobile.locator('.melo-character').getAttribute('data-expression'), 'care');
   await mobile.waitForTimeout(300);
-  await mobile.screenshot({ path: 'D:/chatgpt/qqmusic/melo-character-mobile.png' });
+  await mobile.screenshot({ path: `${screenshotDir}/melo-character-mobile.png` });
   await mobile.keyboard.press('Escape');
-  await mobile.screenshot({ path: 'D:/chatgpt/qqmusic/melo-character-mobile-home.png' });
+  await mobile.screenshot({ path: `${screenshotDir}/melo-character-mobile-home.png` });
   const character = await mobile.locator('.melo-character').boundingBox();
   assert(character.y + character.height < 844, 'Mobile first viewport must contain complete character');
   const width = await mobile.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
   assert(width.document <= width.viewport);
   assert.deepEqual(errors, []);
-  fs.writeFileSync('character-verification.json', JSON.stringify({ expressions: 7, desktop: true, mobile: true, referenceProportions: proportions, music: true, chatEntry: true, pointerFollow: true, automaticBlink: true, idleAnimation: true, reducedMotion: true, width, errors }, null, 2));
-  console.log('PASS: seven expressions, picker, interaction, audio, chat entry, reduced motion, mobile, no page errors');
+  fs.writeFileSync('character-verification.json', JSON.stringify({ expressions: 7, desktop: true, tablet: true, mobile: true, rapidSwitching: true, sharedChatCharacterState: true, referenceProportions: proportions, music: true, chatEntry: true, pointerFollow: true, automaticBlink: true, idleAnimation: true, reducedMotion: true, width, errors }, null, 2));
+  console.log('PASS: seven expressions, stable character, rapid switching, shared chat state, tablet/mobile, music, reduced motion, no page errors');
 } finally { await browser.close(); }

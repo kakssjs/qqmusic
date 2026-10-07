@@ -20,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <head><link rel="preload" as="image" href="/mascot/melo-reference-cutout.png" fetchPriority="high" /></head>
+      <head>
+        <link rel="preload" as="image" href="/mascot/melo-reference-cutout.webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/mascot/painted-heads.webp" fetchPriority="low" />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );

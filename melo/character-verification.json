@@ -1,7 +1,10 @@
 {
   "expressions": 7,
   "desktop": true,
+  "tablet": true,
   "mobile": true,
+  "rapidSwitching": true,
+  "sharedChatCharacterState": true,
   "referenceProportions": "reference artwork preserved",
   "music": true,
   "chatEntry": true,

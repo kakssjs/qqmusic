@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { tracks, useMeloAudio } from "../useMeloAudio";
 import { useExpression } from '../../../hooks/useExpression';
-import { expressionForMessage } from '../../../data/expressions';
+import { expressionForMessage, expressionForMood, type Expression } from '../../../data/expressions';
 export type MeloRecord = {
   id: string;
   type: string;
@@ -28,7 +28,6 @@ export const moods = [
 ];
 export function useLiveMelo() {
   const { expression, setExpression } = useExpression('wink');
-  const [now, setNow] = useState<Date | null>(null);
   const [records, setRecords] = useState<MeloRecord[]>([]);
   const [ready, setReady] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -43,9 +42,18 @@ export function useLiveMelo() {
   const [reduced, setReduced] = useState(false);
   const audio = useMeloAudio();
   const wasPlaying = useRef(false);
+  const expressionBeforePlayback = useRef<Expression>('calm');
+  const expressionRef = useRef(expression);
   useEffect(() => {
-    if (audio.playing) setExpression('listen');
-    else if (wasPlaying.current) setExpression('calm');
+    expressionRef.current = expression;
+  }, [expression]);
+  useEffect(() => {
+    if (audio.playing && !wasPlaying.current) {
+      expressionBeforePlayback.current = expressionRef.current;
+      setExpression('listen');
+    } else if (!audio.playing && wasPlaying.current && expressionRef.current === 'listen') {
+      setExpression(expressionBeforePlayback.current === 'listen' ? 'calm' : expressionBeforePlayback.current);
+    }
     wasPlaying.current = audio.playing;
   }, [audio.playing, setExpression]);
   const counted = useRef(0);
@@ -72,13 +80,15 @@ export function useLiveMelo() {
     }
   }
   useEffect(() => {
-    setNow(new Date());
-    void load();
+    const initialLoad = setTimeout(() => void load(), 0);
     const media = matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReduced(media.matches);
     update();
     media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
+    return () => {
+      clearTimeout(initialLoad);
+      media.removeEventListener("change", update);
+    };
   }, []);
   async function write(
     type: string,
@@ -99,7 +109,7 @@ export function useLiveMelo() {
     return data.event;
   }
   function chooseMood(id: string) {
-    setExpression(id === 'bright' ? 'happy' : id === 'tired' || id === 'sad' ? 'care' : 'calm');
+    setExpression(expressionForMood(id));
     setMood(id);
     setReason("");
     audio.select(
@@ -111,6 +121,8 @@ export function useLiveMelo() {
   }
   async function analyze() {
     if (!note.trim() || busy) return;
+    const previousExpression = expression;
+    setExpression('listen');
     setBusy("emotion");
     setError("");
     try {
@@ -131,6 +143,7 @@ export function useLiveMelo() {
       setScores(data.values);
       setStatus("Melo 已匹配音乐氛围，你仍然可以自己选择心情。");
     } catch (e) {
+      setExpression(previousExpression);
       setError((e as Error).message);
     } finally {
       setBusy("");
@@ -157,21 +170,24 @@ export function useLiveMelo() {
   }
   async function send() {
     if (!chatDraft.trim() || busy) return;
-    setExpression(expressionForMessage(chatDraft));
+    const message = chatDraft.trim();
+    const previousExpression = expression;
+    setExpression('listen');
     setBusy("chat");
     setError("");
     try {
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: chatDraft, id: crypto.randomUUID() }),
+        body: JSON.stringify({ message, id: crypto.randomUUID() }),
       });
-      const data = (await r.json()) as { error?: string };
+      const data = (await r.json()) as { error?: string; reply?: string };
       if (!r.ok) throw new Error(data.error);
+      setExpression(expressionForMessage(message, data.reply));
       setChatDraft("");
       await load();
-      setExpression('calm');
     } catch (e) {
+      setExpression(previousExpression);
       setError((e as Error).message);
     } finally {
       setBusy("");
@@ -199,6 +215,8 @@ export function useLiveMelo() {
   }
   async function story() {
     if (busy) return;
+    const previousExpression = expression;
+    setExpression('listen');
     setBusy("story");
     setError("");
     try {
@@ -206,8 +224,10 @@ export function useLiveMelo() {
       const data = (await r.json()) as { event: MeloRecord; error?: string };
       if (!r.ok) throw new Error(data.error);
       setRecords((list) => [data.event, ...list]);
+      setExpression('surprise');
       setStatus("你的音乐故事已生成并保存。");
     } catch (e) {
+      setExpression(previousExpression);
       setError((e as Error).message);
     } finally {
       setBusy("");
@@ -247,11 +267,10 @@ export function useLiveMelo() {
       .finally(() => {
         savingTime.current = false;
       });
-  }, [audio.listened, audio.playing, ready]);
+  }, [audio.listened, audio.playing, audio.song.id, ready]);
   return {
     expression,
     setExpression,
-    now,
     records,
     ready,
     connected,

@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, ArrowUp } from "lucide-react";
 import type { LiveMelo } from "./useLiveMelo";
+import { MeloIdentityArt } from "../MeloIdentityArt";
 export function AIChat({ melo }: { melo: LiveMelo }) {
   const viewport = useRef<HTMLDivElement>(null);
   const messages = melo.records
@@ -21,11 +22,15 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
       <div className="together-layout">
         <div className="together-portrait reveal">
           <div className="portrait-aura" />
-          <img
-            src="/mascot/melo-reference-cutout.png"
-            alt="Melo 戴着音乐耳机，向你伸出手"
-            loading="lazy"
-          />
+          <div className="together-melo-window" aria-hidden="true">
+            <MeloIdentityArt
+              className="together-melo-art"
+              expression={melo.expression}
+              reduced={melo.reduced}
+              busy={melo.busy === "chat"}
+              alt=""
+            />
+          </div>
           <div className="portrait-caption">
             <span className="world-live-dot" />
             Melo is here for you
