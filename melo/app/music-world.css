@@ -1119,7 +1119,7 @@
   max-width: 340px;
   line-height: 1.8;
 }
-/* Journey: a few meaningful numbers, not a dashboard. */
+/* Journey: a visual path built from the listener's real moments. */
 .music-world .journey-section {
   background-image:
     radial-gradient(ellipse at 20% 35%, #7fffa10b, transparent 55%),
@@ -1128,120 +1128,544 @@
 .music-world .journey-heading .world-title {
   font-size: clamp(36px, 4vw, 66px);
 }
-.music-world .journey-keywords {
-  margin: 65px 0 75px;
+.music-world .journey-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(340px, 0.86fr);
+  gap: clamp(24px, 4vw, 58px);
+  align-items: stretch;
+  margin-top: 58px;
 }
-.music-world .journey-keywords > span {
-  color: var(--world-muted);
-  font-size: 13px;
+.music-world .journey-keywords {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 440px;
+  margin: 0;
+  padding: clamp(28px, 4vw, 54px);
+  border: 1px solid rgba(180, 255, 208, 0.13);
+  border-radius: 26px;
+  background:
+    radial-gradient(
+      ellipse at 88% 14%,
+      rgba(127, 255, 161, 0.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      ellipse at 5% 100%,
+      rgba(102, 229, 255, 0.08),
+      transparent 42%
+    ),
+    linear-gradient(135deg, rgba(16, 29, 23, 0.92), rgba(9, 14, 12, 0.88));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.035),
+    0 30px 90px #0000001a;
+}
+.music-world .journey-keywords > span:not(.journey-keyword-orbit) {
+  position: relative;
+  z-index: 1;
+  color: rgba(225, 242, 230, 0.66);
+  font-size: 12px;
   letter-spacing: 0;
   display: block;
-  margin: 0 0 28px;
+  margin: 0 0 25px;
+}
+.music-world .journey-keywords > .journey-keyword-orbit {
+  position: absolute;
+  z-index: -1;
+  right: -32px;
+  bottom: -76px;
+  width: 270px;
+  height: 270px;
+  border: 1px solid rgba(127, 255, 161, 0.1);
+  border-radius: 50%;
+  margin: 0;
+}
+.music-world .journey-keyword-orbit::before,
+.music-world .journey-keyword-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 23px;
+  border: 1px solid rgba(127, 255, 161, 0.08);
+  border-radius: 50%;
+}
+.music-world .journey-keyword-orbit::after {
+  inset: 54px;
+}
+.music-world .journey-keyword-orbit i {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--world-mint);
+  box-shadow: 0 0 18px #7fffa188;
+}
+.music-world .journey-keyword-orbit i:nth-child(2) {
+  left: 14%;
+  top: 35%;
+  width: 5px;
+  height: 5px;
+  background: var(--world-green);
+}
+.music-world .journey-keyword-orbit i:nth-child(3) {
+  left: 74%;
+  top: 73%;
+  width: 4px;
+  height: 4px;
 }
 .music-world .journey-keywords > div {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 0;
 }
 .music-world .journey-keywords .journey-word {
   font-family: Manrope, "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: clamp(65px, 10vw, 154px);
+  font-size: clamp(60px, 7.4vw, 112px);
   font-weight: 400;
-  line-height: 1.18;
-  letter-spacing: -0.065em;
+  line-height: 1.08;
+  letter-spacing: -0.075em;
   color: var(--world-fg);
   display: flex;
   align-items: baseline;
-  gap: 24px;
+  gap: 17px;
   margin: 0;
   transform: none;
   overflow-wrap: anywhere;
   max-width: 100%;
 }
 .music-world .journey-keywords .journey-word:nth-child(2) {
-  margin-left: 17%;
+  margin-left: 12%;
   color: var(--world-green);
 }
 .music-world .journey-keywords .journey-word:nth-child(3) {
-  margin-left: 35%;
+  margin-left: 24%;
   color: var(--world-mint);
 }
 .music-world .journey-keywords .journey-word > small {
   font:
-    11px Manrope,
+    10px Manrope,
     sans-serif;
   color: var(--world-muted);
   letter-spacing: 0;
   flex-shrink: 0;
 }
 .music-world .journey-keywords > .world-fineprint {
-  margin-left: 20%;
-  margin-top: 27px;
+  position: relative;
+  z-index: 1;
+  max-width: 300px;
+  margin: 25px 0 0 12%;
+  line-height: 1.75;
+}
+.music-world .journey-route {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 440px;
+  padding: 30px clamp(22px, 2.8vw, 38px) 22px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 26px;
+  background:
+    radial-gradient(
+      ellipse at 100% 0%,
+      rgba(102, 229, 255, 0.09),
+      transparent 34%
+    ),
+    linear-gradient(145deg, rgba(19, 25, 23, 0.88), rgba(9, 12, 11, 0.95));
+}
+.music-world .journey-route-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--world-line);
+}
+.music-world .journey-route-heading > div > span {
+  color: var(--world-mint);
+  font:
+    10px Manrope,
+    sans-serif;
+  letter-spacing: 0.14em;
+}
+.music-world .journey-route-heading h3 {
+  color: var(--world-fg);
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  margin: 9px 0 0;
+}
+.music-world .journey-route-count {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: var(--world-copy);
+  font-size: 10px;
+}
+.music-world .journey-route-count svg {
+  color: var(--world-mint);
+}
+.music-world .journey-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  flex: 1;
+  padding: 9px 0;
+  margin: 0;
+  list-style: none;
+}
+.music-world .journey-timeline::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 28px;
+  bottom: 28px;
+  width: 1px;
+  background: linear-gradient(to bottom, #7fffa14d, #7fffa10b);
+}
+.music-world .journey-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 74px;
+  padding: 10px 0;
+}
+.music-world .journey-timeline-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid rgba(127, 255, 161, 0.22);
+  border-radius: 50%;
+  color: var(--world-mint);
+  background: #101813;
+}
+.music-world .journey-timeline-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.music-world .journey-timeline-copy > span {
+  color: var(--world-muted);
+  font-size: 10px;
+}
+.music-world .journey-timeline-copy > strong {
+  overflow: hidden;
+  color: var(--world-copy);
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.music-world .journey-timeline time {
+  color: var(--world-muted);
+  font:
+    10px Manrope,
+    "PingFang SC",
+    sans-serif;
+  white-space: nowrap;
+}
+.music-world .journey-route-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 245px;
+  text-align: center;
+}
+.music-world .journey-empty-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 42px;
+  margin-bottom: 21px;
+}
+.music-world .journey-empty-wave i {
+  width: 3px;
+  height: 15px;
+  border-radius: 4px;
+  background: linear-gradient(var(--world-mint), #7fffa133);
+}
+.music-world .journey-empty-wave i:nth-child(2),
+.music-world .journey-empty-wave i:nth-child(6) {
+  height: 28px;
+}
+.music-world .journey-empty-wave i:nth-child(3),
+.music-world .journey-empty-wave i:nth-child(5) {
+  height: 38px;
+}
+.music-world .journey-empty-wave i:nth-child(4) {
+  height: 23px;
+  background: var(--world-green);
+}
+.music-world .journey-route-empty p {
+  color: var(--world-fg);
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+.music-world .journey-route-empty > span:last-child {
+  max-width: 250px;
+  color: var(--world-muted);
+  font-size: 11px;
+  line-height: 1.75;
+}
+.music-world .journey-route-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 15px;
+  border-top: 1px solid var(--world-line);
+  color: var(--world-muted);
+  font-size: 10px;
+}
+.music-world .journey-route-foot > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--world-mint);
+  box-shadow: 0 0 10px #7fffa188;
 }
 .music-world .journey-numbers {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  border-top: 1px solid var(--world-line);
-  border-bottom: 1px solid var(--world-line);
-  padding: 45px 0;
-  margin: 0;
+  gap: 14px;
+  margin: 18px 0 0;
 }
-.music-world .journey-numbers > div {
-  border: 0;
-  padding: 0;
+.music-world .journey-stat {
+  position: relative;
+  min-height: 170px;
+  padding: 22px 24px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(17, 23, 20, 0.88),
+    rgba(9, 12, 11, 0.8)
+  );
 }
 .music-world .journey-numbers strong {
   font:
-    400 clamp(60px, 6.9vw, 105px)/1 Manrope,
+    400 clamp(48px, 5.5vw, 76px)/1 Manrope,
     sans-serif;
   letter-spacing: -0.065em;
   color: var(--world-green);
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 9px;
+  margin-top: 13px;
 }
 .music-world .journey-numbers small {
   font:
-    12px Manrope,
+    10px Manrope,
     sans-serif;
   letter-spacing: 0;
   color: var(--world-muted);
 }
-.music-world .journey-numbers span {
+.music-world .journey-stat-icon {
+  position: absolute;
+  top: 20px;
+  right: 21px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(127, 255, 161, 0.16);
+  border-radius: 50%;
+  color: var(--world-mint);
+  background: rgba(127, 255, 161, 0.045);
+}
+.music-world .journey-stat-label {
   display: block;
-  font-size: 13px;
+  color: var(--world-muted);
+  font:
+    9px Manrope,
+    sans-serif;
+  letter-spacing: 0.12em;
+}
+.music-world .journey-stat-caption {
+  display: block;
+  font-size: 11px;
   color: var(--world-copy);
-  margin: 20px 0 0;
+  margin: 10px 0 0;
   letter-spacing: 0;
 }
 .music-world .your-music-story {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  align-items: center;
+  gap: 35px;
+  overflow: hidden;
+  max-width: none;
+  min-height: 315px;
+  border: 1px solid rgba(127, 255, 161, 0.17);
+  border-radius: 26px;
+  padding: clamp(28px, 5vw, 58px);
+  margin: 52px 0 0;
   text-align: left;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  background: none;
-  max-width: 780px;
-  padding: 0;
-  margin: 65px 0 0;
+  background:
+    radial-gradient(
+      ellipse at 90% 50%,
+      rgba(127, 255, 161, 0.105),
+      transparent 35%
+    ),
+    linear-gradient(120deg, rgba(17, 28, 22, 0.95), rgba(9, 13, 11, 0.95));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
 }
-.music-world .your-music-story > span {
-  font:
-    12px Manrope,
-    sans-serif;
-  letter-spacing: 0;
+.music-world .journey-story-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+}
+.music-world .journey-story-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: var(--world-mint);
+  font:
+    11px Manrope,
+    sans-serif;
+  letter-spacing: 0.01em;
+}
+.music-world .journey-story-kicker svg {
+  color: var(--world-green);
+}
+.music-world .journey-story-copy h3 {
+  color: var(--world-fg);
+  font-size: clamp(23px, 2.4vw, 33px);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  margin: 20px 0 0;
 }
 .music-world .your-music-story > p:not(.world-fineprint) {
-  font-size: 20px;
+  font-size: 16px;
   color: var(--world-copy);
-  line-height: 1.95;
+  line-height: 1.9;
   font-weight: 400;
-  margin: 25px 0 30px;
+  margin: 16px 0 23px;
   text-align: left;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+.music-world .your-music-story .world-button {
+  min-height: 48px;
+}
+.music-world .your-music-story .world-fineprint {
+  margin-top: 15px;
+}
+.music-world .journey-story-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 250px;
+  height: 220px;
+  justify-self: center;
+}
+.music-world .journey-story-disc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 178px;
+  height: 178px;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle,
+      transparent 0 10px,
+      rgba(255, 255, 255, 0.045) 11px 12px
+    ),
+    radial-gradient(circle at 35% 30%, #23362a, #0a100c 63%);
+  box-shadow:
+    0 0 0 12px rgba(127, 255, 161, 0.025),
+    0 0 55px #7fffa11a;
+  animation: journey-disc-spin 24s linear infinite;
+}
+.music-world .journey-story-disc::before {
+  content: "";
+  position: absolute;
+  inset: 47%;
+  border: 5px solid #c8ff32;
+  border-radius: 50%;
+  background: #080c09;
+  box-shadow: 0 0 18px #c8ff3255;
+}
+.music-world .journey-story-disc i {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--world-mint);
+  box-shadow: 0 0 14px #7fffa188;
+}
+.music-world .journey-story-disc i:nth-child(1) {
+  top: 28px;
+  left: 78px;
+}
+.music-world .journey-story-disc i:nth-child(2) {
+  right: 25px;
+  bottom: 53px;
+  width: 6px;
+  height: 6px;
+  background: #9fe8ff;
+}
+.music-world .journey-story-disc i:nth-child(3) {
+  left: 33px;
+  bottom: 43px;
+  width: 4px;
+  height: 4px;
+}
+.music-world .journey-story-spark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--world-green);
+  box-shadow: 0 0 15px #c8ff3277;
+}
+.music-world .journey-story-spark-one {
+  top: 30px;
+  right: 30px;
+}
+.music-world .journey-story-spark-two {
+  bottom: 20px;
+  left: 16px;
+  width: 3px;
+  height: 3px;
+  background: #9fe8ff;
+}
+.music-world .journey-story-note {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  color: rgba(234, 255, 240, 0.58);
+  font:
+    9px/1.6 Manrope,
+    sans-serif;
+  letter-spacing: 0.17em;
+  transform: rotate(-8deg);
+}
+@keyframes journey-disc-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 /* Ending: a final invitation, not a contact form. */
 .music-world .ending-section {
@@ -1948,5 +2372,253 @@
   .music-world .reveal {
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* Responsive Journey card layout. */
+@media (max-width: 1100px) {
+.music-world .journey-numbers {
+    gap: 12px;
+  }
+.music-world .journey-board {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+    gap: 18px;
+  }
+.music-world .journey-keywords,
+  .music-world .journey-route {
+    min-height: 390px;
+  }
+.music-world .journey-keywords {
+    padding: 29px;
+  }
+.music-world .journey-keywords .journey-word {
+    font-size: clamp(58px, 8vw, 88px);
+  }
+.music-world .journey-route {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+.music-world .journey-timeline li {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 10px;
+  }
+.music-world .journey-timeline time {
+    grid-column: 2;
+    margin-top: -4px;
+  }
+.music-world .journey-timeline-icon {
+    grid-row: span 2;
+    width: 32px;
+    height: 32px;
+  }
+.music-world .journey-timeline::before {
+    left: 15px;
+  }
+.music-world .journey-story-art {
+    width: 210px;
+  }
+.music-world .your-music-story {
+    grid-template-columns: minmax(0, 1fr) 210px;
+    gap: 18px;
+  }
+}
+@media (max-width: 760px) {
+.music-world .journey-heading .world-title {
+    font-size: 34px;
+  }
+.music-world .journey-heading .world-title > span {
+    display: block;
+  }
+.music-world .journey-board {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 31px;
+  }
+.music-world .journey-keywords {
+    min-height: 310px;
+    padding: 25px 21px;
+    border-radius: 21px;
+  }
+.music-world .journey-keywords > span:not(.journey-keyword-orbit) {
+    font-size: 11px;
+    margin-bottom: 22px;
+  }
+.music-world .journey-keywords .journey-word {
+    font-size: clamp(55px, 16vw, 84px);
+    gap: 12px;
+    line-height: 1.15;
+  }
+.music-world .journey-keywords .journey-word:nth-child(2) {
+    margin-left: 10%;
+  }
+.music-world .journey-keywords .journey-word:nth-child(3) {
+    margin-left: 19%;
+  }
+.music-world .journey-keywords .journey-word > small {
+    font-size: 9px;
+  }
+.music-world .journey-keywords > .world-fineprint {
+    margin-left: 0;
+    max-width: 280px;
+  }
+.music-world .journey-keyword-orbit {
+    width: 205px;
+    height: 205px;
+    right: -71px;
+    bottom: -59px;
+  }
+.music-world .journey-route {
+    min-height: 0;
+    padding: 22px 18px 17px;
+    border-radius: 21px;
+  }
+.music-world .journey-route-heading {
+    padding-bottom: 18px;
+  }
+.music-world .journey-route-heading h3 {
+    font-size: 20px;
+  }
+.music-world .journey-route-count {
+    font-size: 9px;
+    padding: 7px 8px;
+  }
+.music-world .journey-timeline {
+    padding: 7px 0;
+  }
+.music-world .journey-timeline::before {
+    left: 15px;
+    top: 22px;
+    bottom: 22px;
+  }
+.music-world .journey-timeline li {
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 9px;
+    min-height: 68px;
+    padding: 8px 0;
+  }
+.music-world .journey-timeline-icon {
+    grid-row: auto;
+    width: 32px;
+    height: 32px;
+  }
+.music-world .journey-timeline-copy > strong {
+    font-size: 11px;
+  }
+.music-world .journey-timeline time {
+    grid-column: auto;
+    margin-top: 0;
+    font-size: 9px;
+  }
+.music-world .journey-route-empty {
+    min-height: 195px;
+  }
+.music-world .journey-route-foot {
+    font-size: 9px;
+  }
+.music-world .journey-numbers {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    margin-top: 15px;
+  }
+.music-world .journey-stat {
+    min-height: 118px;
+    padding: 15px 18px 13px;
+    border-radius: 15px;
+  }
+.music-world .journey-numbers strong {
+    font-size: 51px;
+    gap: 7px;
+    margin-top: 8px;
+  }
+.music-world .journey-numbers small {
+    font-size: 9px;
+  }
+.music-world .journey-stat-icon {
+    top: 14px;
+    right: 16px;
+    width: 30px;
+    height: 30px;
+  }
+.music-world .journey-stat-label {
+    font-size: 8px;
+  }
+.music-world .journey-stat-caption {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+.music-world .your-music-story {
+    grid-template-columns: 1fr;
+    gap: 0;
+    min-height: 0;
+    padding: 26px 21px 16px;
+    margin-top: 26px;
+    border-radius: 21px;
+  }
+.music-world .your-music-story > p:not(.world-fineprint) {
+    font-size: 15px;
+    line-height: 1.85;
+    margin: 15px 0 21px;
+  }
+.music-world .journey-story-copy h3 {
+    font-size: 22px;
+    margin-top: 15px;
+  }
+.music-world .journey-story-kicker {
+    font-size: 10px;
+  }
+.music-world .journey-story-art {
+    width: 100%;
+    height: 142px;
+    justify-self: stretch;
+  }
+.music-world .journey-story-disc {
+    width: 124px;
+    height: 124px;
+  }
+.music-world .journey-story-disc::before {
+    border-width: 4px;
+  }
+.music-world .journey-story-disc i:nth-child(1) {
+    top: 18px;
+    left: 54px;
+  }
+.music-world .journey-story-disc i:nth-child(2) {
+    right: 17px;
+    bottom: 38px;
+  }
+.music-world .journey-story-disc i:nth-child(3) {
+    left: 22px;
+    bottom: 30px;
+  }
+.music-world .journey-story-note {
+    right: 8%;
+    bottom: 4px;
+  }
+}
+@media (max-width: 370px) {
+.music-world .journey-keywords .journey-word {
+    font-size: 52px;
+  }
+.music-world .journey-keywords {
+    padding: 22px 18px;
+  }
+.music-world .journey-keywords .journey-word {
+    font-size: 50px;
+  }
+.music-world .journey-timeline li {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
+  }
+.music-world .journey-timeline-icon {
+    grid-row: span 2;
+    width: 30px;
+    height: 30px;
+  }
+.music-world .journey-timeline time {
+    grid-column: 2;
+    margin-top: -5px;
+  }
+.music-world .journey-timeline::before {
+    left: 14px;
   }
 }
