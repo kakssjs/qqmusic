@@ -1,0 +1,38 @@
+{
+  "errors": [],
+  "hero": [
+    {
+      "width": 1440,
+      "unchanged": true
+    },
+    {
+      "width": 390,
+      "unchanged": true
+    }
+  ],
+  "mobile": [
+    {
+      "width": 390,
+      "noOverflow": true,
+      "menu": true
+    }
+  ],
+  "functions": {
+    "emotion": true,
+    "save": true,
+    "chat": true,
+    "audio": true,
+    "seek": true,
+    "volume": true,
+    "skip": true,
+    "favorite": true,
+    "story": true,
+    "deleteCancel": true
+  },
+  "lenis": {
+    "early": 239,
+    "later": 577,
+    "smooth": true
+  },
+  "reducedMotion": true
+}

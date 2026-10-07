@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.vinext/
+dist/
+.wrangler/
+.sites-runtime/
+.env*
+.dev.vars*
+*.pem
+*.key
+*.tar.gz
+*.log
+.DS_Store

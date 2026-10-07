@@ -1,0 +1,92 @@
+{
+  "video": {
+    "ready": 4,
+    "paused": false,
+    "muted": true,
+    "loop": true,
+    "inline": true,
+    "time": 1.225206,
+    "position": "50% 50%"
+  },
+  "content": "MEET YOUR MUSIC COMPANION\n\nMelo\n\nAI音乐陪伴伙伴\n\n有时候，你需要的不是一首歌，\n而是一位懂你的朋友。\n开始和 Melo 聊聊\n✳\nEmotion AI\nMusic Companion\nMemory\nSCROLL TO CONNECT",
+  "font": {
+    "font": "Geist, system-ui, \"Microsoft YaHei\", sans-serif",
+    "geist": [
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "loading",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "loading",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "loading",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "loading",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "unloaded",
+      "loading"
+    ]
+  },
+  "lenis": {
+    "present": true,
+    "early": 202,
+    "later": 565,
+    "inertia": true
+  },
+  "anchor": {
+    "hash": "#emotion",
+    "top": 90.078125,
+    "focus": "emotion"
+  },
+  "product": {
+    "chat": 1,
+    "emotion": 1,
+    "music": 1,
+    "memory": 1,
+    "journey": 1
+  },
+  "reduced": {
+    "mode": "reduced",
+    "lenis": false,
+    "videoPaused": true,
+    "revealsVisible": true
+  },
+  "reducedAnchor": {
+    "hash": "#music",
+    "top": 90.34375
+  },
+  "mobile": {
+    "width": 390,
+    "documentWidth": 390,
+    "heroHeight": 844,
+    "videoPosition": "70% 50%",
+    "paused": true
+  },
+  "menu": {
+    "overflow": "hidden",
+    "width": 280,
+    "focused": "BUTTON"
+  },
+  "escape": {
+    "overflow": "",
+    "focus": null
+  },
+  "mobileAnchor": {
+    "hash": "#chat",
+    "top": 90,
+    "overflow": ""
+  },
+  "errors": []
+}

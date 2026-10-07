@@ -1,0 +1,54 @@
+{
+  "initial": {
+    "title": "Melo — 让音乐听懂你的情绪",
+    "scroll": 0,
+    "lenis": true,
+    "width": 1440
+  },
+  "smoothWheel": {
+    "early": 217,
+    "later": 622,
+    "inertia": true
+  },
+  "anchor": {
+    "hash": "#emotion",
+    "top": 90.078125,
+    "focus": "emotion"
+  },
+  "emotion": "疲惫信号\n60%\n压力信号\n40%\n放松需求\n80%",
+  "reason": "练习后的疲惫需要缓冲，轻柔的旋律能安抚紧绷的神经，助你回归宁静。",
+  "chatStatus": 200,
+  "chatMemory": "✳\n\n钢琴\n\n18:14",
+  "audio": {
+    "progress": "1.7",
+    "wave": true
+  },
+  "seek": "40.2",
+  "favorite": "true",
+  "storyStatus": 200,
+  "story": "琴弦余音未绝，指尖尚带练琴的微痛。从吉他的指弹到钢琴的黑白键，你在旋律中穿梭。疲惫如潮水般涌来，你放下乐谱，只想让一段安静的旋律洗去尘埃。在音符的间隙，你找到了片刻的喘息，那是疲惫过后最温柔的自我疗愈。",
+  "keywords": "2026 · YOUR WORDS\n01\n吉他\n02\n钢琴\n03\n休息",
+  "persisted": "2026/10/07\n平静\n验证记录：今天完成了钢琴练习，感到有些疲惫，想安静听一会音乐。\n再听一次这个瞬间\n2026/10/07\n疲惫\n验证记录：今天完成了钢琴练习，感到有些疲惫，想安静听一会音乐。\n再听一次这个瞬间\n2026/10/07\n疲惫\n今天练习吉他很累，但弹完一首曲子很满足。\n再听一次这个瞬间",
+  "listened": "0分钟\n一起听音乐的时间\n1天\n从第一次留下记录开始\n3个\n被记住的心情瞬间",
+  "errors": [],
+  "reduced": {
+    "mode": "reduced",
+    "lenis": false,
+    "particles": "none",
+    "animation": "none",
+    "revealsVisible": true
+  },
+  "reducedAnchor": {
+    "hash": "#memory",
+    "top": 89.734375
+  },
+  "mobile": {
+    "width": 390,
+    "documentWidth": 390,
+    "scroll": 0
+  },
+  "mobileNav": {
+    "hash": "#chat",
+    "open": false
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "390": {
+    "#home": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 845.4375,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".cloud-title": {
+      "x": 24,
+      "y": 125,
+      "width": 342,
+      "height": 72,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "72px",
+      "color": "rgb(245, 245, 247)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".cloud-statement": {
+      "x": 24,
+      "y": 250,
+      "width": 342,
+      "height": 31.25,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "25px",
+      "color": "rgb(246, 247, 248)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".character-copy": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".character-stage": {
+      "x": 24,
+      "y": 338.4375,
+      "width": 342,
+      "height": 365,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".canonical-character-art": {
+      "x": 87,
+      "y": 338.4375,
+      "width": 243.328125,
+      "height": 364.984375,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".cloud-video": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 845.4375,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 65%, rgba(0, 0, 0, 0) 88%)",
+      "filter": "url(\"#melo-cloud-color\") brightness(1.15) contrast(1.06)"
+    }
+  },
+  "1440": {
+    "#home": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 960,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".cloud-title": {
+      "x": 54.71875,
+      "y": 239.078125,
+      "width": 604.796875,
+      "height": 140.265625,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "137.52px",
+      "color": "rgb(245, 245, 247)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".cloud-statement": {
+      "x": 54.71875,
+      "y": 476.71875,
+      "width": 604.796875,
+      "height": 52.203125,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "41.76px",
+      "color": "rgb(246, 247, 248)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".character-copy": {
+      "x": 54.71875,
+      "y": 207.359375,
+      "width": 604.796875,
+      "height": 556.296875,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".character-stage": {
+      "x": 504,
+      "y": 158.390625,
+      "width": 691.203125,
+      "height": 772.796875,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".canonical-character-art": {
+      "x": 632.59375,
+      "y": 158.390625,
+      "width": 510.03125,
+      "height": 765.046875,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "none",
+      "filter": "none"
+    },
+    ".cloud-video": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 960,
+      "font": "Geist, \"Microsoft YaHei\", sans-serif",
+      "fontSize": "16px",
+      "color": "rgb(243, 246, 239)",
+      "opacity": "1",
+      "mask": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 68%, rgba(0, 0, 0, 0) 86%)",
+      "filter": "url(\"#melo-cloud-color\") brightness(1.15) contrast(1.06)"
+    }
+  }
+}

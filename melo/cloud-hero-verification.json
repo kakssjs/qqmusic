@@ -1,0 +1,15 @@
+{
+  "originalVideoPreserved": true,
+  "video": {
+    "paused": false,
+    "muted": true,
+    "loop": true,
+    "inline": true,
+    "filter": "url(\"#melo-cloud-color\") brightness(1.15) contrast(1.06)",
+    "opacity": "1",
+    "mask": "linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 68%, rgba(0, 0, 0, 0) 86%)"
+  },
+  "reducedMotion": true,
+  "mobile": true,
+  "errors": []
+}

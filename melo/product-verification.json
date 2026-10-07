@@ -1,0 +1,29 @@
+{
+  "session": {
+    "status": 200,
+    "data": {
+      "user": {
+        "name": "Seedy"
+      },
+      "events": [],
+      "aiConnected": true
+    }
+  },
+  "moodSong": "月光停靠\n\n把疲惫交给夜晚",
+  "audio": {
+    "pauseButton": 1,
+    "progress": "1.4"
+  },
+  "seek": "30.3",
+  "favorite": "true",
+  "persisted": "10月7日\n17:57\n疲惫\n今天练习吉他很累，但弹完一首曲子很满足。\n再听一次这段心情",
+  "realAI": "✳\n\n记得，你今天练习了吉他。\n\n17:57",
+  "chatPersisted": 1,
+  "saved": "♡\n月光停靠\n把疲惫交给夜晚",
+  "mobile": {
+    "width": 390,
+    "documentWidth": 390,
+    "motion": true
+  },
+  "errors": []
+}

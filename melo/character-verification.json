@@ -1,0 +1,17 @@
+{
+  "expressions": 7,
+  "desktop": true,
+  "mobile": true,
+  "referenceProportions": "reference artwork preserved",
+  "music": true,
+  "chatEntry": true,
+  "pointerFollow": true,
+  "automaticBlink": true,
+  "idleAnimation": true,
+  "reducedMotion": true,
+  "width": {
+    "viewport": 390,
+    "document": 390
+  },
+  "errors": []
+}

@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791366470124,
+      "tag": "0000_tricky_jigsaw",
+      "breakpoints": true
+    }
+  ]
+}

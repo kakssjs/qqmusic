@@ -1,0 +1,155 @@
+@font-face {
+  font-family: MeloSans;
+  src: local("Inter"), local("Arial");
+  font-display: swap;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  background: #050505;
+  scroll-padding-top: 90px;
+}
+body {
+  margin: 0;
+  background: #050505;
+  color: #f5f0fa;
+  font-family: MeloSans, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+textarea,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a,
+input,
+textarea {
+  outline-offset: 6px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #bdabed;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+  min-width: 0;
+}
+em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+::selection {
+  background: #8264b0;
+  color: white;
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 12px;
+  letter-spacing: 0.19em;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #aaa1b4;
+}
+.wordmark {
+  font-size: 28px;
+  letter-spacing: -1.8px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.wordmark span {
+  font-size: 22px;
+  color: #bdb0e4;
+  margin-left: 6px;
+}
+.glass {
+  border: 1px solid #ffffff17;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #18121ead, #08060bc9);
+  box-shadow: 0 32px 100px #0006;
+  backdrop-filter: blur(20px);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 10px;
+  left: 10px;
+  transform: translateY(-180%);
+  background: white;
+  color: black;
+  padding: 14px;
+}
+.skip-link:focus {
+  transform: none;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes particle {
+  50% {
+    transform: translate(9px, -16px);
+    opacity: 0.2;
+  }
+}
+@keyframes scrollPulse {
+  50% {
+    opacity: 0.25;
+    transform: translateY(5px);
+  }
+}
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *:before,
+html[data-motion="reduced"] *:after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

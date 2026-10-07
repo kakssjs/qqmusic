@@ -1,0 +1,40 @@
+{
+  "title": "Melo — 让音乐听懂你的情绪",
+  "lenis": true,
+  "triggers": 18,
+  "anchor": {
+    "hash": "#experience",
+    "top": 170,
+    "focused": "experience"
+  },
+  "emotion": "喜悦\n91%\n压力\n22%\n需要陪伴\n68%",
+  "chat": "✳\n\n这一刻值得被记住。\n让我们用一首明亮的旋律，庆祝你的努力。",
+  "audio": {
+    "paused": false,
+    "time": 0.304777,
+    "duration": 90
+  },
+  "gallery": "AI聊天 · 让表达被听见，让重要的瞬间被记住。",
+  "journey": "CHAPTER 03 · 示例旅程\n\n走过的路，都成为下一段旋律。",
+  "horizontal": 347,
+  "reduced": {
+    "mode": "reduced",
+    "lenis": false,
+    "particles": "none",
+    "animation": "none",
+    "revealsVisible": true
+  },
+  "reducedAnchor": {
+    "hash": "#journey",
+    "top": 90.203125
+  },
+  "mobile": {
+    "width": 390,
+    "documentWidth": 390
+  },
+  "mobileNav": {
+    "hash": "#showcase",
+    "open": false
+  },
+  "errors": []
+}
