@@ -560,9 +560,10 @@
   },
   "runtimeArtifacts": {
     "css": "index-CJ7a5r58.css",
-    "jsSha256": "E567E17DA83946952AB55B26106292235DE6A4B8C695974CA5B66D6F37D3AF3F",
-    "cssSha256": "7E11FC5BEB1CE380511AD79C706B0A10B623D04A9ACB9506FAFC8D039482C01B",
-    "js": "index-D4Ca-aGf.js"
+    "jsSha256": "ECA9F3AE3FD161586B2C61D037690DB637E37FF83DE6DF5A8AAB3373F815B830",
+    "cssSha256": "743E4EEAA5F519DDE26A74349C2C7B0D04C35037458B72589C274E68C4A0DA5A",
+    "js": "index-D4Ca-aGf.js",
+    "lineEndings": "LF (Git deployment)"
   },
   "limits": [
     "Physical phone lock-screen audio is not verified; mobile Chromium viewport checks passed.",
