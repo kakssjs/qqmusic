@@ -1,10 +1,12 @@
 import { findTrack } from './music/catalog.ts';
+import type { MoodJourneyRoute } from '../lib/music/mood-journey.ts';
 export type MeloRecord = {
   id: string;
   type: string;
   payload: {
     momentId?: string;
     momentAt?: string;
+    journey?: MoodJourneyRoute;
     catalogTrackId?: string;
     playlist?: string[];
     mix?: { id: string; title: string; subtitle: string; tracks: string[]; generatedAt: string; reason: string };

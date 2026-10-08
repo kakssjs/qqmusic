@@ -1,0 +1,126 @@
+/* Primitive palette, semantic contrast and shared scale. */
+:root {
+  --melo-green: #c8ff32;
+  --melo-mint: #a5e8b8;
+  --melo-ink: #07100c;
+  --melo-deep: #111c18;
+  --melo-cloud: #aebec6;
+  --melo-fog: #e1e6e3;
+  --melo-text: #f4f7f3;
+  --melo-muted: #b6c5bc;
+  --melo-border: #aebec633;
+  --melo-space: clamp(72px, 9vw, 136px);
+  --melo-gutter: clamp(22px, 6vw, 92px);
+  --melo-title: clamp(38px, 5.4vw, 78px);
+  --scene-fg: var(--melo-text);
+  --scene-copy: var(--melo-muted);
+  --scene-line: var(--melo-border);
+  --scene-accent: var(--melo-green);
+}
+html {
+  background: var(--melo-ink);
+  scroll-padding-top: 90px;
+}
+body {
+  margin: 0;
+  background: var(--melo-ink);
+  color: var(--melo-text);
+  font-family: Inter, system-ui, "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+* {
+  box-sizing: border-box;
+}
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+  color: #98aaa0;
+  background: #1b2924;
+  border-color: #8ba19545;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--scene-accent, var(--melo-green));
+  outline-offset: 5px;
+}
+::selection {
+  color: #07100c;
+  background: #a5e8b8;
+}
+input[type="range"] {
+  accent-color: var(--melo-green);
+  min-width: 0;
+  cursor: pointer;
+}
+svg {
+  flex-shrink: 0;
+}
+img {
+  max-width: 100%;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  transform: translateY(-180%);
+  background: var(--melo-green);
+  color: #07100c;
+  padding: 12px 18px;
+}
+.skip-link:focus {
+  transform: none;
+}
+.wordmark {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 30px;
+  font-weight: 650;
+  letter-spacing: -1.6px;
+  white-space: nowrap;
+}
+.wordmark svg,
+.wordmark img {
+  width: 25px;
+  height: 25px;
+}
+.wordmark > span {
+  display: inline-flex;
+}

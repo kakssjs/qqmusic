@@ -3,7 +3,7 @@ import { QQMusicIcon } from "../QQMusicIcon";
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, ArrowUp } from "lucide-react";
 import type { LiveMelo } from "./useLiveMelo";
-import { MeloIdentityArt } from "../MeloIdentityArt";
+import { CharacterPresence } from "../CharacterPresence";
 export function AIChat({ melo }: { melo: LiveMelo }) {
   const viewport = useRef<HTMLDivElement>(null);
   const messages = melo.records
@@ -15,7 +15,11 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
       viewport.current.scrollTop = viewport.current.scrollHeight;
   }, [messages.length, melo.busy]);
   return (
-    <section id="chat" className="world-section together-section" data-flow-ready={melo.flowReady && !melo.busy}>
+    <section
+      id="chat"
+      className="world-section together-section"
+      data-flow-ready={melo.flowReady && !melo.busy}
+    >
       <div className="world-section-meta reveal">
         <span>01 / Talk</span>
         <span>不用一直很勇敢</span>
@@ -23,15 +27,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
       <div className="together-layout">
         <div className="together-portrait reveal">
           <div className="portrait-aura" />
-          <div className="together-melo-window" aria-hidden="true">
-            <MeloIdentityArt
-              className="together-melo-art"
-              expression={melo.expression}
-              reduced={melo.reduced}
-              busy={melo.busy === "chat"}
-              alt=""
-            />
-          </div>
+          <CharacterPresence melo={melo} className="talk-character" />
           <div className="portrait-caption">
             <span className="world-live-dot" />
             Melo is here for you
@@ -89,7 +85,13 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
                 <div key={e.id} className={"live-message " + e.payload.role}>
                   <span>{e.payload.role === "assistant" ? "Melo" : "你"}</span>
                   <div>
-                    <div className="reply-paragraphs">{e.payload.content?.split(/\n\s*\n/).map((part,i)=><p key={i} style={{animationDelay:`${i*160}ms`}}>{part}</p>)}</div>
+                    <div className="reply-paragraphs">
+                      {e.payload.content?.split(/\n\s*\n/).map((part, i) => (
+                        <p key={i} style={{ animationDelay: `${i * 160}ms` }}>
+                          {part}
+                        </p>
+                      ))}
+                    </div>
                     <small>
                       {new Date(e.createdAt).toLocaleTimeString("zh-CN", {
                         hour: "2-digit",
@@ -102,17 +104,73 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             ) : (
               <div className="conversation-opening">
                 <h3>Melo 想先了解一下现在的你。</h3>
-                <div className="onboarding-choices">{[['😌','想放松一下','我想放松一下，慢慢从紧绷中退出。'],['🥱','今天有点累','今天有点累，想让节奏慢下来。'],['✨','心情很好','今天心情很好，想听一点轻盈的旋律。'],['🌙','只是想找首适合现在的歌','想给现在找一首歌，你先陪我聊聊吧。']].map(([icon,label,text])=><button key={label} aria-label={label} disabled={!melo.ready||!!melo.busy} onClick={()=>void melo.send(text)}><span aria-hidden="true">{icon}</span>{label}<ArrowUpRight size={14}/></button>)}</div>
+                <div className="onboarding-choices">
+                  {[
+                    ["😌", "想放松一下", "我想放松一下，慢慢从紧绷中退出。"],
+                    ["🥱", "今天有点累", "今天有点累，想让节奏慢下来。"],
+                    ["✨", "心情很好", "今天心情很好，想听一点轻盈的旋律。"],
+                    [
+                      "🌙",
+                      "只是想找首适合现在的歌",
+                      "想给现在找一首歌，你先陪我聊聊吧。",
+                    ],
+                  ].map(([icon, label, text]) => (
+                    <button
+                      key={label}
+                      aria-label={label}
+                      disabled={!melo.ready || !!melo.busy}
+                      onClick={() => void melo.send(text)}
+                    >
+                      <span aria-hidden="true">{icon}</span>
+                      {label}
+                      <ArrowUpRight size={14} />
+                    </button>
+                  ))}
+                </div>
                 <p className="world-fineprint">或者，直接告诉 Melo。</p>
               </div>
             )}
             {(melo.busy === "chat" || melo.busy === "emotion") && (
               <p className="thinking" role="status">
-                <span>{<QQMusicIcon />}</span> {melo.busy==='chat'?'我在听。你不用急着整理好所有话。':'我在把这段心情，和适合你的旋律连起来。'}
+                <span>{<QQMusicIcon />}</span>{" "}
+                {melo.busy === "chat"
+                  ? "我在听。你不用急着整理好所有话。"
+                  : "我在把这段心情，和适合你的旋律连起来。"}
               </p>
             )}
           </div>
-          {messages.length>0 && <div className="chat-next-steps"><span>你现在更想…</span><button disabled={!!melo.busy} onClick={()=>void melo.send('我想先安静一会，听一点柔和的音乐。')}>安静一会</button><button disabled={!!melo.busy} onClick={()=>void melo.send('给我点能量，想重新找回一点状态。')}>给我点能量</button>{melo.flowReady&&<a href="#music" className="world-text-button">听听这首歌</a>}</div>}
+          {messages.length > 0 && (
+            <div className="chat-next-steps">
+              <span>听完这段音乐，你希望更接近…</span>
+              <button
+                disabled={!!melo.busy}
+                onClick={() => {
+                  melo.startJourney("quiet");
+                  document.getElementById("mood-journey")?.scrollIntoView({
+                    behavior: melo.reduced ? "auto" : "smooth",
+                  });
+                }}
+              >
+                安静下来
+              </button>
+              <button
+                disabled={!!melo.busy}
+                onClick={() => {
+                  melo.startJourney("energy");
+                  document.getElementById("mood-journey")?.scrollIntoView({
+                    behavior: melo.reduced ? "auto" : "smooth",
+                  });
+                }}
+              >
+                找回一点能量
+              </button>
+              {melo.flowReady && (
+                <a href="#music" className="world-text-button">
+                  听听这首歌
+                </a>
+              )}
+            </div>
+          )}
           <form
             className="live-chat-compose"
             onSubmit={(e) => {
@@ -139,25 +197,25 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             />
             <button
               aria-label="发送给 Melo"
-              disabled={
-                !!melo.busy ||
-                !melo.ready ||
-                !melo.chatDraft.trim()
-              }
+              disabled={!!melo.busy || !melo.ready || !melo.chatDraft.trim()}
             >
               <ArrowUp size={21} />
             </button>
           </form>
           <p className="live-chat-note">
-            {melo.connectionState === "unconfigured"
-              ? "AI 服务尚未配置；你仍可体验情绪选择与音乐。"
-              : melo.connectionState === "offline"
-                ? "AI 服务暂时连接不上；可点击上方重试，或继续听音乐。"
-                : melo.modelState === "ready"
-                  ? "最近一次成功回复已保存在云端。"
-                  : melo.modelState === "error"
-                    ? "服务已配置，但最近一次模型调用失败；请查看提示信息。"
-                    : "服务端已配置；首次成功回复后会显示模型状态。"}
+            {melo.demo
+              ? "演示回复为预设脚本，记录独立保存在本机。"
+              : melo.connectionState === "unconfigured"
+                ? "AI 服务尚未配置；你仍可体验情绪选择与音乐。"
+                : melo.connectionState === "offline"
+                  ? "AI 服务暂时连接不上；可点击上方重试，或继续听音乐。"
+                  : melo.modelState === "ready"
+                    ? melo.storageMode === "cloud"
+                      ? "最近一次成功回复已保存在云端。"
+                      : "最近一次回复保留在本机，云端恢复后可以同步。"
+                    : melo.modelState === "error"
+                      ? "服务已配置，但最近一次模型调用失败；请查看提示信息。"
+                      : "服务端已配置；首次成功回复后会显示模型状态。"}
             {melo.connected && <span>Shift + Enter 换行</span>}
           </p>
         </div>

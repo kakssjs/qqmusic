@@ -1,4 +1,4 @@
-import { findTrack, type Playlist } from '../../data/music/catalog';
+import { findTrack, type Playlist } from '../../data/music/catalog.ts';
 import type { MeloRecord } from '../../data/experience';
 export function transportPayload(payload:MeloRecord['payload']) {
   const id=payload.catalogTrackId||payload.track;

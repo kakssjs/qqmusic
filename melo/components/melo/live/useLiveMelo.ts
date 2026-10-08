@@ -1,4 +1,6 @@
 "use client";
+import { characterMode } from "../../../lib/character-mode";
+import { adjustMoodJourney } from "../../../lib/music/mood-journey";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { tracks, useMeloAudio } from "../useMeloAudio";
 import { useExpression } from "../../../hooks/useExpression";
@@ -19,9 +21,27 @@ import {
   localRecords,
   keepLocal,
 } from "../../../data/demo";
-import { catalog, type Playlist } from '../../../data/music/catalog';
-import { recommend, parseIntent, buildMix, preferencesFromRecords, recordTrack, differentTracks } from '../../../lib/music/recommendation';
-import { transportPayload, normalizeRecord, likedMixes } from '../../../lib/music/persistence';
+import { catalog, type Playlist } from "../../../data/music/catalog";
+import {
+  recommend,
+  parseIntent,
+  buildMix,
+  preferencesFromRecords,
+  recordTrack,
+  differentTracks,
+} from "../../../lib/music/recommendation";
+import {
+  transportPayload,
+  normalizeRecord,
+  likedMixes,
+} from "../../../lib/music/persistence";
+import {
+  makeMoodJourney,
+  validJourney,
+  journeyListenSeconds,
+  type MoodJourneyRoute,
+  type JourneyTarget,
+} from "../../../lib/music/mood-journey";
 export type { MeloRecord } from "../../../data/experience";
 export type AIConnectionState =
   "checking" | "configured" | "unconfigured" | "offline";
@@ -41,6 +61,12 @@ export function useLiveMelo() {
   const [connectionState, setConnectionState] =
       useState<AIConnectionState>("checking"),
     [modelState, setModelState] = useState<AIModelState>("unverified");
+  const [celebrating, setCelebrating] = useState(false);
+  useEffect(() => {
+    if (!celebrating) return;
+    const timer = setTimeout(() => setCelebrating(false), 1800);
+    return () => clearTimeout(timer);
+  }, [celebrating]);
   const [error, setError] = useState(""),
     [status, setStatus] = useState(""),
     [busy, setBusy] = useState(""),
@@ -61,42 +87,349 @@ export function useLiveMelo() {
     busyRef = useRef(false),
     recordsRef = useRef(records),
     retryRef = useRef<(() => void) | null>(null),
-    counted = useRef<Record<string,number>>({}),
+    counted = useRef<Record<string, number>>({}),
     saving = useRef(false),
     chatId = useRef<{ text: string; id: string } | null>(null);
-  const preferences=useMemo(()=>preferencesFromRecords(records),[records]);
-  const [musicDirection,setMusicDirection]=useState<'quiet'|'warm'|'energy'|undefined>();
-  const signal=useMemo(()=>({...parseIntent(currentMoment?.payload.text||note,mood,scores||undefined),mood,direction:musicDirection,preferences}),[currentMoment,note,mood,scores,musicDirection,preferences]);
-  const recommendations=useMemo(()=>recommend(signal),[signal]);
-  const [mix,setMix]=useState<Playlist>(()=>buildMix({mood:'calm'}));
-  const mixVariation=useRef(0);
-  const [nowPlaying,setNowPlaying]=useState(false);
-  const [searching,setSearching]=useState(false),[searchResults,setSearchResults]=useState<typeof catalog>([]),[searchStatus,setSearchStatus]=useState('');
-  const [speaking,setSpeaking]=useState(false);
-  useEffect(()=>{if(!speaking)return;const t=setTimeout(()=>setSpeaking(false),4000);return ()=>clearTimeout(t);},[speaking]);
-  const mode=busy==='chat'?'listening':['emotion','story'].includes(busy)?'thinking':['favorite','save'].includes(busy)?'celebrate':audio.playing?'music':speaking?'speaking':'idle';
-  function regenerateMix(){const next=buildMix(signal,++mixVariation.current);setMix(next);setExpression('surprise');setStatus('六段声音，换一种走向。');}
-  function playQueue(ids:string[],shuffle=false){
-    const q=ids.filter(id=>tracks.some(t=>t.id===id));
-    if(shuffle)for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]];}
-    if(!q.length)return;
-    audio.setQueue(q);direction(q[0],q);void audio.play(tracks.findIndex(t=>t.id===q[0]),0);
+  const preferences = useMemo(() => preferencesFromRecords(records), [records]);
+  const [musicDirection, setMusicDirection] = useState<
+    "quiet" | "warm" | "energy" | undefined
+  >();
+  const signal = useMemo(
+    () => ({
+      ...parseIntent(
+        currentMoment?.payload.text || note,
+        mood,
+        scores || undefined,
+      ),
+      mood,
+      direction: musicDirection,
+      preferences,
+    }),
+    [currentMoment, note, mood, scores, musicDirection, preferences],
+  );
+  const recommendations = useMemo(() => recommend(signal), [signal]);
+  const [mix, setMix] = useState<Playlist>(() => buildMix({ mood: "calm" }));
+  const mixVariation = useRef(0);
+  const [nowPlaying, setNowPlaying] = useState(false);
+  const [myMeloOpen, setMyMeloOpen] = useState(false);
+  const [moodJourney, setMoodJourney] = useState<MoodJourneyRoute | null>(null);
+  const journeyBaseline = useRef<Record<string, number>>({});
+  const [journeyCarry, setJourneyCarry] = useState(0);
+  const journeySeconds = moodJourney
+    ? journeyCarry +
+      journeyListenSeconds(
+        moodJourney,
+        audio.listeningByTrack,
+        journeyBaseline.current,
+      )
+    : 0;
+  const journeyHeardTracks = useMemo(
+    () =>
+      moodJourney
+        ? [
+            ...new Set([
+              ...(moodJourney.heardTracks || []),
+              ...moodJourney.steps
+                .filter(
+                  (s) =>
+                    (audio.listeningByTrack[s.track] || 0) >
+                    (journeyBaseline.current[s.track] || 0),
+                )
+                .map((s) => s.track),
+            ]),
+          ]
+        : [],
+    [moodJourney, audio.listeningByTrack],
+  );
+  function adoptJourney(route: MoodJourneyRoute, carry = 0) {
+    setMoodJourney(route);
+    journeyBaseline.current = { ...audio.listeningByTrack };
+    setJourneyCarry(Math.max(0, carry));
   }
-  function changeDirection(dir:'quiet'|'warm'|'energy'){setMusicDirection(dir);const list=recommend({...signal,direction:dir});direction(list[0].id,list.map(t=>t.id));}
-  async function favoriteMix(){const liked=likedMixes(recordsRef.current).some(p=>p.id===mix.id);await write('favorite',{track:mix.tracks[0],mix,liked:!liked});setExpression(liked?'calm':'love');setStatus(liked?'已取消收藏歌单。':'这六段陪伴，一起收藏。');}
-  async function searchMusic(text:string){
-    if(!text.trim()||searching)return;
-    setSearching(true);let moodHint=mood,values:number[]|undefined;
-    try{const d=await json('/api/emotion',{text:text.slice(0,1000)});moodHint=d.mood;values=d.values;setSearchStatus(demoEnabled()?'演示情绪 + 场景关键词规则':'AI 理解状态 + 场景与风格关键词规则');}
-    catch{setSearchStatus('AI 暂时走神了，本次使用本地关键词规则找歌。');}
-    const intent=parseIntent(text,moodHint,values),list=recommend({...intent,preferences},6,catalog);
-    setSearchResults(list);setSearching(false);setExpression('surprise');
+  function startJourney(target: JourneyTarget, variation = 0) {
+    if (busyRef.current) return;
+    const route = makeMoodJourney(
+      { ...signal, ...(!scores ? parseIntent(note || chatDraft, mood) : {}) },
+      target,
+      variation,
+    );
+    route.source = scores ? "ai-signals" : "user-rules";
+    adoptJourney(route);
+    setExpression("calm");
+    setStatus("这次不用一步到位，四首歌陪你慢慢走。");
   }
-  function surprise(){const list=differentTracks(preferences,tracks);if(!list.length)return;direction(list[0].id,list.map(t=>t.id));setStatus(preferences.recentTracks.length||preferences.likedTracks.length?'这次，试一种与你最近不同的声音。':'第一次见面，先试一段明亮的陌生声音。');}
-  const musicRestored=useRef(false);
-  function musicKey(){return 'melo-music-v4:'+(demoEnabled()?'demo':localStorage.getItem('melo-cloud-session-v1')||'browser');}
-  function restoreMusic(){try{const p=JSON.parse(localStorage.getItem(musicKey())||'null');if(p&&tracks.some(t=>t.id===p.track)){if(Array.isArray(p.queue))audio.setQueue(p.queue);audio.select(tracks.findIndex(t=>t.id===p.track));if(p.mix?.tracks?.length===6&&p.mix.tracks.every((id:string)=>tracks.some(t=>t.id===id)))setMix(p.mix);mixVariation.current=p.variation||0;}}catch{}musicRestored.current=true;}
-  useEffect(()=>{if(!ready||!musicRestored.current)return;try{localStorage.setItem(musicKey(),JSON.stringify({track:audio.song.id,queue:audio.queue,mix,variation:mixVariation.current}));}catch{}},[ready,audio.song.id,audio.queue,mix]);
+  function newJourney() {
+    if (busyRef.current) {
+      setStatus("正在保存这段记忆，稍后再开始新的旅程。");
+      return;
+    }
+    setMoodJourney(null);
+    journeyBaseline.current = { ...audio.listeningByTrack };
+    setJourneyCarry(0);
+    setStatus("选一个新的方向，记忆仍然为你保留。");
+  }
+  function regenerateJourney() {
+    if (moodJourney)
+      startJourney(moodJourney.target, moodJourney.variation + 1);
+  }
+  function playJourney(index = 0) {
+    if (moodJourney)
+      playQueue(moodJourney.steps.slice(index).map((s) => s.track));
+  }
+  async function finishJourney() {
+    if (
+      !moodJourney ||
+      moodJourney.outcome ||
+      journeySeconds < 25 ||
+      busyRef.current
+    )
+      return;
+    busyRef.current = true;
+    setBusy("save");
+    try {
+      const completed = {
+        ...moodJourney,
+        outcome: "better" as const,
+        completedAt: new Date().toISOString(),
+        heardTracks: journeyHeardTracks,
+        listenedSeconds: journeySeconds,
+      };
+      const event = await write(
+        "checkin",
+        {
+          momentId: completed.id,
+          momentAt: completed.createdAt,
+          mood: completed.from,
+          text:
+            note ||
+            currentMoment?.payload.text ||
+            "这一刻，我选择让音乐陪自己慢慢走。",
+          reply: currentMoment?.payload.reply,
+          track: completed.steps[0].track,
+          playlist: completed.steps.map((s) => s.track),
+          journey: completed,
+          source: demoEnabled() ? "demo" : completed.source,
+          reason: "你选择了“好多了”，这是一段由你自己确认的音乐瞬间。",
+        },
+        completed.id,
+        true,
+      );
+      setMoodJourney(completed);
+      setCurrentMoment(event);
+      setExpression("love");
+      setCelebrating(true);
+      setStatus(
+        event.payload.pending
+          ? "这条音乐旅程已保存在本机，云端恢复后可以同步。"
+          : "这条音乐旅程，已经成为一颗记忆。",
+      );
+    } catch {
+      setError("这次记忆暂时没有保存成功，路线仍在这里，请再试一次。");
+    } finally {
+      busyRef.current = false;
+      setBusy("");
+    }
+  }
+  async function adjustJourney() {
+    if (
+      !moodJourney ||
+      moodJourney.outcome ||
+      journeySeconds < 25 ||
+      busyRef.current
+    )
+      return;
+    if (
+      moodJourney.steps.length >= 5 &&
+      moodJourney.steps.every((s) => journeyHeardTracks.includes(s.track))
+    ) {
+      setStatus("这条路线都听过了，选择换一种路线开始新的旅程。");
+      return;
+    }
+    busyRef.current = true;
+    setBusy("save");
+    try {
+      const completed = {
+        ...moodJourney,
+        outcome: "not-yet" as const,
+        completedAt: new Date().toISOString(),
+        heardTracks: journeyHeardTracks,
+        listenedSeconds: journeySeconds,
+      };
+      const event = await write(
+        "checkin",
+        {
+          momentId: completed.id,
+          momentAt: completed.createdAt,
+          mood: completed.from,
+          text: note || currentMoment?.payload.text || "",
+          reply: currentMoment?.payload.reply,
+          track: completed.steps[0].track,
+          playlist: completed.steps.map((s) => s.track),
+          journey: completed,
+          source: demoEnabled() ? "demo" : completed.source,
+          reason: "你选择了“差一点”。这次路线没有让你更接近目标状态。",
+        },
+        completed.id,
+        true,
+      );
+      setCurrentMoment(event);
+      const next = adjustMoodJourney(moodJourney, signal, journeyHeardTracks);
+      adoptJourney(next, journeySeconds);
+      audio.setQueue(next.steps.map((s) => s.track));
+      setExpression("care");
+      setStatus(
+        event.payload.pending
+          ? "反馈已保存在本机，换一种声音继续；云端恢复后可以同步。"
+          : "已经记下“还差一点”，换一条路线陪你继续。",
+      );
+    } catch {
+      setError("反馈暂时没有保存成功，原来的路线仍在这里，请再试一次。");
+    } finally {
+      busyRef.current = false;
+      setBusy("");
+    }
+  }
+  const [searching, setSearching] = useState(false),
+    [searchResults, setSearchResults] = useState<typeof catalog>([]),
+    [searchStatus, setSearchStatus] = useState("");
+  const [speaking, setSpeaking] = useState(false);
+  useEffect(() => {
+    if (!speaking) return;
+    const t = setTimeout(() => setSpeaking(false), 4000);
+    return () => clearTimeout(t);
+  }, [speaking]);
+  const mode = characterMode({
+    busy,
+    celebrating,
+    speaking,
+    playing: audio.playing,
+    interacting: !!chatDraft.trim() || !!note.trim(),
+  });
+  function regenerateMix() {
+    const next = buildMix(signal, ++mixVariation.current);
+    setMix(next);
+    setExpression("surprise");
+    setStatus("六段声音，换一种走向。");
+  }
+  function playQueue(ids: string[], shuffle = false) {
+    const q = ids.filter((id) => tracks.some((t) => t.id === id));
+    if (shuffle)
+      for (let i = q.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [q[i], q[j]] = [q[j], q[i]];
+      }
+    if (!q.length) return;
+    audio.setQueue(q);
+    direction(q[0], q);
+    void audio.play(
+      tracks.findIndex((t) => t.id === q[0]),
+      0,
+    );
+  }
+  function changeDirection(dir: "quiet" | "warm" | "energy") {
+    setMusicDirection(dir);
+    const list = recommend({ ...signal, direction: dir });
+    direction(
+      list[0].id,
+      list.map((t) => t.id),
+    );
+  }
+  async function favoriteMix() {
+    const liked = likedMixes(recordsRef.current).some((p) => p.id === mix.id);
+    await write("favorite", { track: mix.tracks[0], mix, liked: !liked });
+    setExpression(liked ? "calm" : "love");
+    setStatus(liked ? "已取消收藏歌单。" : "这六段陪伴，一起收藏。");
+  }
+  async function searchMusic(text: string) {
+    if (!text.trim() || searching) return;
+    setSearching(true);
+    let moodHint = mood,
+      values: number[] | undefined;
+    try {
+      const d = await json("/api/emotion", { text: text.slice(0, 1000) });
+      moodHint = d.mood;
+      values = d.values;
+      setSearchStatus(
+        demoEnabled()
+          ? "演示情绪 + 场景关键词规则"
+          : "AI 理解状态 + 场景与风格关键词规则",
+      );
+    } catch {
+      setSearchStatus("AI 暂时走神了，本次使用本地关键词规则找歌。");
+    }
+    const intent = parseIntent(text, moodHint, values),
+      list = recommend({ ...intent, preferences }, 6, catalog);
+    setSearchResults(list);
+    setSearching(false);
+    setExpression("surprise");
+  }
+  function surprise() {
+    const list = differentTracks(preferences, tracks);
+    if (!list.length) return;
+    direction(
+      list[0].id,
+      list.map((t) => t.id),
+    );
+    setStatus(
+      preferences.recentTracks.length || preferences.likedTracks.length
+        ? "这次，试一种与你最近不同的声音。"
+        : "第一次见面，先试一段明亮的陌生声音。",
+    );
+  }
+  const musicRestored = useRef(false);
+  function musicKey() {
+    return (
+      "melo-music-v4:" +
+      (demoEnabled()
+        ? "demo"
+        : localStorage.getItem("melo-cloud-session-v1") || "browser")
+    );
+  }
+  function restoreMusic() {
+    try {
+      const p = JSON.parse(localStorage.getItem(musicKey()) || "null");
+      if (p && tracks.some((t) => t.id === p.track)) {
+        if (Array.isArray(p.queue)) audio.setQueue(p.queue);
+        audio.select(tracks.findIndex((t) => t.id === p.track));
+        if (
+          p.mix?.tracks?.length === 6 &&
+          p.mix.tracks.every((id: string) => tracks.some((t) => t.id === id))
+        )
+          setMix(p.mix);
+        if (validJourney(p.journey))
+          adoptJourney(p.journey, Number(p.heard) || 0);
+        mixVariation.current = p.variation || 0;
+      }
+    } catch {}
+    musicRestored.current = true;
+  }
+  const journeySaveBucket = Math.floor(journeySeconds / 5);
+  const musicSnapshot = useMemo(
+    () => ({
+      track: audio.song.id,
+      queue: audio.queue,
+      mix,
+      variation: mixVariation.current,
+      journey: moodJourney
+        ? { ...moodJourney, heardTracks: journeyHeardTracks }
+        : null,
+      heard: journeySaveBucket * 5,
+    }),
+    [
+      audio.song.id,
+      audio.queue,
+      mix,
+      moodJourney,
+      journeySaveBucket,
+      journeyHeardTracks,
+    ],
+  );
+  useEffect(() => {
+    if (!ready || !musicRestored.current) return;
+    try {
+      localStorage.setItem(musicKey(), JSON.stringify(musicSnapshot));
+    } catch {}
+  }, [ready, musicSnapshot]);
   useEffect(() => {
     recordsRef.current = records;
   }, [records]);
@@ -157,8 +490,15 @@ export function useLiveMelo() {
   }
   function restore(moment: MeloRecord) {
     const p = moment.payload;
-    if(p.playlist?.length)audio.setQueue(p.playlist);
-    setMix(p.mix||buildMix({...parseIntent(p.text||'',p.mood,p.values),mood:p.mood||'calm'}));
+    if (validJourney(p.journey)) adoptJourney(p.journey);
+    if (p.playlist?.length) audio.setQueue(p.playlist);
+    setMix(
+      p.mix ||
+        buildMix({
+          ...parseIntent(p.text || "", p.mood, p.values),
+          mood: p.mood || "calm",
+        }),
+    );
     setCurrentMoment(moment);
     setMood(p.mood || "calm");
     setReason(p.reason || "");
@@ -176,7 +516,10 @@ export function useLiveMelo() {
     setError("");
     try {
       const d = await json("/api/session");
-      const merged = mergeRecords((d.events || []).map(normalizeRecord), localRecords().map(normalizeRecord));
+      const merged = mergeRecords(
+        (d.events || []).map(normalizeRecord),
+        localRecords().map(normalizeRecord),
+      );
       updateRecords(merged);
       setReady(true);
       setConnected(!!d.aiConnected);
@@ -224,10 +567,15 @@ export function useLiveMelo() {
     type: string,
     payload: MeloRecord["payload"],
     id = crypto.randomUUID(),
+    requireDurable = false,
   ) {
     let event: MeloRecord;
     try {
-      const d = await json("/api/session", { type, payload:transportPayload(payload), id });
+      const d = await json("/api/session", {
+        type,
+        payload: transportPayload(payload),
+        id,
+      });
       event = normalizeRecord(d.event);
       setStorageMode(demoEnabled() ? "demo" : "cloud");
     } catch {
@@ -240,8 +588,16 @@ export function useLiveMelo() {
       setStorageMode("local");
       setStatus("已暂存于本机。云端恢复后可以重试同步。");
     }
-    const kept=keepLocal([event, ...localRecords().filter((e) => e.id !== event.id)]);
-    if(!kept&&event.payload.pending)setStatus("浏览器存储不可用。这次记录仅在当前页面中，请恢复网络后重试同步。");
+    const kept = keepLocal([
+      event,
+      ...localRecords().filter((e) => e.id !== event.id),
+    ]);
+    if (!kept && event.payload.pending && requireDurable)
+      throw new Error("Neither cloud nor local persistence is available");
+    if (!kept && event.payload.pending)
+      setStatus(
+        "浏览器存储不可用。这次记录仅在当前页面中，请恢复网络后重试同步。",
+      );
     updateRecords([
       event,
       ...recordsRef.current.filter((e) => e.id !== event.id),
@@ -252,10 +608,22 @@ export function useLiveMelo() {
     setMood(id);
     setExpression(expressionForMood(id));
     setMusicDirection(undefined);
-    const list=recommend({...signal,mood:id,energy:undefined,direction:undefined});
-    setMix(buildMix({...signal,mood:id,energy:undefined,direction:undefined}));
+    const list = recommend({
+      ...signal,
+      mood: id,
+      energy: undefined,
+      direction: undefined,
+    });
+    setMix(
+      buildMix({
+        ...signal,
+        mood: id,
+        energy: undefined,
+        direction: undefined,
+      }),
+    );
     setReason(list[0].reason);
-    audio.setQueue(list.map(t=>t.id));
+    audio.setQueue(list.map((t) => t.id));
     audio.select(
       Math.max(
         0,
@@ -278,10 +646,17 @@ export function useLiveMelo() {
     setMood(d.mood);
     setScores(d.values);
     setReason(d.reason);
-    const nextSignal={...parseIntent(text,d.mood,d.values),mood:d.mood,preferences:preferencesFromRecords(recordsRef.current)};
-    const list=recommend(nextSignal),nextMix=buildMix(nextSignal);
-    setMix(nextMix);setMusicDirection(undefined);audio.setQueue(list.map(t=>t.id));
-    audio.select(tracks.findIndex(t=>t.id===list[0].id));
+    const nextSignal = {
+      ...parseIntent(text, d.mood, d.values),
+      mood: d.mood,
+      preferences: preferencesFromRecords(recordsRef.current),
+    };
+    const list = recommend(nextSignal),
+      nextMix = buildMix(nextSignal);
+    setMix(nextMix);
+    setMusicDirection(undefined);
+    audio.setQueue(list.map((t) => t.id));
+    audio.select(tracks.findIndex((t) => t.id === list[0].id));
     setExpression(expressionForMessage(text, reply));
     const event = await write(
       "checkin",
@@ -290,9 +665,9 @@ export function useLiveMelo() {
         mood: d.mood,
         text: text.slice(0, 1000),
         track: list[0].id,
-        momentAt:new Date().toISOString(),
-        playlist:list.map(t=>t.id),
-        mix:nextMix,
+        momentAt: new Date().toISOString(),
+        playlist: list.map((t) => t.id),
+        mix: nextMix,
         liked: isFavorite(recordsRef.current, list[0].id),
         reply,
         reason: d.reason,
@@ -413,8 +788,8 @@ export function useLiveMelo() {
           note.trim() ||
           `此刻，我感觉${moods.find((m) => m[0] === mood)?.[1]}。`,
         track: audio.song.id,
-        momentAt:new Date().toISOString(),
-        playlist:audio.queue,
+        momentAt: new Date().toISOString(),
+        playlist: audio.queue,
         mix,
         reply: currentMoment?.payload.reply,
         reason,
@@ -423,6 +798,7 @@ export function useLiveMelo() {
       });
       setCurrentMoment(e);
       setExpression("love");
+      setCelebrating(true);
       setStatus("这颗记忆已经亮起。");
     } finally {
       busyRef.current = false;
@@ -483,8 +859,12 @@ export function useLiveMelo() {
       keepLocal([]);
       updateRecords([]);
       setCurrentMoment(null);
-      setMix(buildMix({mood:'calm'}));
-      try{localStorage.removeItem(musicKey());}catch{}
+      setMoodJourney(null);
+      setJourneyCarry(0);
+      setMix(buildMix({ mood: "calm" }));
+      try {
+        localStorage.removeItem(musicKey());
+      } catch {}
       setFlowReady(false);
       setStatus("你的记录已清空。");
     } catch (e) {
@@ -495,6 +875,8 @@ export function useLiveMelo() {
     }
   }
   function replay(event: MeloRecord) {
+    if (validJourney(event.payload.journey))
+      adoptJourney(event.payload.journey);
     setCurrentMoment(event);
     setScores(event.payload.values || null);
     const id = recordTrack(event),
@@ -504,15 +886,15 @@ export function useLiveMelo() {
       );
     setMood(event.payload.mood || id);
     setReason(event.payload.reason || tracks[i].reason);
-    if(event.payload.playlist?.length)audio.setQueue(event.payload.playlist);
-    if(event.payload.mix)setMix(event.payload.mix);
+    if (event.payload.playlist?.length) audio.setQueue(event.payload.playlist);
+    if (event.payload.mix) setMix(event.payload.mix);
     audio.select(i);
     void audio.play(i, 0);
     setStatus("一起再听一次这段心情。");
   }
-  function direction(id: string,queue?:string[]) {
-    if(!tracks.some(t=>t.id===id))return;
-    if(queue)audio.setQueue(queue);
+  function direction(id: string, queue?: string[]) {
+    if (!tracks.some((t) => t.id === id)) return;
+    if (queue) audio.setQueue(queue);
     const nextReason = tracks.find((t) => t.id === id)?.reason || "";
     audio.select(
       Math.max(
@@ -529,9 +911,9 @@ export function useLiveMelo() {
           ...currentMoment.payload,
           momentId: currentMoment.payload.momentId || currentMoment.id,
           track: id,
-          catalogTrackId:id,
-          playlist:queue||audio.queue,
-          momentAt:currentMoment.payload.momentAt||currentMoment.createdAt,
+          catalogTrackId: id,
+          playlist: queue || audio.queue,
+          momentAt: currentMoment.payload.momentAt || currentMoment.createdAt,
           reason: nextReason,
         },
       };
@@ -551,7 +933,10 @@ export function useLiveMelo() {
           payload: transportPayload(p),
           id: r.id,
         });
-        keepLocal([normalizeRecord(d.event), ...localRecords().filter((e) => e.id !== r.id)]);
+        keepLocal([
+          normalizeRecord(d.event),
+          ...localRecords().filter((e) => e.id !== r.id),
+        ]);
       }
       await load();
     } catch {
@@ -559,22 +944,61 @@ export function useLiveMelo() {
     }
   }
   useEffect(() => {
-    if(!ready||saving.current)return;
-    const entry=Object.entries(audio.listeningByTrack).find(([id,value])=>{
-      const amount=Math.floor(value)-(counted.current[id]||0);
-      return amount>=1&&(!audio.playing||id!==audio.song.id||amount>=10);
+    if (!ready || saving.current) return;
+    const entry = Object.entries(audio.listeningByTrack).find(([id, value]) => {
+      const amount = Math.floor(value) - (counted.current[id] || 0);
+      return (
+        amount >= 1 && (!audio.playing || id !== audio.song.id || amount >= 10)
+      );
     });
-    if(!entry)return;
-    const [id,value]=entry,seconds=Math.min(60,Math.floor(value)-(counted.current[id]||0));
-    saving.current=true;
-    void write('listening',{seconds,track:id}).then(()=>{counted.current[id]=(counted.current[id]||0)+seconds;}).finally(()=>{saving.current=false;});
-  }, [audio.listeningByTrack,audio.playing,audio.song.id,ready]);
+    if (!entry) return;
+    const [id, value] = entry,
+      seconds = Math.min(60, Math.floor(value) - (counted.current[id] || 0));
+    saving.current = true;
+    void write("listening", { seconds, track: id })
+      .then(() => {
+        counted.current[id] = (counted.current[id] || 0) + seconds;
+      })
+      .finally(() => {
+        saving.current = false;
+      });
+  }, [audio.listeningByTrack, audio.playing, audio.song.id, ready]);
 
   return {
-    skip:(delta:number)=>{const q=audio.queue,at=q.indexOf(audio.song.id);direction(q[(Math.max(0,at)+delta+q.length)%q.length]);},
-    preferences,signal,recommendations,mix,regenerateMix,playQueue,favoriteMix,
-    mixLiked:likedMixes(records).some(p=>p.id===mix.id),likedMixes:likedMixes(records),
-    nowPlaying,setNowPlaying,searchMusic,searching,searchResults,searchStatus,surprise,changeDirection,mode,
+    myMeloOpen,
+    setMyMeloOpen,
+    moodJourney,
+    journeySeconds,
+    journeyHeardTracks,
+    startJourney,
+    regenerateJourney,
+    playJourney,
+    finishJourney,
+    adjustJourney,
+    newJourney,
+    skip: (delta: number) => {
+      const q = audio.queue,
+        at = q.indexOf(audio.song.id);
+      direction(q[(Math.max(0, at) + delta + q.length) % q.length]);
+    },
+    preferences,
+    signal,
+    recommendations,
+    mix,
+    regenerateMix,
+    playQueue,
+    favoriteMix,
+    mixLiked: likedMixes(records).some((p) => p.id === mix.id),
+    likedMixes: likedMixes(records),
+    nowPlaying,
+    setNowPlaying,
+    searchMusic,
+    searching,
+    searchResults,
+    searchStatus,
+    surprise,
+    changeDirection,
+    mode,
     expression,
     setExpression,
     records,

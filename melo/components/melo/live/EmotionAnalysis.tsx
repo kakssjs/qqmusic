@@ -1,7 +1,8 @@
 "use client";
-import { QQMusicIcon } from "../QQMusicIcon";
+import { CharacterPresence } from "../CharacterPresence";
 import { ArrowUpRight } from "lucide-react";
 import { moods, type LiveMelo } from "./useLiveMelo";
+import { JourneyGoals } from "../../music/MoodJourney";
 export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
   return (
     <section id="emotion" className="world-section feel-section">
@@ -42,8 +43,8 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
               <ArrowUpRight size={17} />
             </button>
             <button
-            className="world-text-button"
-            aria-label="记住这一刻"
+              className="world-text-button"
+              aria-label="记住这一刻"
               disabled={!!melo.busy || !melo.ready}
               onClick={() => void melo.saveMoment()}
             >
@@ -70,10 +71,35 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
           </p>
           <div className="emotion-insight" aria-live="polite">
             <span className="world-label">此刻的你</span>
-            <h3>{melo.scores ? moods.find(([id])=>id===melo.mood)?.[1] : '先听你说，再慢慢理解'}</h3>
-            {melo.currentMoment && <p>{melo.currentMoment.payload.secondary} · {melo.currentMoment.payload.scene}</p>}
-            <p>{melo.reason || '分享一句现在的感受，Melo 会把理解和音乐连在一起。'}</p>
-            {melo.scores && <><p className="world-fineprint">这些结果是音乐推荐信号，不是心理健康诊断。</p><a className="world-text-button" href="#music">所以，Melo 为你选了一组声音 ↗</a></>}
+            <h3>
+              {melo.scores
+                ? moods.find(([id]) => id === melo.mood)?.[1]
+                : "先听你说，再慢慢理解"}
+            </h3>
+            {melo.currentMoment && (
+              <p>
+                {melo.currentMoment.payload.secondary} ·{" "}
+                {melo.currentMoment.payload.scene}
+              </p>
+            )}
+            <p>
+              {melo.reason ||
+                "分享一句现在的感受，Melo 会把理解和音乐连在一起。"}
+            </p>
+            {melo.scores && (
+              <>
+                <p className="world-fineprint">
+                  这些结果是音乐推荐信号，不是心理健康诊断。
+                </p>
+                <p className="journey-goal-prompt">
+                  听完一段音乐，你希望更接近哪一种状态？
+                </p>
+                <JourneyGoals melo={melo} />
+                <a className="world-text-button" href="#music">
+                  先听此刻的推荐 ↗
+                </a>
+              </>
+            )}
           </div>
         </div>
         <div
@@ -82,30 +108,40 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
             (melo.busy === "emotion" ? "analyzing" : "")
           }
         >
-          <div className="feeling-rings" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <div className="feeling-core">{<QQMusicIcon />}</div>
-            <svg viewBox="0 0 460 460">
-              <path d="M18 230 Q80 205 108 230 T165 230 L187 230 L198 187 L210 278 L223 158 L236 290 L248 204 L260 230 Q299 258 325 230 T442 230" />
+          <div className="emotion-canvas" aria-label="当前音乐状态">
+            <svg viewBox="0 0 500 430" aria-hidden="true">
+              <ellipse cx="250" cy="215" rx="208" ry="144" />
+              <ellipse cx="250" cy="215" rx="170" ry="188" />
+              <path d="M0 225 Q70 180 140 220 T230 215 L248 178 L270 250 L291 195 Q350 240 500 210" />
             </svg>
+            <div className="canvas-state">
+              <span>CURRENT STATE</span>
+              <strong>
+                {moods.find(([id]) => id === melo.mood)?.[1] || "此刻"}
+              </strong>
+              <small>
+                {melo.scores
+                  ? "AI 分析后，你仍可自己调整"
+                  : "由你自己选择的感受"}
+              </small>
+            </div>
+            <span className="canvas-signal signal-energy">
+              ENERGY <b>{Math.round(melo.signal.energy ?? 35)}</b>
+              <small>当前音乐信号</small>
+            </span>
+            <span className="canvas-signal signal-warmth">
+              WARMTH{" "}
+              <b>{melo.audio.song.scenes.includes("healing") ? 80 : 45}</b>
+              <small>陪伴歌曲的温暖感</small>
+            </span>
+            <span className="canvas-signal signal-space">
+              SPACE <b>{100 - melo.audio.song.energy}</b>
+              <small>陪伴歌曲的留白</small>
+            </span>
+            <CharacterPresence melo={melo} compact className="feel-character" />
           </div>
-          <div className="live-scores floating-scores" aria-live="polite">
-            {["疲惫", "压力", "需要放松"].map((label, i) => (
-              <div className={"floating-score score-" + i} key={label}>
-                <strong>
-                  {melo.scores ? melo.scores[i] : "—"}
-                  <small>{melo.scores ? "%" : ""}</small>
-                </strong>
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
-          <div className="music-signal"><span>YOUR MUSIC SIGNAL</span>{[['Energy',melo.signal.energy||35],['Warmth',melo.audio.song.scenes.includes('healing')?80:45],['Tempo',melo.audio.song.energy],['Space',100-melo.audio.song.energy]].map(([label,value])=><div key={label}><small>{label}</small><i style={{width:`${value}%`}}/></div>)}</div>
-          <span className="frequency-caption">Your emotional frequency</span>
           <p className="emotional-state">
-            {melo.reason || "还没有分析。等你愿意，Melo 会认真听。"}
+            {melo.reason || "每一种心情，都值得被认真听见。"}
           </p>
           <p className="world-fineprint">
             仅用于匹配音乐氛围，随时可以自己调整。
