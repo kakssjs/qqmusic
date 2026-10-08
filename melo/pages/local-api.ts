@@ -12,7 +12,14 @@ export function backendAddress() {
       const { apiBase } = (await r.json()) as { apiBase?: string };
       if (!apiBase) return "";
       const url = new URL(apiBase);
-      if (url.protocol !== "https:")
+      if (
+        url.protocol !== "https:" &&
+        !(
+          url.protocol === "http:" &&
+          ["127.0.0.1", "localhost"].includes(url.hostname) &&
+          ["127.0.0.1", "localhost"].includes(location.hostname)
+        )
+      )
         throw new Error("后端需要有效的 HTTPS 地址。");
       return url.origin;
     })

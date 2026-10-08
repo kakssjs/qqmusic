@@ -19,3 +19,6 @@ backend/data/
 
 backend/data/
 
+
+# Local voice verification data
+backend/data-*/

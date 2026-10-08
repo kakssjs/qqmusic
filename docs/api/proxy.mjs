@@ -1,5 +1,5 @@
 // Same-origin transport to the existing Melo backend. No model credentials in this project.
-const allowed=new Set(['session','chat','emotion','story','health']);
+const allowed=new Set(['session','chat','emotion','story','health','voice-ticket']);
 export default async function handler(req,res){
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
  const route=String(req.query.route||'');if(!allowed.has(route)||!['GET','POST','DELETE'].includes(req.method)){res.status(404).json({error:'接口不存在。'});return;}

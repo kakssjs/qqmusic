@@ -8,6 +8,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/voice-ticket",
+      "destination": "/api/proxy?route=voice-ticket"
+    },
+    {
       "destination": "/api/proxy?route=session",
       "source": "/api/session"
     },
