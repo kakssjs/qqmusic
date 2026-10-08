@@ -7,24 +7,29 @@ const base=process.env.MELO_TEST_URL||'https://melo-qqmusic.vercel.app/';
 const mode=process.env.MELO_TEST_MODE||'demo';
 const output='D:/chatgpt/qqmusic/final-acceptance';fs.mkdirSync(output,{recursive:true});
 const browser=await chromium.launch({headless:true});
-const report={url:base,mode,at:new Date().toISOString(),passed:false,viewports:[],errors:[],network:[]};
+const report={url:base,mode,at:new Date().toISOString(),passed:false,viewports:[],errors:[],consoleErrors:[],network:[],recoveredFailures:[]};
+async function complete(page,kind){
+ await page.waitForFunction(kind=>{const done=kind==='story'?document.querySelector('.journey-story-copy h3')?.textContent.includes('真实瞬间'):document.querySelector('[data-flow-ready="true"]');return done||document.querySelector('.live-toast.error');},kind,{timeout:65000});
+ if(await page.locator('.live-toast.error').count()){const failure=report.network.filter(r=>r.status>=400).at(-1);assert(failure&&[502,503,504].includes(failure.status));report.recoveredFailures.push({...failure,kind,message:await page.locator('.live-toast.error p').innerText()});await page.getByRole('button',{name:'重新尝试',exact:true}).click();}
+ await page.waitForFunction(kind=>kind==='story'?document.querySelector('.journey-story-copy h3')?.textContent.includes('真实瞬间'):!!document.querySelector('[data-flow-ready="true"]'),kind,{timeout:65000});assert.equal(await page.locator('.live-toast.error').count(),0);
+}
 try {
  for(const width of [1440,390,430,768]) {
   const ctx=await browser.newContext({viewport:{width,height:width>1000?960:900},acceptDownloads:true,reducedMotion:'reduce'});
-  const page=await ctx.newPage(); page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
+  const page=await ctx.newPage(); page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push(m.text());});
   page.on('response',r=>{if(r.url().includes('/api/')||r.status()>=400)report.network.push({url:r.url(),status:r.status()});});
   const target=new URL(base);if(mode==='demo')target.searchParams.set('demo','1');if(process.env.MELO_PREVIEW_BYPASS)target.searchParams.set('_vercel_share',process.env.MELO_PREVIEW_BYPASS);
   await page.goto(target.href,{waitUntil:'networkidle'});
   assert.equal(await page.locator('.memory-node').count(),0,'new visitor has no invented memories');
   await page.getByRole('link',{name:'开始和 Melo 聊聊',exact:true}).click();
   await page.getByRole('button',{name:'今天有点累',exact:true}).click();
-  await page.waitForFunction(()=>document.querySelector('[data-flow-ready="true"]'),{timeout:65000});
+  await complete(page,'flow');
   assert(await page.locator('.live-message.assistant').count()>0);
   assert(await page.locator('.emotion-insight').innerText());
   assert.equal(await page.locator('.record-cover h3').innerText(),'月光停靠');
   assert(await page.locator('.memory-node').count()>0);
   await page.getByRole('button',{name:'安静一会',exact:true}).click();
-  await page.waitForFunction(()=>document.querySelector('[data-flow-ready="true"]'),{timeout:65000});
+  await complete(page,'flow');
   await page.getByRole('link',{name:'听听这首歌',exact:true}).click();
   await page.getByRole('button',{name:'播放音乐',exact:true}).click();await page.waitForTimeout(1400);
   assert(await page.getByRole('button',{name:'暂停音乐',exact:true}).count());
@@ -45,8 +50,8 @@ try {
   const copyBtn=page.getByRole('button',{name:'复制音乐签文案'});assert(await copyBtn.isEnabled());await copyBtn.click();await page.waitForTimeout(250);assert((await page.locator('.daily-sign').innerText()).includes('复制')||await page.locator('textarea').count()>0);
   await page.reload({waitUntil:'networkidle'});await page.waitForTimeout(1200);assert(await page.locator('.memory-node').count()>0,'snapshot persists after reload');
   assert.equal(await page.getByRole('button',{name:'收藏当前音乐'}).getAttribute('aria-pressed'),'true','latest favorite persists');
-  if(width===1440){await page.getByLabel('给 Melo 的消息').fill('你还记得我一开始说今天有点累吗？用一句话告诉我你记住了什么。');await page.getByRole('button',{name:'发送给 Melo',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-flow-ready="true"]'));assert(/累|疲|慢|休息/.test(await page.locator('.live-message.assistant').last().innerText()));report.contextRecall=true;}
-  await page.getByRole('button',{name:'生成我的音乐故事',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.journey-story-copy h3')?.textContent.includes('真实瞬间'));report.storyGenerated=true;
+  if(width===1440){await page.getByLabel('给 Melo 的消息').fill('你还记得我一开始说今天有点累吗？用一句话告诉我你记住了什么。');await page.getByRole('button',{name:'发送给 Melo',exact:true}).click();await complete(page,'flow');assert(/累|疲|慢|休息/.test(await page.locator('.live-message.assistant').last().innerText()));report.contextRecall=true;}
+  await page.getByRole('button',{name:'生成我的音乐故事',exact:true}).click();await complete(page,'story');report.storyGenerated=true;
   const layout=await page.evaluate(async()=>{await document.fonts.ready;return {width:innerWidth,doc:document.documentElement.scrollWidth,font:document.fonts.check('16px Inter'),localApis:performance.getEntriesByType('resource').filter(r=>r.name.includes('/api/')&&r.name.includes('localhost')).length};});
   assert(layout.doc<=width);assert(layout.font);assert.equal(layout.localApis,0);
   await page.locator('#chat').scrollIntoViewIfNeeded();await page.screenshot({path:`${output}/chat-${mode}-${width}.png`});
@@ -55,7 +60,7 @@ try {
   report.viewports.push({width,completeFlow:true,persisted:true,audio:true,layout});await ctx.close();
   if(mode==='real'&&width===390)break;
  }
- assert.deepEqual(report.errors,[]);assert(!report.network.some(r=>r.status>=400));report.passed=true;
+ assert.deepEqual(report.errors,[]);const failed=report.network.filter(r=>r.status>=400);assert.equal(failed.length,report.recoveredFailures.length,'every failed API must visibly recover through the retry control');assert(report.consoleErrors.every(e=>report.recoveredFailures.length&&/Failed to load resource.*(502|503|504)/.test(e)),'no unexpected console errors');report.passed=true;
 }catch(e){report.failure=e.message;throw e;}finally{fs.writeFileSync(`${output}/final-demo-${mode}-verification.json`,JSON.stringify(report,null,2));fs.writeFileSync('final-demo-verification.json',JSON.stringify(report,null,2));await browser.close();console.log(JSON.stringify(report,null,2));}
 
 
