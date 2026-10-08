@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "url": "https://melo-qqmusic.vercel.app/",
+  "tracks": [
+    {
+      "id": "snow",
+      "duration": 90,
+      "cover": 200
+    },
+    {
+      "id": "petal",
+      "duration": 90,
+      "cover": 200
+    },
+    {
+      "id": "forest",
+      "duration": 90,
+      "cover": 200
+    },
+    {
+      "id": "aurora",
+      "duration": 90,
+      "cover": 200
+    }
+  ],
+  "bundle": "index-BwQwwoiy.js"
+}

@@ -229,5 +229,14 @@
     "Offline fallback checked by aborting original audio file requests; API error recovery is separate fault injection",
     "Artwork generated specifically for Melo; not official artist album artwork",
     "Cloud ECS backend was not redeployed; catalog IDs use compatibility transport"
-  ]
+  ],
+  "productionVerified": true,
+  "productionArtifactCommit": "fdbe183a294d0d6f824465d65b02c705ab78276e",
+  "productionEvidence": "verification/award-v4/production-real.json",
+  "observedTransientFailure": {
+    "path": "/api/emotion",
+    "status": 503,
+    "behavior": "Natural-language music search explicitly fell back to keyword rules; full repeat passed with no network failures",
+    "evidence": "verification/award-v4/production-first-run.json"
+  }
 }
