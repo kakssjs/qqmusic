@@ -15,7 +15,7 @@ export function MeloHero({ melo, reduced = false }: { melo: LiveMelo; reduced?: 
     <CloudBackground reduced={noMotion}/>
     <div className="character-hero-layout">
       <div className="character-copy">
-        <p className="character-kicker">MEET YOUR MUSIC COMPANION</p>
+        <p className="character-kicker">{new Date().getHours()>=18||new Date().getHours()<6?'TONIGHT WITH MELO':'TODAY WITH MELO'} · YOUR MUSIC COMPANION</p>
         <h1 className="cloud-title">Melo</h1>
         <p className="cloud-subtitle">AI音乐陪伴伙伴</p>
         <h2 className="cloud-statement">让音乐听懂你的情绪。</h2>
@@ -24,7 +24,7 @@ export function MeloHero({ melo, reduced = false }: { melo: LiveMelo; reduced?: 
         <div className="character-player"><button aria-label={melo.audio.playing?'暂停陪伴音乐':'播放陪伴音乐'} onClick={() => melo.audio.toggle()}>{melo.audio.playing?<Pause size={17}/>:<Play size={17}/>}</button><div><span>{melo.audio.playing?'正在陪你听':'给今天，一点旋律'}</span><strong>{melo.audio.song.name} <small>原创氛围音乐</small></strong></div><Headphones size={19}/></div>
         {melo.audio.error && <p role="alert">{melo.audio.error}</p>}
       </div>
-      <div className="character-stage"><MeloScene expression={melo.expression} setExpression={melo.setExpression} reduced={noMotion} busy={['chat','emotion','story'].includes(melo.busy)}/>{picker && <ExpressionPicker expression={melo.expression} setExpression={melo.setExpression} close={close} reduced={noMotion}/>}</div>
+      <div className="character-stage"><MeloScene expression={melo.expression} setExpression={melo.setExpression} reduced={noMotion} busy={['chat','emotion','story'].includes(melo.busy)} mode={melo.mode} level={melo.audio.playing?Math.max(...melo.audio.levels)/85:0}/>{picker && <ExpressionPicker expression={melo.expression} setExpression={melo.setExpression} close={close} reduced={noMotion}/>}</div>
     </div>
   </section>;
 }

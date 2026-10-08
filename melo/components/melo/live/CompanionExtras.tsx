@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { personality, moodNames } from "../../../data/experience";
 import { PaintedExpression } from "../PaintedExpression";
-import { MusicCompanion } from "../MusicCompanion";
 import type { LiveMelo } from "./useLiveMelo";
 export function PersonalityPanel({ melo }: { melo: LiveMelo }) {
   const p = personality(melo.records);
@@ -36,9 +35,7 @@ export function PersonalityPanel({ melo }: { melo: LiveMelo }) {
 export function CompanionExtras({ melo }: { melo: LiveMelo }) {
   const p = personality(melo.records),
     [copied, setCopied] = useState(""),
-    [generated, setGenerated] = useState(false),
-    [prompt, setPrompt] = useState(""),
-    shown = useRef(new Set<string>());
+    [generated, setGenerated] = useState(false);
   const date = new Date().toLocaleDateString("zh-CN", {
       month: "2-digit",
       day: "2-digit",
@@ -48,35 +45,6 @@ export function CompanionExtras({ melo }: { melo: LiveMelo }) {
         ? "把这一点光，留给下一段旋律。"
         : "今天不用证明什么，先让耳朵休息一下。";
   const text = `TODAY WITH MELO\n${date} · ${moodNames[melo.mood]}\n今日音乐：《${melo.audio.song.name}》\n${line}${melo.demo ? "\n预设演示模式" : ""}`;
-  useEffect(() => {
-    if (melo.audio.listened < 30 || shown.current.has("listening")) return;
-    shown.current.add("listening");
-    const t = setTimeout(() => setPrompt("listening"), 0);
-    return () => clearTimeout(t);
-  }, [melo.audio.listened]);
-  useEffect(() => {
-    const el = document.getElementById("memory");
-    if (!el) return;
-    let t: ReturnType<typeof setTimeout>;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries.some((e) => e.isIntersecting) &&
-          melo.currentMoment &&
-          !shown.current.has("memory")
-        ) {
-          shown.current.add("memory");
-          t = setTimeout(() => setPrompt("memory"), 4500);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      clearTimeout(t);
-    };
-  }, [melo.currentMoment]);
   async function download() {
     const c = document.createElement("canvas");
     c.width = 1080;
@@ -215,41 +183,7 @@ export function CompanionExtras({ melo }: { melo: LiveMelo }) {
           )}
         </article>
       </div>
-      {prompt && (
-        <aside className="proactive-companion">
-          <MusicCompanion
-            reduced={melo.reduced}
-            playing={melo.audio.playing}
-            greet={() => melo.setExpression("wink")}
-          />
-          <p>
-            {prompt === "listening"
-              ? "这一段，你喜欢吗？"
-              : "这个瞬间已经留下了，要再听一次吗？"}
-          </p>
-          <button
-            onClick={() => {
-              if (prompt === "listening") {
-                if (!melo.liked) void melo.favorite();
-              } else if (melo.currentMoment) melo.replay(melo.currentMoment);
-              setPrompt("");
-            }}
-          >
-            {prompt === "listening" ? "很喜欢" : "再听一次"}
-          </button>
-          <button
-            onClick={() => {
-              melo.direction("bright");
-              setPrompt("");
-            }}
-          >
-            换一种感觉
-          </button>
-          <button aria-label="关闭陪伴提示" onClick={() => setPrompt("")}>
-            ×
-          </button>
-        </aside>
-      )}
+
     </section>
   );
 }

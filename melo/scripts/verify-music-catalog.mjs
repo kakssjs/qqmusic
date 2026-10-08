@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { catalog, playableTracks } from '../data/music/catalog.ts';
+import { recommend, parseIntent, buildMix, preferencesFromRecords } from '../lib/music/recommendation.ts';
+assert(catalog.length >= 20);
+assert(playableTracks.length >= 12);
+assert.equal(new Set(catalog.map(t => t.id)).size,catalog.length);
+assert.equal(new Set(playableTracks.map(t=>JSON.stringify(t.composition))).size,playableTracks.length);
+assert(catalog.filter(t=>t.source==='qq-music').every(t=>t.officialUrl.startsWith('https://y.qq.com/')&&!t.audioUrl));
+const results=['calm','tired','sad','bright','focus'].map(mood=>recommend({mood,hour:23}).map(t=>t.id).join(','));
+assert.equal(new Set(results).size,5);
+assert(recommend({mood:'tired',direction:'energy',hour:23})[0].energy>recommend({mood:'tired',direction:'quiet',hour:23})[0].energy);
+assert.equal(buildMix({mood:'tired',hour:23},0).tracks.length,6);
+assert.notDeepEqual(buildMix({mood:'tired',hour:23},0).tracks,buildMix({mood:'tired',hour:23},1).tracks);
+assert(parseIntent('雨天坐公交').scenes.includes('commute'));
+assert.equal(parseIntent('赶作业，想专注').mood,'focus');
+const prefs=preferencesFromRecords([{id:'a',type:'favorite',createdAt:'2026-10-08',payload:{track:'calm',catalogTrackId:'mint',liked:true}},{id:'b',type:'favorite',createdAt:'2026-10-09',payload:{track:'calm',catalogTrackId:'mint',liked:false}}]);
+assert(!prefs.likedTracks.includes('mint'));
+console.log(JSON.stringify({passed:true,catalog:catalog.length,playable:playableTracks.length,moods:results.length,checks:12}));

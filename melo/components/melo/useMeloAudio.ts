@@ -1,62 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-export const tracks = [
-  {
-    id: "calm",
-    name: "晚风",
-    subtitle: "让今天慢慢落下",
-    reason: "平静的和弦与缓慢的旋律，为你留一段安静的时间。",
-    color: "#a8a5ce",
-    notes: [130.81, 196, 261.63],
-    melody: [523.25, 587.33, 659.25, 587.33, 523.25, 440],
-    tempo: 3,
-  },
-  {
-    id: "tired",
-    name: "月光停靠",
-    subtitle: "把疲惫交给夜晚",
-    reason: "更慢的节奏、更柔和的音色，让紧绷的心情慢慢松开。",
-    color: "#a392c4",
-    notes: [110, 164.81, 220],
-    melody: [440, 392, 329.63, 293.66, 329.63, 392],
-    tempo: 4,
-  },
-  {
-    id: "sad",
-    name: "雨后",
-    subtitle: "不必急着放晴",
-    reason: "低音与轻柔的留白，陪你容纳此刻的低落。",
-    color: "#8aafba",
-    notes: [146.83, 220, 293.66],
-    melody: [587.33, 523.25, 440, 392, 440, 523.25],
-    tempo: 3.5,
-  },
-  {
-    id: "bright",
-    name: "向光而行",
-    subtitle: "让好心情再亮一点",
-    reason: "轻盈的上行音符，让开心的时刻有自己的旋律。",
-    color: "#d3b492",
-    notes: [174.61, 261.63, 349.23],
-    melody: [523.25, 659.25, 783.99, 880, 783.99, 659.25],
-    tempo: 1.7,
-  },
-  {
-    id: "focus",
-    name: "深蓝航线",
-    subtitle: "只留下一件重要的事",
-    reason: "稳定重复的音型，减少旋律变化，陪你专注当下。",
-    color: "#859dce",
-    notes: [98, 146.83, 196],
-    melody: [392, 392, 440, 392, 293.66, 392],
-    tempo: 2.5,
-  },
-];
+import { playableTracks as tracks } from '../../data/music/catalog';
+import { audioBuffer } from '../../lib/music/provider';
+export { playableTracks as tracks } from '../../data/music/catalog';
 export function useMeloAudio() {
   const [track, setTrack] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [listened, setListened] = useState(0);
+  const [listeningByTrack,setListeningByTrack]=useState<Record<string,number>>({});
   const lastTick = useRef(0);
   const [volume, setVolume] = useState(0.65);
   const [error, setError] = useState("");
@@ -71,9 +23,25 @@ export function useMeloAudio() {
   const active = useRef(false);
   const index = useRef(0);
   const generation = useRef(0);
-  const duration = 90;
+  const duration = tracks[track].duration;
+  const [loading, setLoading] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [queue, setQueueState] = useState<string[]>(tracks.map(t=>t.id));
+  const queueRef = useRef(queue);
+  const volumeRef = useRef(volume);
+  volumeRef.current=volume;
+  function setQueue(ids:string[]) {
+    const valid=[...new Set(ids.filter(id=>tracks.some(t=>t.id===id)))];
+    if(valid.length){queueRef.current=valid;setQueueState(valid);}
+  }
+  function step(delta:number) {
+    const q=queueRef.current,at=q.indexOf(tracks[index.current].id);
+    select(Math.max(0,tracks.findIndex(t=>t.id===q[(Math.max(0,at)+delta+q.length)%q.length])));
+  }
+
   function stop() {
     generation.current += 1;
+    setLoading(false);
     if (source.current) {
       source.current.onended = null;
       source.current.stop();
@@ -85,6 +53,7 @@ export function useMeloAudio() {
   }
   async function play(which = index.current, position = offset.current) {
     const ticket = ++generation.current;
+    if(!tracks[which])return;
     try {
       if (!context.current) {
         context.current = new AudioContext();
@@ -100,36 +69,17 @@ export function useMeloAudio() {
       stop();
       index.current = which;
       setTrack(which);
+      setLoading(true);
+      const loadTicket=generation.current;
       let b = buffers.current.get(which);
       if (!b) {
-        const rate = 22050;
-        b = ctx.createBuffer(1, rate * duration, rate);
-        const data = b.getChannelData(0),
-          t = tracks[which];
-        for (let i = 0; i < data.length; i++) {
-          const sec = i / rate;
-          let sample = 0;
-          const segment = sec % 12,
-            env = Math.min(1, segment / 2) * Math.min(1, (12 - segment) / 2);
-          for (const f of t.notes)
-            sample +=
-              0.035 *
-              env *
-              (Math.sin(2 * Math.PI * f * sec) +
-                0.16 * Math.sin(2 * Math.PI * f * 2 * sec));
-          const phase = sec % t.tempo,
-            note = t.melody[Math.floor(sec / t.tempo) % t.melody.length];
-          sample +=
-            0.075 *
-            Math.min(1, phase / 0.05) *
-            Math.exp(-phase * 1.9) *
-            Math.sin(2 * Math.PI * note * sec);
-          data[i] =
-            sample * Math.min(1, sec / 3) * Math.min(1, (duration - sec) / 5);
-        }
-        buffers.current.set(which, b);
+        const result=await audioBuffer(ctx,tracks[which]);
+        if(loadTicket!==generation.current)return;
+        b=result.buffer;buffers.current.set(which,b);
+        if(buffers.current.size>4){const oldest=buffers.current.keys().next().value;if(oldest!==undefined&&oldest!==which)buffers.current.delete(oldest);}
       }
-      gain.current!.gain.value = volume;
+      setLoading(false);
+      gain.current!.gain.value = volumeRef.current;
       const s = ctx.createBufferSource();
       s.buffer = b;
       s.connect(gain.current!);
@@ -140,6 +90,7 @@ export function useMeloAudio() {
       active.current = true;
       lastTick.current = ctx.currentTime;
       setPlaying(true);
+      setHasStarted(true);
       setError("");
       s.onended = () => {
         active.current = false;
@@ -147,10 +98,13 @@ export function useMeloAudio() {
         offset.current = 0;
         setProgress(0);
         setPlaying(false);
+        const q=queueRef.current,at=q.indexOf(tracks[index.current].id);
+        if(q.length>1&&at>=0&&at<q.length-1)void play(Math.max(0,tracks.findIndex(t=>t.id===q[at+1])),0);
       };
     } catch {
       setError("声音暂时无法启动，请再次点击播放。");
       setPlaying(false);
+      setLoading(false);
     }
   }
   function toggle() {
@@ -164,6 +118,7 @@ export function useMeloAudio() {
     } else void play();
   }
   function select(which: number) {
+    if(!tracks[which])return;
     const wasPlaying = active.current;
     stop();
     index.current = which;
@@ -175,7 +130,7 @@ export function useMeloAudio() {
   function seek(position: number) {
     const wasPlaying = active.current;
     stop();
-    offset.current = position;
+    offset.current = Math.max(0,Math.min(duration-.1,position));
     setProgress(position);
     if (wasPlaying) void play(index.current, position);
   }
@@ -186,7 +141,9 @@ export function useMeloAudio() {
     const timer = setInterval(() => {
       if (active.current && context.current) {
         const now = context.current.currentTime;
-        setListened((v) => v + Math.max(0, now - lastTick.current));
+        const delta=Math.max(0,now-lastTick.current),id=tracks[index.current].id;
+        setListened((v) => v + delta);
+        setListeningByTrack(v=>({...v,[id]:(v[id]||0)+delta}));
         lastTick.current = now;
         setProgress(
           Math.min(
@@ -212,7 +169,8 @@ export function useMeloAudio() {
   }, []);
   return {
     play,
-    listened,
+    loading,hasStarted,queue,setQueue,
+    listened,listeningByTrack,
     track,
     song: tracks[track],
     playing,
@@ -225,7 +183,7 @@ export function useMeloAudio() {
     toggle,
     select,
     seek,
-    next: () => select((index.current + 1) % tracks.length),
-    previous: () => select((index.current + tracks.length - 1) % tracks.length),
+    next: () => step(1),
+    previous: () => step(-1),
   };
 }

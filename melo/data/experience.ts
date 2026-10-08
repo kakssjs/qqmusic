@@ -1,8 +1,13 @@
+import { findTrack } from './music/catalog.ts';
 export type MeloRecord = {
   id: string;
   type: string;
   payload: {
     momentId?: string;
+    momentAt?: string;
+    catalogTrackId?: string;
+    playlist?: string[];
+    mix?: { id: string; title: string; subtitle: string; tracks: string[]; generatedAt: string; reason: string };
     mood?: string;
     text?: string;
     role?: string;
@@ -73,9 +78,9 @@ export function isFavorite(records: MeloRecord[], track: string) {
   return (
     [...records]
       .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
-      .find((e) => e.type === "favorite" && e.payload.track === track)?.payload
+      .find((e) => e.type === "favorite" && !e.payload.mix && (e.payload.catalogTrackId || e.payload.track) === track)?.payload
       .liked !== false &&
-    records.some((e) => e.type === "favorite" && e.payload.track === track)
+    records.some((e) => e.type === "favorite" && !e.payload.mix && (e.payload.catalogTrackId || e.payload.track) === track)
   );
 }
 export function mergeRecords(cloud: MeloRecord[], local: MeloRecord[]) {
@@ -115,24 +120,24 @@ export function personality(records: MeloRecord[]) {
     const h = new Date(e.createdAt).getHours();
     return h >= 22 || h < 6;
   }).length;
-  const enough = !!moments.length && !!listens.length;
+  const enough = moments.length >= 5 && !!listens.length;
   const title = !enough
     ? "你的音乐人格还在形成"
     : night > listens.length / 2
       ? "深夜漫游者"
       : dominant === "bright"
-        ? "向光的节奏收集者"
+        ? "节奏追风者"
         : dominant === "focus"
-          ? "安静的专注者"
-          : "慢慢整理自己的人";
+          ? "安静充电者"
+          : "柔光收集者";
   const caption = !enough
-    ? "完成一次聊天，再听一首歌，就会出现第一份结果。"
+    ? moments.length >= 3 ? "已经看见你常需要的音乐能量，再留下两次真实状态，就能形成音乐人格。" : moments.length ? "今日状态已经留下。完成三次状态记录，看见常需要的音乐能量；五次以后形成音乐人格。" : "第一次聊天会点亮今日状态，三次看见常用能量，五次解锁音乐人格。"
     : `从 ${moments.length} 次心情和 ${listens.length} 段聆听来看，你正在用音乐${night > listens.length / 2 ? "为夜晚留一个安静的出口" : "给自己一段重新整理的时间"}。这是初步观察，会随记录变化。`;
   const weekStart = Date.now() - 7 * 86400000,
     week = records.filter((e) => Date.parse(e.createdAt) >= weekStart);
   const favorites = records.filter(
     (e) =>
-      e.type === "favorite" &&
+      e.type === "favorite" && !e.payload.mix &&
       e.payload.liked !== false &&
       isFavorite(records, e.payload.track || ""),
   );
@@ -150,13 +155,14 @@ export function personality(records: MeloRecord[]) {
     title,
     caption,
     enough,
+    stage: Math.min(5,moments.length),
     dominant: moodNames[dominant] || "等你分享",
     time: !listens.length
       ? "还没有聆听记录"
       : night > listens.length / 2
         ? "深夜"
         : "白天 / 傍晚",
-    energy: favorites.some((e) => e.payload.track === "bright")
+    energy: favorites.some((e) => (findTrack(e.payload.catalogTrackId||e.payload.track)?.energy||0)>=65)
       ? "明亮、有能量"
       : favorites.length
         ? "柔和、留白"

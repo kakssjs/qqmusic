@@ -26,12 +26,20 @@ import { MemorySpace } from "./MemorySpace";
 import { Journey } from "./Journey";
 import { Contact } from "./Contact";
 import { CompanionExtras } from './CompanionExtras';
+import { LateMount } from '../../music/LateMount';
+import { Player } from '../../music/Player';
+import { Playlist } from '../../music/Playlist';
+import { Discover } from '../../music/Discover';
+import { CompanionDock } from '../../music/CompanionDock';
+import { MyMelo } from '../../music/MyMelo';
 const nav = [
   ["聊聊", "chat"],
   ["情绪", "emotion"],
   ["音乐", "music"],
+  ["发现", "discover"],
   ["记忆", "memory"],
   ["旅程", "journey"],
+  ["我的", "my-melo"],
 ];
 function ConnectionStatus({
   state,
@@ -277,16 +285,22 @@ export default function MeloExperience() {
           <AIChat melo={melo} />
           <EmotionAnalysis melo={melo} />
           <MusicRecommendation melo={melo} />
+          <Playlist melo={melo} />
+          <LateMount id="discover"><Discover melo={melo} /></LateMount>
+          <CompanionExtras melo={melo} />
           <MemorySpace melo={melo} />
           <Journey melo={melo} />
-          <CompanionExtras melo={melo} />
+          <LateMount id="my-melo"><MyMelo melo={melo} /></LateMount>
           <Contact />
           </div>
         </main>
+        <Player melo={{...melo,reduced:noMotion}} />
+        <CompanionDock melo={{...melo,reduced:noMotion}} visible={scrolled} />
         {melo.error && (
           <div className="live-toast error" role="alert">
             <p>{melo.error}</p>
             <button disabled={!!melo.busy} onClick={melo.retry}>重新尝试</button>
+            <a href="#music">先听点音乐</a>
             {!melo.demo && <a href="?demo=1#chat">体验预设演示</a>}
             <button aria-label="关闭错误提示" onClick={() => melo.setError("")}>
               <X size={16} />

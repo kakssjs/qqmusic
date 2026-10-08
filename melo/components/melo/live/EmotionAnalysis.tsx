@@ -72,7 +72,7 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
             <h3>{melo.scores ? moods.find(([id])=>id===melo.mood)?.[1] : '先听你说，再慢慢理解'}</h3>
             {melo.currentMoment && <p>{melo.currentMoment.payload.secondary} · {melo.currentMoment.payload.scene}</p>}
             <p>{melo.reason || '分享一句现在的感受，Melo 会把理解和音乐连在一起。'}</p>
-            {melo.scores && <><p className="world-fineprint">这是音乐氛围的主观适配信号，不是情绪诊断或概率。</p><a className="world-text-button" href="#music">所以，为你选了《{melo.audio.song.name}》 ↗</a></>}
+            {melo.scores && <><p className="world-fineprint">这些结果是音乐推荐信号，不是心理健康诊断。</p><a className="world-text-button" href="#music">所以，Melo 为你选了一组声音 ↗</a></>}
           </div>
         </div>
         <div
@@ -101,6 +101,7 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
               </div>
             ))}
           </div>
+          <div className="music-signal"><span>YOUR MUSIC SIGNAL</span>{[['Energy',melo.signal.energy||35],['Warmth',melo.audio.song.scenes.includes('healing')?80:45],['Tempo',melo.audio.song.energy],['Space',100-melo.audio.song.energy]].map(([label,value])=><div key={label}><small>{label}</small><i style={{width:`${value}%`}}/></div>)}</div>
           <span className="frequency-caption">Your emotional frequency</span>
           <p className="emotional-state">
             {melo.reason || "还没有分析。等你愿意，Melo 会认真听。"}

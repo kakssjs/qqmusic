@@ -26,6 +26,7 @@ export function localRecords() {
   }
 }
 export function keepLocal(records: MeloRecord[]) {
+  try {
   localStorage.setItem(
     demoEnabled()
       ? key
@@ -33,6 +34,8 @@ export function keepLocal(records: MeloRecord[]) {
           (localStorage.getItem("melo-cloud-session-v1") || "browser"),
     JSON.stringify(records.slice(0, 500)),
   );
+  return true;
+  } catch { return false; }
 }
 export function demoRequest(url: string, options: RequestInit = {}) {
   const records = localRecords(),

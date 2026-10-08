@@ -7,7 +7,7 @@ import {
   SkipForward,
   Volume2,
 } from "lucide-react";
-import { tracks } from "../useMeloAudio";
+import { TrackCard } from "../../music/TrackCard";
 import type { LiveMelo } from "./useLiveMelo";
 import { PaintedExpression } from '../PaintedExpression';
 const clock = (n: number) =>
@@ -28,7 +28,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
       <div className="listen-heading reveal">
         <p className="world-label">Tonight’s Song</p>
         <h2 className="world-title">
-          今晚，Melo 想送你<span>这首歌。</span>
+          此刻，不止<span>一首答案。</span>
         </h2>
       </div>
       <div className={"record-space reveal " + (a.playing ? "playing" : "")}>
@@ -39,7 +39,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
         </div>
         <div className="record-cover">
           <img
-            src="/cloud-ice-scene.webp"
+            src={a.song.cover}
             alt={a.song.name + "：蓝灰云海与薄荷色光线"}
             loading="lazy"
           />
@@ -72,7 +72,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
       </div>
       <div className="song-understanding">
         <PaintedExpression expression={melo.expression} thumbnail reduced={melo.reduced}/>
-        <div><span className="world-label">WHY THIS SONG</span><p>{melo.reason || a.song.reason}</p><div className="matching-lines">{[['情绪',melo.mood===a.song.id?'与你的状态同向':'换一种感觉'],['能量',a.song.tempo>=3?'缓慢 · 柔和':'轻盈 · 稳定'],['场景',melo.currentMoment?.payload.scene||'留一点时间给自己']].map(([label,value])=><span key={label}><b>{label}</b><i/><small>{value}</small></span>)}</div></div>
+        <div><span className="world-label">WHY THIS SONG</span><p>{melo.reason || a.song.reason}</p><div className="matching-lines">{[['情绪',a.song.moods.includes(melo.mood)?'与你的状态同向':'换一种感觉'],['能量',`音乐能量 ${a.song.energy}%`],['场景',melo.currentMoment?.payload.scene||'留一点时间给自己']].map(([label,value])=><span key={label}><b>{label}</b><i/><small>{value}</small></span>)}</div></div>
       </div>
       <div className="music-installation-player minimal-player reveal">
         <div className="real-wave" aria-hidden="true">
@@ -86,7 +86,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
             type="range"
             aria-label="音乐播放进度"
             min={0}
-            max={89.9}
+            max={a.duration-.1}
             step={0.1}
             value={a.progress}
             onChange={(e) => a.seek(+e.target.value)}
@@ -94,7 +94,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
           <time>1:30</time>
         </div>
         <div className="real-player-controls">
-          <button aria-label="上一首" onClick={()=>melo.direction(tracks[(a.track+tracks.length-1)%tracks.length].id)}>
+          <button aria-label="上一首" onClick={()=>melo.skip(-1)}>
             <SkipBack size={19} />
           </button>
           <button
@@ -108,7 +108,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
               <Play size={22} fill="currentColor" />
             )}
           </button>
-          <button aria-label="下一首" onClick={()=>melo.direction(tracks[(a.track+1)%tracks.length].id)}>
+          <button aria-label="下一首" onClick={()=>melo.skip(1)}>
             <SkipForward size={19} />
           </button>
           <div className="real-volume">
@@ -128,30 +128,10 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
         {a.error && <p role="alert">{a.error}</p>}
       </div>
       <p className="music-lyric" aria-live="off">{['把今天没说完的话，留给耳机里的夜晚。','不必急着抵达，让这段旋律先陪你。','每一次停下来，都是靠近自己的开始。'][Math.floor(a.progress/30)%3]}</p>
-      <div className="music-directions"><span>如果不想听这一首</span>{[['calm','安静一点'],['sad','更治愈一点'],['bright','给我一点能量']].map(([id,label])=><button key={id} onClick={()=>melo.direction(id)}>{label} ↗</button>)}</div>
+      <div className="music-directions"><span>如果不想听这一首</span>{([['quiet','安静一点'],['warm','更治愈一点'],['energy','给我一点能量']] as const).map(([id,label])=><button key={id} onClick={()=>melo.changeDirection(id)}>{label} ↗</button>)}</div>
       {melo.currentMoment && <a href="#memory" className="world-button">查看这次记忆</a>}
-      <div
-        className="frequency-options music-track-list reveal"
-        aria-label="选择音乐"
-      >
-        {tracks.map((t, i) => (
-          <button
-            key={t.id}
-            className={a.track === i ? "selected" : ""}
-            aria-pressed={a.track === i}
-            onClick={() => melo.direction(t.id)}
-          >
-            <span>0{i + 1}</span>
-            <strong>{t.name}</strong>
-            <small>{t.subtitle}</small>
-            {a.track === i && (
-              <span className="track-pulse" aria-hidden="true">
-                ≋
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      <div className="award-alternatives" aria-label="为此刻推荐的音乐">{melo.recommendations.slice(0,4).map(t=><TrackCard key={t.id} track={t} melo={melo}/>)}</div>
+
     </section>
   );
 }
