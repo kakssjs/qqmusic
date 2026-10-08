@@ -20,7 +20,61 @@ export type MoodJourneyRoute = {
   steps: { track: string; energy: number; stage: string; line: string }[];
   outcome?: "better" | "not-yet";
   completedAt?: string;
+  heardTracks?: string[];
+  listenedSeconds?: number;
 };
+export function adjustMoodJourney(
+  route: MoodJourneyRoute,
+  signal: MusicSignal,
+  heardIds: string[],
+): MoodJourneyRoute {
+  const heard = new Set(
+    heardIds.filter((id) => route.steps.some((s) => s.track === id)),
+  );
+  const allHeard = route.steps.every((s) => heard.has(s.track));
+  if (allHeard && route.steps.length >= 5) return route;
+  const used = new Set(heard);
+  const count = allHeard ? route.steps.length + 1 : route.steps.length;
+  const end = route.steps.at(-1)!.energy;
+  const steps: MoodJourneyRoute["steps"] = [];
+  for (let i = 0; i < count; i++) {
+    const existing = route.steps[i];
+    if (existing && heard.has(existing.track)) {
+      steps.push(existing);
+      continue;
+    }
+    const energy = existing?.energy ?? end;
+    const pool = recommend(
+      {
+        ...signal,
+        mood: i > 1 ? route.targetMood : signal.mood,
+        energy,
+        direction: undefined,
+      },
+      16,
+    ).filter((t) => !used.has(t.id) && t.id !== existing?.track);
+    const track = pool[route.variation % Math.min(3, pool.length)];
+    if (!track) return route;
+    used.add(track.id);
+    steps.push({
+      track: track.id,
+      energy,
+      stage: existing?.stage || "CONTINUE",
+      line: existing?.line || "多一点时间，也没有关系。",
+    });
+  }
+  return {
+    ...route,
+    id: `route-${Date.now()}-${route.variation + 1}`,
+    variation: route.variation + 1,
+    createdAt: new Date().toISOString(),
+    steps,
+    heardTracks: [...heard],
+    outcome: undefined,
+    completedAt: undefined,
+    listenedSeconds: undefined,
+  };
+}
 export function makeMoodJourney(
   signal: MusicSignal,
   target: JourneyTarget,
@@ -110,6 +164,20 @@ export function validJourney(value: unknown): value is MoodJourneyRoute {
   ) {
     return false;
   }
+  if (
+    r.heardTracks !== undefined &&
+    (!Array.isArray(r.heardTracks) ||
+      r.heardTracks.some(
+        (id) =>
+          typeof id !== "string" || !r.steps!.some((step) => step.track === id),
+      ))
+  )
+    return false;
+  if (
+    r.listenedSeconds !== undefined &&
+    (!Number.isFinite(r.listenedSeconds) || r.listenedSeconds < 0)
+  )
+    return false;
   if (r.outcome !== undefined) {
     if (
       (r.outcome !== "better" && r.outcome !== "not-yet") ||

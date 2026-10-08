@@ -34,10 +34,10 @@ const nav = [
   ["聊聊", "chat"],
   ["情绪", "emotion"],
   ["音乐旅程", "mood-journey"],
-  ["足迹", "journey"],
   ["音乐", "music"],
   ["发现", "discover"],
   ["记忆", "memory"],
+  ["日记", "journey"],
 ];
 function ConnectionStatus({
   state,
@@ -342,7 +342,7 @@ export default function MeloExperience() {
             </LateMount>
             <MemorySpace melo={melo} />
             <Journey melo={melo} />
-            <Contact />
+            <Contact melo={melo} />
           </div>
         </main>
         <Player melo={{ ...melo, reduced: noMotion }} />

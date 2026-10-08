@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
-import { catalog, findTrack, playableTracks } from "../../data/music/catalog";
+import { catalog, playableTracks } from "../../data/music/catalog";
 import { differentTracks, recommend } from "../../lib/music/recommendation";
 import type { LiveMelo } from "../melo/live/useLiveMelo";
 import { DiscoverRail } from "./DiscoverRail";
-import { TrackCard } from "./TrackCard";
+import { HeroTrackCard, CompactTrackRow } from "./TrackCard";
 
 export function Discover({ melo }: { melo: LiveMelo }) {
   const [query, setQuery] = useState("");
@@ -40,20 +40,6 @@ export function Discover({ melo }: { melo: LiveMelo }) {
   ];
   const rails = [
     {
-      title: "For This Moment",
-      caption: "此刻的状态，值得不止一个答案。",
-      tracks: recommend(melo.signal, 6, catalog),
-    },
-    {
-      title: "Late Night",
-      caption: "给夜晚留一点声音，给明天留一点空间。",
-      tracks: recommend(
-        { mood: "tired", energy: 24, scenes: ["night"], hour: 23 },
-        6,
-        catalog,
-      ),
-    },
-    {
       title: "Because You Loved…",
       caption: melo.preferences.likedTracks.length
         ? "从你真正收藏的声音，继续向外走。"
@@ -70,11 +56,6 @@ export function Discover({ melo }: { melo: LiveMelo }) {
         ? "暂时走出最近听过的声音。"
         : "第一次见面，先把不同的声音放在你面前。",
       tracks: differentTracks(melo.preferences),
-    },
-    {
-      title: "Melo Mix",
-      caption: "由慢到亮，再回到柔软。今天的六首陪伴。",
-      tracks: melo.mix.tracks.map((id) => findTrack(id)!).filter(Boolean),
     },
   ];
 
@@ -97,21 +78,20 @@ export function Discover({ melo }: { melo: LiveMelo }) {
 
       <div className="discover-feature">
         <div className="discover-feature-copy">
-          <small>FEATURED · FROM THIS MOMENT</small>
-          <h3>{melo.currentMoment?.payload.scene || "此刻的声音"}</h3>
+          <small>FEATURED · SLOW CITY</small>
+          <h3>{melo.currentMoment?.payload.scene || "雨夜公交"}</h3>
           <p>
             {melo.currentMoment
               ? "从你刚刚留下的心情出发，看看这首声音是否合适。"
-              : "从当前音乐信号开始，慢慢找到这一刻的节奏。"}
+              : "有时候下雨不是坏天气，只是城市把节奏放慢了。"}
           </p>
           <a href="#music">去听今晚的推荐 ↗</a>
         </div>
         {featured && (
-          <TrackCard
+          <HeroTrackCard
             track={featured}
             melo={melo}
             reason={featured.reason}
-            size="hero"
           />
         )}
       </div>
@@ -121,7 +101,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
           <div className="discover-spotlight" key={title}>
             <small>{title}</small>
             <h3>{label}</h3>
-            {track && <TrackCard track={track} melo={melo} size="compact" />}
+            {track && <CompactTrackRow track={track} melo={melo} />}
           </div>
         ))}
       </div>

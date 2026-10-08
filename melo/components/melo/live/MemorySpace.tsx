@@ -1,4 +1,5 @@
 "use client";
+import { PaintedExpression } from "../PaintedExpression";
 import { useState } from "react";
 import { Trash2, Play, ArrowUpRight } from "lucide-react";
 import { moods, type LiveMelo } from "./useLiveMelo";
@@ -70,7 +71,13 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
                       day: "2-digit",
                     })}
                   </time>
-                  <span className="memory-dot" aria-hidden="true" />
+                  <span className="memory-dot" aria-hidden="true">
+                    <PaintedExpression
+                      expression="love"
+                      thumbnail
+                      reduced={melo.reduced}
+                    />
+                  </span>
                   <div>
                     <span className="memory-node-label">
                       {moods.find((m) => m[0] === e.payload.mood)?.[1] ||
@@ -102,7 +109,16 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
                               ? "你选择“差一点”"
                               : "旅程记录"}
                         </small>
-                        <button onClick={() => melo.replay(e)}>
+                        <button
+                          onClick={() => {
+                            melo.replay(e);
+                            document
+                              .getElementById("mood-journey")
+                              ?.scrollIntoView({
+                                behavior: melo.reduced ? "auto" : "smooth",
+                              });
+                          }}
+                        >
                           <Play size={12} /> 重听这条音乐旅程
                         </button>
                       </div>
@@ -160,10 +176,12 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
                       onClick={() => {
                         melo.replay(e);
                         document
-                          .querySelector<HTMLAnchorElement>(
-                            ".music-revisit-link",
+                          .getElementById(
+                            e.payload.journey ? "mood-journey" : "music",
                           )
-                          ?.click();
+                          ?.scrollIntoView({
+                            behavior: melo.reduced ? "auto" : "smooth",
+                          });
                       }}
                     >
                       <Play size={12} />

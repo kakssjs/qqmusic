@@ -1,4 +1,6 @@
 "use client";
+import { characterMode } from "../../../lib/character-mode";
+import { adjustMoodJourney } from "../../../lib/music/mood-journey";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { tracks, useMeloAudio } from "../useMeloAudio";
 import { useExpression } from "../../../hooks/useExpression";
@@ -59,6 +61,12 @@ export function useLiveMelo() {
   const [connectionState, setConnectionState] =
       useState<AIConnectionState>("checking"),
     [modelState, setModelState] = useState<AIModelState>("unverified");
+  const [celebrating, setCelebrating] = useState(false);
+  useEffect(() => {
+    if (!celebrating) return;
+    const timer = setTimeout(() => setCelebrating(false), 1800);
+    return () => clearTimeout(timer);
+  }, [celebrating]);
   const [error, setError] = useState(""),
     [status, setStatus] = useState(""),
     [busy, setBusy] = useState(""),
@@ -115,12 +123,31 @@ export function useLiveMelo() {
         journeyBaseline.current,
       )
     : 0;
+  const journeyHeardTracks = useMemo(
+    () =>
+      moodJourney
+        ? [
+            ...new Set([
+              ...(moodJourney.heardTracks || []),
+              ...moodJourney.steps
+                .filter(
+                  (s) =>
+                    (audio.listeningByTrack[s.track] || 0) >
+                    (journeyBaseline.current[s.track] || 0),
+                )
+                .map((s) => s.track),
+            ]),
+          ]
+        : [],
+    [moodJourney, audio.listeningByTrack],
+  );
   function adoptJourney(route: MoodJourneyRoute, carry = 0) {
     setMoodJourney(route);
     journeyBaseline.current = { ...audio.listeningByTrack };
     setJourneyCarry(Math.max(0, carry));
   }
   function startJourney(target: JourneyTarget, variation = 0) {
+    if (busyRef.current) return;
     const route = makeMoodJourney(
       { ...signal, ...(!scores ? parseIntent(note || chatDraft, mood) : {}) },
       target,
@@ -130,6 +157,16 @@ export function useLiveMelo() {
     adoptJourney(route);
     setExpression("calm");
     setStatus("这次不用一步到位，四首歌陪你慢慢走。");
+  }
+  function newJourney() {
+    if (busyRef.current) {
+      setStatus("正在保存这段记忆，稍后再开始新的旅程。");
+      return;
+    }
+    setMoodJourney(null);
+    journeyBaseline.current = { ...audio.listeningByTrack };
+    setJourneyCarry(0);
+    setStatus("选一个新的方向，记忆仍然为你保留。");
   }
   function regenerateJourney() {
     if (moodJourney)
@@ -154,6 +191,8 @@ export function useLiveMelo() {
         ...moodJourney,
         outcome: "better" as const,
         completedAt: new Date().toISOString(),
+        heardTracks: journeyHeardTracks,
+        listenedSeconds: journeySeconds,
       };
       const event = await write(
         "checkin",
@@ -173,18 +212,39 @@ export function useLiveMelo() {
           reason: "你选择了“好多了”，这是一段由你自己确认的音乐瞬间。",
         },
         completed.id,
+        true,
       );
       setMoodJourney(completed);
       setCurrentMoment(event);
       setExpression("love");
-      setStatus("这条音乐旅程，已经成为一颗记忆。");
+      setCelebrating(true);
+      setStatus(
+        event.payload.pending
+          ? "这条音乐旅程已保存在本机，云端恢复后可以同步。"
+          : "这条音乐旅程，已经成为一颗记忆。",
+      );
+    } catch {
+      setError("这次记忆暂时没有保存成功，路线仍在这里，请再试一次。");
     } finally {
       busyRef.current = false;
       setBusy("");
     }
   }
   async function adjustJourney() {
-    if (!moodJourney || moodJourney.outcome || busyRef.current) return;
+    if (
+      !moodJourney ||
+      moodJourney.outcome ||
+      journeySeconds < 25 ||
+      busyRef.current
+    )
+      return;
+    if (
+      moodJourney.steps.length >= 5 &&
+      moodJourney.steps.every((s) => journeyHeardTracks.includes(s.track))
+    ) {
+      setStatus("这条路线都听过了，选择换一种路线开始新的旅程。");
+      return;
+    }
     busyRef.current = true;
     setBusy("save");
     try {
@@ -192,6 +252,8 @@ export function useLiveMelo() {
         ...moodJourney,
         outcome: "not-yet" as const,
         completedAt: new Date().toISOString(),
+        heardTracks: journeyHeardTracks,
+        listenedSeconds: journeySeconds,
       };
       const event = await write(
         "checkin",
@@ -208,11 +270,20 @@ export function useLiveMelo() {
           reason: "你选择了“差一点”。这次路线没有让你更接近目标状态。",
         },
         completed.id,
+        true,
       );
       setCurrentMoment(event);
-      startJourney(moodJourney.target, moodJourney.variation + 1);
+      const next = adjustMoodJourney(moodJourney, signal, journeyHeardTracks);
+      adoptJourney(next, journeySeconds);
+      audio.setQueue(next.steps.map((s) => s.track));
       setExpression("care");
-      setStatus("已经记下“还差一点”，换一条路线陪你继续。");
+      setStatus(
+        event.payload.pending
+          ? "反馈已保存在本机，换一种声音继续；云端恢复后可以同步。"
+          : "已经记下“还差一点”，换一条路线陪你继续。",
+      );
+    } catch {
+      setError("反馈暂时没有保存成功，原来的路线仍在这里，请再试一次。");
     } finally {
       busyRef.current = false;
       setBusy("");
@@ -227,18 +298,13 @@ export function useLiveMelo() {
     const t = setTimeout(() => setSpeaking(false), 4000);
     return () => clearTimeout(t);
   }, [speaking]);
-  const mode =
-    busy === "chat"
-      ? "listening"
-      : ["emotion", "story"].includes(busy)
-        ? "thinking"
-        : ["favorite", "save"].includes(busy)
-          ? "celebrate"
-          : audio.playing
-            ? "music"
-            : speaking
-              ? "speaking"
-              : "idle";
+  const mode = characterMode({
+    busy,
+    celebrating,
+    speaking,
+    playing: audio.playing,
+    interacting: !!chatDraft.trim() || !!note.trim(),
+  });
   function regenerateMix() {
     const next = buildMix(signal, ++mixVariation.current);
     setMix(next);
@@ -344,10 +410,19 @@ export function useLiveMelo() {
       queue: audio.queue,
       mix,
       variation: mixVariation.current,
-      journey: moodJourney,
+      journey: moodJourney
+        ? { ...moodJourney, heardTracks: journeyHeardTracks }
+        : null,
       heard: journeySaveBucket * 5,
     }),
-    [audio.song.id, audio.queue, mix, moodJourney, journeySaveBucket],
+    [
+      audio.song.id,
+      audio.queue,
+      mix,
+      moodJourney,
+      journeySaveBucket,
+      journeyHeardTracks,
+    ],
   );
   useEffect(() => {
     if (!ready || !musicRestored.current) return;
@@ -492,6 +567,7 @@ export function useLiveMelo() {
     type: string,
     payload: MeloRecord["payload"],
     id = crypto.randomUUID(),
+    requireDurable = false,
   ) {
     let event: MeloRecord;
     try {
@@ -516,6 +592,8 @@ export function useLiveMelo() {
       event,
       ...localRecords().filter((e) => e.id !== event.id),
     ]);
+    if (!kept && event.payload.pending && requireDurable)
+      throw new Error("Neither cloud nor local persistence is available");
     if (!kept && event.payload.pending)
       setStatus(
         "浏览器存储不可用。这次记录仅在当前页面中，请恢复网络后重试同步。",
@@ -720,6 +798,7 @@ export function useLiveMelo() {
       });
       setCurrentMoment(e);
       setExpression("love");
+      setCelebrating(true);
       setStatus("这颗记忆已经亮起。");
     } finally {
       busyRef.current = false;
@@ -890,11 +969,13 @@ export function useLiveMelo() {
     setMyMeloOpen,
     moodJourney,
     journeySeconds,
+    journeyHeardTracks,
     startJourney,
     regenerateJourney,
     playJourney,
     finishJourney,
     adjustJourney,
+    newJourney,
     skip: (delta: number) => {
       const q = audio.queue,
         at = q.indexOf(audio.song.id);

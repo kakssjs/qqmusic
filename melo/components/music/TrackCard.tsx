@@ -71,3 +71,13 @@ export function TrackCard({
     </article>
   );
 }
+
+export const HeroTrackCard = (
+  props: Omit<Parameters<typeof TrackCard>[0], "size">,
+) => <TrackCard {...props} size="hero" />;
+export const StandardTrackCard = (
+  props: Omit<Parameters<typeof TrackCard>[0], "size">,
+) => <TrackCard {...props} size="standard" />;
+export const CompactTrackRow = (
+  props: Omit<Parameters<typeof TrackCard>[0], "size">,
+) => <TrackCard {...props} size="compact" />;

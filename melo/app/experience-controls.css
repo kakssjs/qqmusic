@@ -1,0 +1,529 @@
+/* Shared navigation, player, partner and sheets. */
+.live-melo {
+  overflow: clip;
+  background: var(--melo-ink);
+}
+.cloud-experience .live-nav {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 90px;
+  padding: 0 var(--melo-gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  z-index: 40;
+  background: linear-gradient(#243e4d88, transparent);
+  color: #f4f7f3;
+  border: 0;
+  backdrop-filter: none;
+}
+.cloud-experience .live-nav.is-scrolled {
+  height: 74px;
+  background: #0d1a19ed;
+  backdrop-filter: blur(20px);
+}
+.cloud-experience .live-nav > nav {
+  position: static;
+  display: flex;
+  gap: clamp(16px, 2vw, 30px);
+  font-size: 14px;
+  color: #e1e8e5;
+}
+.live-nav > div {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.live-motion,
+.live-connect {
+  font-size: 12px;
+  color: #dde9e1;
+}
+.live-motion {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 8px;
+}
+.live-motion i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--melo-mint);
+}
+.live-connect {
+  max-width: 100px;
+  line-height: 1.5;
+}
+.world-nav-talk {
+  display: none;
+}
+.my-melo-trigger {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #c5d5ce55;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #07100c44;
+}
+.live-menu {
+  display: none;
+}
+.connection-retry {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.demo-banner {
+  position: relative;
+  padding: 104px 25px 14px;
+  background: #20382c;
+  color: #eef5ef;
+  font-size: 13px;
+  text-align: center;
+}
+.demo-banner a {
+  margin-left: 15px;
+  color: var(--melo-green);
+}
+.global-player {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 40px));
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 13px 20px;
+  border: 1px solid #b2cdbc55;
+  border-radius: 20px;
+  background: #0d2018f5;
+  color: #f1f5ee;
+  z-index: 45;
+  box-shadow: 0 15px 50px #0004;
+  backdrop-filter: blur(18px);
+}
+.global-song {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  min-width: 175px;
+}
+.global-song img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.global-song span {
+  display: grid;
+  gap: 3px;
+}
+.global-song strong {
+  font-size: 14px;
+  font-weight: 450;
+}
+.global-song small {
+  font-size: 11px;
+  color: #bdd1c2;
+}
+.global-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.global-controls button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+}
+.global-progress {
+  flex: 1;
+  min-width: 0;
+}
+.global-progress time {
+  font-size: 10px;
+}
+.global-player > button {
+  padding: 5px;
+  color: #c8ff32;
+}
+.companion-dock {
+  position: fixed;
+  right: 24px;
+  bottom: 28px;
+  z-index: 46;
+  color: #f4f7f3;
+}
+.companion-dock.above-player {
+  bottom: 112px;
+}
+.dock-toggle {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 1px solid #b3d4c144;
+  background: #152f24;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 25px #0003;
+}
+.dock-toggle .painted-expression {
+  width: 43px;
+  height: 43px;
+}
+.dock-status {
+  position: absolute;
+  bottom: 8px;
+  right: 6px;
+}
+.dock-status i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: #c8ff32;
+  border-radius: 50%;
+  border: 1px solid #152f24;
+}
+.dock-body {
+  position: absolute;
+  right: 0;
+  bottom: 75px;
+  width: 300px;
+  max-width: calc(100vw - 35px);
+  padding: 28px 24px;
+  background: #162d22f5;
+  border: 1px solid #c9e2ce44;
+  border-radius: 22px;
+  box-shadow: 0 20px 50px #0004;
+}
+.dock-body > .music-companion {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  width: 50px;
+  height: 45px;
+  margin: 0 0 22px;
+}
+.dock-body p {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+.dock-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 22px;
+}
+.dock-actions,
+.dock-directions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: #c8ff32;
+}
+.dock-actions > * {
+  padding: 7px 0;
+}
+.dock-collapse {
+  display: block;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #c0d5c7;
+}
+.dock-directions button {
+  padding: 7px 10px;
+  border: 1px solid #adc9b444;
+  border-radius: 20px;
+}
+.my-melo-drawer,
+.now-playing,
+.melo-menu-panel {
+  background: #10271c !important;
+  color: #f0f6ed !important;
+  border-color: #8caf9966 !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  --scene-copy: #b8d0c0;
+  --scene-fg: #f0f6ed;
+  --scene-accent: #c8ff32;
+  padding: 38px !important;
+}
+.my-melo-drawer {
+  width: min(640px, 96vw) !important;
+  max-width: none !important;
+}
+.my-melo-drawer [data-slot="sheet-title"] {
+  font-size: 25px;
+  font-weight: 450;
+}
+.my-melo-drawer [data-slot="sheet-description"] {
+  font-size: 13px;
+  color: #bfd5c5;
+}
+.my-melo-drawer .world-section {
+  padding: 32px 0;
+}
+.my-melo-drawer .world-section-meta {
+  font-size: 11px;
+  padding-bottom: 15px;
+}
+.my-melo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+.my-melo-grid h3 {
+  font-size: 21px;
+  font-weight: 450;
+  margin-bottom: 18px;
+}
+.my-melo-grid article > p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #bed0c3;
+}
+.my-melo-grid button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  border-bottom: 1px solid #afc2c933;
+  padding: 13px 0;
+}
+.my-melo-grid button > span {
+  flex: 1;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.my-melo-grid small {
+  display: block;
+  font-size: 11px;
+  color: #b8d0c0;
+}
+.my-melo-grid b {
+  font-weight: 400;
+  color: #c8ff32;
+}
+.drawer-routes {
+  padding: 22px 0;
+  border-top: 1px solid #afc2c944;
+  border-bottom: 1px solid #afc2c944;
+}
+.drawer-routes h3 {
+  font-size: 19px;
+  font-weight: 450;
+  margin-top: 20px;
+}
+.drawer-routes button {
+  display: block;
+  text-align: left;
+  padding: 12px 0;
+  font-size: 14px;
+  color: #c4dfcd;
+}
+.week-with-melo,
+.daily-sign {
+  padding: 20px 0;
+}
+.week-with-melo h3,
+.daily-sign h3 {
+  font-size: 23px;
+  font-weight: 450;
+  margin-bottom: 20px;
+}
+.week-words p {
+  margin: 16px 0;
+}
+.week-words small {
+  display: block;
+  color: #b9d0c2;
+  font-size: 12px;
+}
+.week-words strong {
+  font-size: 16px;
+  font-weight: 450;
+}
+.companion-extras p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #bbd1c3;
+}
+.music-sign {
+  margin-top: 25px;
+  padding: 25px;
+  background: #223d2e;
+  border: 1px solid #a5e8b844;
+  border-radius: 16px;
+}
+.music-sign .painted-expression {
+  width: 80px;
+  height: 80px;
+  margin: 20px 0;
+}
+.music-sign h4 {
+  font-size: 24px;
+  line-height: 1.5;
+}
+.music-sign > span {
+  font-size: 12px;
+}
+.music-sign button {
+  padding: 10px 0;
+  margin-right: 20px;
+  font-size: 13px;
+  color: #c8ff32;
+}
+.now-playing {
+  max-height: 92svh !important;
+  border-radius: 25px 25px 0 0 !important;
+}
+.now-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8%;
+  max-width: 1000px;
+  margin: 30px auto;
+  align-items: center;
+}
+.now-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.now-layout h2 {
+  font-size: 36px;
+  font-weight: 450;
+}
+.now-companion {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin: 25px 0;
+}
+.now-companion .painted-expression {
+  width: 60px;
+  height: 60px;
+}
+.now-companion p {
+  font-size: 14px;
+}
+.now-why h3 {
+  font-size: 16px;
+  margin-top: 20px;
+}
+.now-why p {
+  font-size: 13px;
+  color: #c1d6c9;
+  margin: 8px 0;
+}
+.now-volume {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-size: 13px;
+  margin: 20px 0;
+}
+.now-line {
+  font-size: 18px;
+  line-height: 1.8;
+  text-align: center;
+}
+.now-line small {
+  display: block;
+  font-size: 12px;
+  color: #bdd2c3;
+}
+.melo-menu-panel {
+  width: min(440px, 94vw) !important;
+}
+.melo-menu-panel nav {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin: 60px 0 35px;
+}
+.melo-menu-panel nav a {
+  font-size: 30px;
+}
+.menu-brand {
+  font-size: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.menu-brand svg {
+  width: 26px;
+}
+.melo-menu-close {
+  position: absolute;
+  right: 28px;
+  top: 28px;
+}
+.menu-connection {
+  font-size: 13px;
+  color: #bad5c4;
+}
+.live-toast {
+  position: fixed;
+  left: 25px;
+  bottom: 115px;
+  max-width: 380px;
+  background: #193325f5;
+  border: 1px solid #a5e8b866;
+  border-radius: 18px;
+  padding: 18px 24px;
+  color: #eaf5ea;
+  z-index: 60;
+  box-shadow: 0 15px 40px #0003;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.live-toast.error {
+  background: #392b22;
+  border-color: #d9a26d;
+  color: #ffe4cb;
+}
+.live-toast button,
+.live-toast a {
+  margin: 8px 12px 0 0;
+  font-size: 12px;
+  text-decoration: underline;
+}
+.live-toast.success {
+  pointer-events: none;
+  animation: toast-fade 5s both;
+}
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.live-toast.success[role="status"] {
+  padding: 13px 20px;
+}
+.pages-notice {
+  bottom: 6px !important;
+  font-size: 10px !important;
+  padding: 4px 12px !important;
+  pointer-events: none;
+}
+.pages-notice a,
+.pages-notice button {
+  pointer-events: auto;
+}

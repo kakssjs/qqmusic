@@ -3,7 +3,7 @@ import { QQMusicIcon } from "../QQMusicIcon";
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, ArrowUp } from "lucide-react";
 import type { LiveMelo } from "./useLiveMelo";
-import { MeloIdentityArt } from "../MeloIdentityArt";
+import { CharacterPresence } from "../CharacterPresence";
 export function AIChat({ melo }: { melo: LiveMelo }) {
   const viewport = useRef<HTMLDivElement>(null);
   const messages = melo.records
@@ -27,15 +27,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
       <div className="together-layout">
         <div className="together-portrait reveal">
           <div className="portrait-aura" />
-          <div className="together-melo-window" aria-hidden="true">
-            <MeloIdentityArt
-              className="together-melo-art"
-              expression={melo.expression}
-              reduced={melo.reduced}
-              busy={melo.busy === "chat"}
-              alt=""
-            />
-          </div>
+          <CharacterPresence melo={melo} className="talk-character" />
           <div className="portrait-caption">
             <span className="world-live-dot" />
             Melo is here for you
@@ -154,11 +146,9 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
                 disabled={!!melo.busy}
                 onClick={() => {
                   melo.startJourney("quiet");
-                  document
-                    .getElementById("mood-journey")
-                    ?.scrollIntoView({
-                      behavior: melo.reduced ? "auto" : "smooth",
-                    });
+                  document.getElementById("mood-journey")?.scrollIntoView({
+                    behavior: melo.reduced ? "auto" : "smooth",
+                  });
                 }}
               >
                 安静下来
@@ -167,11 +157,9 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
                 disabled={!!melo.busy}
                 onClick={() => {
                   melo.startJourney("energy");
-                  document
-                    .getElementById("mood-journey")
-                    ?.scrollIntoView({
-                      behavior: melo.reduced ? "auto" : "smooth",
-                    });
+                  document.getElementById("mood-journey")?.scrollIntoView({
+                    behavior: melo.reduced ? "auto" : "smooth",
+                  });
                 }}
               >
                 找回一点能量
@@ -215,15 +203,19 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             </button>
           </form>
           <p className="live-chat-note">
-            {melo.connectionState === "unconfigured"
-              ? "AI 服务尚未配置；你仍可体验情绪选择与音乐。"
-              : melo.connectionState === "offline"
-                ? "AI 服务暂时连接不上；可点击上方重试，或继续听音乐。"
-                : melo.modelState === "ready"
-                  ? "最近一次成功回复已保存在云端。"
-                  : melo.modelState === "error"
-                    ? "服务已配置，但最近一次模型调用失败；请查看提示信息。"
-                    : "服务端已配置；首次成功回复后会显示模型状态。"}
+            {melo.demo
+              ? "演示回复为预设脚本，记录独立保存在本机。"
+              : melo.connectionState === "unconfigured"
+                ? "AI 服务尚未配置；你仍可体验情绪选择与音乐。"
+                : melo.connectionState === "offline"
+                  ? "AI 服务暂时连接不上；可点击上方重试，或继续听音乐。"
+                  : melo.modelState === "ready"
+                    ? melo.storageMode === "cloud"
+                      ? "最近一次成功回复已保存在云端。"
+                      : "最近一次回复保留在本机，云端恢复后可以同步。"
+                    : melo.modelState === "error"
+                      ? "服务已配置，但最近一次模型调用失败；请查看提示信息。"
+                      : "服务端已配置；首次成功回复后会显示模型状态。"}
             {melo.connected && <span>Shift + Enter 换行</span>}
           </p>
         </div>
