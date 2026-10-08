@@ -1,4 +1,5 @@
 "use client";
+import { QQMusicIcon } from "../QQMusicIcon";
 import { ArrowUpRight } from "lucide-react";
 import { moods, type LiveMelo } from "./useLiveMelo";
 export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
@@ -85,7 +86,7 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
             <i />
             <i />
             <i />
-            <div className="feeling-core">✳</div>
+            <div className="feeling-core">{<QQMusicIcon />}</div>
             <svg viewBox="0 0 460 460">
               <path d="M18 230 Q80 205 108 230 T165 230 L187 230 L198 187 L210 278 L223 158 L236 290 L248 204 L260 230 Q299 258 325 230 T442 230" />
             </svg>

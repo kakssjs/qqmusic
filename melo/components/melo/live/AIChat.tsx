@@ -1,4 +1,5 @@
 "use client";
+import { QQMusicIcon } from "../QQMusicIcon";
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, ArrowUp } from "lucide-react";
 import type { LiveMelo } from "./useLiveMelo";
@@ -107,7 +108,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             )}
             {(melo.busy === "chat" || melo.busy === "emotion") && (
               <p className="thinking" role="status">
-                <span>✳</span> {melo.busy==='chat'?'我在听。你不用急着整理好所有话。':'我在把这段心情，和适合你的旋律连起来。'}
+                <span>{<QQMusicIcon />}</span> {melo.busy==='chat'?'我在听。你不用急着整理好所有话。':'我在把这段心情，和适合你的旋律连起来。'}
               </p>
             )}
           </div>

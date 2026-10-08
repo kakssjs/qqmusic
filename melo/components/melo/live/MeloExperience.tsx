@@ -1,4 +1,5 @@
 "use client";
+import { QQMusicIcon } from "../QQMusicIcon";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { MotionConfig } from "framer-motion";
 import gsap from "gsap";
@@ -181,7 +182,7 @@ export default function MeloExperience() {
         </a>
         <header className={`live-nav ${scrolled ? "is-scrolled" : ""}`}>
           <a href="#home" className="wordmark">
-            melo <span>✳</span>
+            melo <span>{<QQMusicIcon />}</span>
           </a>
           <nav aria-label="主导航" className={menu ? "open" : ""}>
             {nav.map(([text, id]) => (
@@ -248,7 +249,7 @@ export default function MeloExperience() {
                     setMenu(false);
                   }}
                 >
-                  melo ✳
+                  melo {<QQMusicIcon />}
                 </a>
                 <nav aria-label="移动端导航">
                   {nav.map(([text, id], i) => (

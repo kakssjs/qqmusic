@@ -1,4 +1,5 @@
 "use client";
+import { QQMusicIcon } from "../QQMusicIcon";
 import {
   Heart,
   Play,
@@ -35,7 +36,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
         <div className="record-halo" aria-hidden="true" />
         <div className="vinyl-record" aria-hidden="true">
           <i />
-          <span>melo ✳</span>
+          <span>melo {<QQMusicIcon />}</span>
         </div>
         <div className="record-cover">
           <img

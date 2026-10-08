@@ -1,3 +1,4 @@
+import { QQMusicIcon } from "../QQMusicIcon";
 export function Contact() {
   return (
     <>
@@ -29,7 +30,7 @@ export function Contact() {
       </section>
       <footer className="world-footer">
         <a href="#home" className="wordmark">
-          melo ✳
+          melo {<QQMusicIcon />}
         </a>
         <span>让音乐听懂你的情绪。</span>
         <small>© 2026 Melo</small>

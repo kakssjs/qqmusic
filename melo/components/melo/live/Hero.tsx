@@ -1,4 +1,5 @@
 "use client";
+import { QQMusicIcon } from "../QQMusicIcon";
 import { useEffect, useRef, useState } from "react";
 const videoUrl = "/hero-clouds.mp4";
 export function Hero({ reduced = false }: { reduced?: boolean }) {
@@ -83,7 +84,7 @@ export function Hero({ reduced = false }: { reduced?: boolean }) {
           </h2>
           <div className="mt-5 flex flex-wrap gap-3 sm:mt-6 sm:gap-4 md:mt-8">
             <a href="#chat" className="meet-button">
-              开始和 Melo 聊聊 <span>✳</span>
+              开始和 Melo 聊聊 <span>{<QQMusicIcon />}</span>
             </a>
           </div>
           <div className="ability-tags mt-6 inline-flex items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md sm:mt-8 sm:gap-4 sm:px-5 sm:py-3.5 md:mt-10">

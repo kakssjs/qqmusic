@@ -8,8 +8,8 @@ export const metadata: Metadata = {
     "codex-preview": "development",
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/qqmusic/qq-music-logo.ico",
+    shortcut: "/qqmusic/qq-music-logo.ico",
   },
 };
 
