@@ -39,6 +39,15 @@ const nav = [
   ["记忆", "memory"],
   ["日记", "journey"],
 ];
+const menuDescriptions: Record<string, string> = {
+  chat: "说说今天，Melo 在听",
+  emotion: "找到此刻的音乐频率",
+  "mood-journey": "从现在，走向想去的状态",
+  music: "留一点时间，听一首歌",
+  discover: "遇见还没听过的声音",
+  memory: "那些被认真听见的瞬间",
+  journey: "翻开你的音乐日记",
+};
 function ConnectionStatus({
   state,
   modelState,
@@ -315,6 +324,10 @@ export default function MeloExperience() {
                 >
                   melo {<QQMusicIcon />}
                 </a>
+                <div className="menu-intro">
+                  <span>YOUR LITTLE MUSIC SPACE</span>
+                  <p>今天，想从哪里开始？</p>
+                </div>
                 <nav aria-label="移动端导航">
                   {nav.map(([text, id], i) => (
                     <a
@@ -328,7 +341,9 @@ export default function MeloExperience() {
                         setMenu(false);
                       }}
                     >
-                      {text}
+                      <span className="menu-entry-number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="menu-entry-copy"><strong>{text}</strong><small>{menuDescriptions[id]}</small></span>
+                      <span className="menu-entry-arrow" aria-hidden="true">↗</span>
                     </a>
                   ))}
                 </nav>

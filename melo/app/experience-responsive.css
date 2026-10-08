@@ -786,7 +786,7 @@
   .my-melo-drawer,
   .now-playing,
   .melo-menu-panel {
-    padding: 32px 23px !important;
+    padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)) !important;
   }
   .my-melo-drawer {
     width: 96vw !important;
