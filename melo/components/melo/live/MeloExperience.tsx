@@ -89,12 +89,32 @@ export default function MeloExperience() {
   const [menu, setMenu] = useState(false);
   const [still, setStill] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [navPalette, setNavPalette] = useState({ background: "#0d1a19", image: "none", size: "auto", position: "center top", color: "#f4f7f3", copy: "#dde9e1" });
   useEffect(() => {
-    const update = () =>
+    let frame = 0;
+    const update = () => {
+      frame = 0;
       setScrolled(window.scrollY > window.innerHeight * 0.65);
+      const point = (root.current?.querySelector('header.live-nav')?.getBoundingClientRect().height || 74) + 20;
+      const section = Array.from(root.current?.querySelectorAll('.world-section, section[id]') || []).find(e => {
+        const rect = e.getBoundingClientRect();
+        return rect.top <= point && rect.bottom > point;
+      });
+      if (!section) return;
+      const style = getComputedStyle(section);
+      const rect = section.getBoundingClientRect();
+      const next = { background: style.backgroundColor, image: style.backgroundImage, size: `${rect.width}px ${rect.height}px`, position: `center ${rect.top}px`, color: style.color, copy: style.getPropertyValue('--scene-copy').trim() || style.color };
+      setNavPalette(previous => Object.keys(next).every(key => previous[key as keyof typeof next] === next[key as keyof typeof next]) ? previous : next);
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      cancelAnimationFrame(frame);
+    };
   }, []);
   const noMotion = melo.reduced || still;
   const menuTarget = useRef<string | null>(null);
@@ -211,7 +231,7 @@ export default function MeloExperience() {
         <a href="#chat" className="skip-link">
           跳到 Melo 聊天
         </a>
-        <header className={`live-nav ${scrolled ? "is-scrolled" : ""}`}>
+        <header className={`live-nav ${scrolled ? "is-scrolled" : ""}`} style={{ '--nav-surface': navPalette.background, '--nav-image': navPalette.image, '--nav-size': navPalette.size, '--nav-position': navPalette.position, '--nav-foreground': navPalette.color, '--nav-copy': navPalette.copy } as CSSProperties}>
           <a href="#home" className="wordmark">
             melo <span>{<QQMusicIcon />}</span>
           </a>

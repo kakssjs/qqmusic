@@ -17,18 +17,24 @@
   color: #f4f7f3;
   border: 0;
   backdrop-filter: none;
+  transition: none;
 }
 .cloud-experience .live-nav.is-scrolled {
   height: 74px;
-  background: #0d1a19ed;
-  backdrop-filter: blur(20px);
+  background: var(--nav-surface, #0d1a19ed);
+  background-image: var(--nav-image, none);
+  background-size: var(--nav-size, auto);
+  background-position: var(--nav-position, center top);
+  background-repeat: no-repeat;
+  color: var(--nav-foreground, #f4f7f3);
+  backdrop-filter: none;
 }
 .cloud-experience .live-nav > nav {
   position: static;
   display: flex;
   gap: clamp(16px, 2vw, 30px);
   font-size: 14px;
-  color: #e1e8e5;
+  color: inherit;
 }
 .live-nav > div {
   display: flex;
@@ -38,7 +44,7 @@
 .live-motion,
 .live-connect {
   font-size: 12px;
-  color: #dde9e1;
+  color: var(--nav-copy, #dde9e1);
 }
 .live-motion {
   display: flex;
@@ -591,4 +597,14 @@
   color: #f1ccb8;
   line-height: 1.8;
   margin: 12px 0;
+}
+.chat-text-label {
+  display: block;
+  margin: 22px 0 10px;
+  color: var(--scene-fg);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.chat-text-label span {
+  color: var(--scene-copy);
 }

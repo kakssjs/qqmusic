@@ -5,3 +5,18 @@
 @import "./music-world.css";
 @import "./experience-controls.css";
 @import "./experience-responsive.css";
+
+/* Hide scrollbar chrome while retaining mouse, touch, and keyboard scrolling. */
+html,
+body,
+body * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+body *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
