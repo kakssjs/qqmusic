@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { catalog, playableTracks } from "../../data/music/catalog";
+import { catalog, originalTracks, uploadedTracks } from "../../data/music/catalog";
 import { differentTracks, recommend } from "../../lib/music/recommendation";
 import type { LiveMelo } from "../melo/live/useLiveMelo";
 import { DiscoverRail } from "./DiscoverRail";
@@ -127,8 +127,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
           </button>
         </div>
         <small>
-          {playableTracks.length} 段原创可完整播放；真实歌曲前往 QQ
-          音乐官方搜索。封面为 Melo 氛围创作。
+          {originalTracks.length} 段原创与 {uploadedTracks.length} 首你带来的歌可完整播放；更多歌曲可前往 QQ 音乐官方搜索。封面为 Melo 氛围创作。
         </small>
       </form>
       {melo.searchStatus && (
@@ -144,6 +143,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
           melo={melo}
         />
       )}
+      <DiscoverRail title="你带来的歌" caption="熟悉的声音，留在你的小小音乐空间。" tracks={uploadedTracks} melo={melo} />
       {rails.map((rail) => (
         <DiscoverRail key={rail.title} {...rail} melo={melo} />
       ))}

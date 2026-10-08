@@ -86,7 +86,7 @@ export function useMeloAudio() {
       s.buffer = b;
       s.connect(gain.current!);
       source.current = s;
-      offset.current = Math.min(89.9, position);
+      offset.current = Math.max(0, Math.min(b.duration - .1, position));
       started.current = ctx.currentTime;
       s.start(0, offset.current);
       active.current = true;
@@ -191,3 +191,4 @@ export function useMeloAudio() {
     previous: () => step(-1),
   };
 }
+
