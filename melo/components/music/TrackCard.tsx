@@ -1,5 +1,5 @@
 "use client";
-import { Play, ArrowUpRight } from "lucide-react";
+import { Play, Pause, LoaderCircle, ArrowUpRight } from "lucide-react";
 import { trackAudioLabel, trackDuration, type Track } from "../../data/music/catalog";
 import type { LiveMelo } from "../melo/live/useLiveMelo";
 export function TrackCard({
@@ -13,6 +13,9 @@ export function TrackCard({
   reason?: string;
   size?: "hero" | "standard" | "compact";
 }) {
+  const current = melo.audio.song.id === t.id;
+  const loading = current && melo.audio.loading;
+  const playing = current && melo.audio.playing;
   const official = t.source === "qq-music";
   return (
     <article
@@ -40,7 +43,8 @@ export function TrackCard({
           </a>
         ) : (
           <button
-            onClick={() =>
+            disabled={loading}
+            onClick={() => playing ? melo.audio.toggle() :
               melo.playQueue([
                 t.id,
                 ...melo.recommendations
@@ -48,13 +52,15 @@ export function TrackCard({
                   .map((x) => x.id),
               ])
             }
-            aria-label={`播放 ${t.title}`}
+            aria-label={`${loading ? "正在加载" : playing ? "暂停" : "播放"} ${t.title}`}
           >
-            <Play size={20} fill="currentColor" />
+            {loading ? <LoaderCircle size={20} /> : playing ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
           </button>
         )}
       </div>
       <small>{official ? trackAudioLabel(t) : `${trackAudioLabel(t)} · ${trackDuration(t)}`}</small>
+      {loading && <p role="status">正在加载歌曲，首次播放需要一点时间…</p>}
+      {current && melo.audio.error && <p role="alert">{melo.audio.error}</p>}
       <h3>{t.title}</h3>
       <p className="track-artist">{t.artist}</p>
       <p className="track-reason">{reason || t.reason}</p>

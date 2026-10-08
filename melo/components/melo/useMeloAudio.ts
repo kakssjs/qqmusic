@@ -105,6 +105,7 @@ export function useMeloAudio() {
         else wantsPlayback.current=false;
       };
     } catch {
+      wantsPlayback.current = false;
       setError("声音暂时无法启动，请再次点击播放。");
       setPlaying(false);
       setLoading(false);

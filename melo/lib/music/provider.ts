@@ -19,7 +19,7 @@ export function synthesize(t:Track,rate=16000) {
 }
 export async function audioBuffer(ctx:AudioContext,t:Track) {
   const url=t.source==='qq-music'?t.previewUrl:t.audioUrl;
-  if(url)try {const r=await fetch(url,{signal:AbortSignal.timeout(8000)});if(r.ok)return {buffer:await ctx.decodeAudioData(await r.arrayBuffer()),fallback:false};}catch{/* Original synthesis remains available if the local file is unreachable. */}
+  if(url)try {const r=await fetch(url,{signal:AbortSignal.timeout(t.source==='user-upload'?120000:8000)});if(r.ok)return {buffer:await ctx.decodeAudioData(await r.arrayBuffer()),fallback:false};}catch{/* Original synthesis remains available if the local file is unreachable. */}
   if(t.source==='user-upload')throw new Error('这首歌暂时无法加载，请稍后重试。');
   const original=t.composition?t:originalTracks.find(x=>x.coreMood===t.coreMood)||originalTracks[0];
   const samples=synthesize(original),buffer=ctx.createBuffer(1,samples.length,16000);buffer.getChannelData(0).set(samples);
