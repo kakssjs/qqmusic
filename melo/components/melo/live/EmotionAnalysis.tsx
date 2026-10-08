@@ -2,6 +2,7 @@
 import { QQMusicIcon } from "../QQMusicIcon";
 import { ArrowUpRight } from "lucide-react";
 import { moods, type LiveMelo } from "./useLiveMelo";
+import { JourneyGoals } from "../../music/MoodJourney";
 export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
   return (
     <section id="emotion" className="world-section feel-section">
@@ -73,7 +74,12 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
             <h3>{melo.scores ? moods.find(([id])=>id===melo.mood)?.[1] : '先听你说，再慢慢理解'}</h3>
             {melo.currentMoment && <p>{melo.currentMoment.payload.secondary} · {melo.currentMoment.payload.scene}</p>}
             <p>{melo.reason || '分享一句现在的感受，Melo 会把理解和音乐连在一起。'}</p>
-            {melo.scores && <><p className="world-fineprint">这些结果是音乐推荐信号，不是心理健康诊断。</p><a className="world-text-button" href="#music">所以，Melo 为你选了一组声音 ↗</a></>}
+            {melo.scores && <>
+              <p className="world-fineprint">这些结果是音乐推荐信号，不是心理健康诊断。</p>
+              <p className="journey-goal-prompt">听完一段音乐，你希望更接近哪一种状态？</p>
+              <JourneyGoals melo={melo} />
+              <a className="world-text-button" href="#music">先听此刻的推荐 ↗</a>
+            </>}
           </div>
         </div>
         <div

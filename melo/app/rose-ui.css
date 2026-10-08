@@ -9,7 +9,7 @@
   align-items: stretch;
   text-align: left;
   padding: 88px 0 0;
-  background: #b69198;
+  background: #657d91;
   isolation: isolate;
   position: relative;
 }
@@ -18,13 +18,13 @@
   object-position: center;
 }
 .mobile-gradient {
-  background: linear-gradient(to top, #b69198 0%, #b69198 30%, transparent 55%);
+  background: linear-gradient(to top, #657d91 0%, #657d91 30%, transparent 55%);
 }
 .desktop-gradient {
   background: linear-gradient(
     to right,
-    #b69198 0%,
-    #b69198 30%,
+    #657d91 0%,
+    #657d91 30%,
     transparent 55%
   );
 }
@@ -75,14 +75,14 @@
 }
 .video-hero .meet-button {
   background: white;
-  color: #271b22;
+  color: #142018;
   border-radius: 8px;
   padding: 13px 24px;
   font-size: 13px;
   gap: 32px;
 }
 .video-hero .meet-button > span {
-  color: #916e7a;
+  color: #708a9a;
 }
 .video-hero .meet-button:hover {
   background: #ffffffeb;
@@ -203,7 +203,7 @@
   font-size: 29px;
   font-weight: 600;
   letter-spacing: -1.5px;
-  color: #86606c;
+  color: #71899a;
   margin-bottom: 35px;
 }
 .melo-menu-panel nav {
@@ -251,126 +251,126 @@
   font-family: Inter, sans-serif;
   font-style: normal;
   font-weight: 350;
-  color: #c7a7b1;
+  color: #9ae6b4;
 }
 .live-section {
   background: transparent;
 }
 .live-melo {
-  background: #120e11;
+  background: #07100c;
 }
 .live-melo .glass {
-  border-color: #c69aa923;
-  background: linear-gradient(145deg, #38272f80, #171016b5);
+  border-color: #afc2c925;
+  background: linear-gradient(145deg, #23363080, #101a17b5);
   box-shadow: 0 30px 90px #05020545;
 }
 .live-heading > .eyebrow {
-  color: #ae8594;
+  color: #afc2c9;
 }
 .live-heading > p:last-child {
-  color: #a48a95;
+  color: #afc2c9;
 }
 .live-heading h2 {
-  color: #f2e8ec;
+  color: #f2f6f2;
 }
 .live-chat-top > div > span,
 .live-message > span,
 .memory-orbit span,
 .emotion-radar > b {
-  color: #c79dae;
+  color: #9ae6b4;
 }
 .live-message > div {
-  background: #d7a6bb0d;
-  border-color: #d7a6bb0e;
+  background: #9ae6b40d;
+  border-color: #9ae6b40e;
 }
 .live-message.user > div {
-  background: #d7a6bb19;
+  background: #9ae6b419;
 }
 .live-message > div p {
-  color: #d6bfca;
+  color: #dce4e1;
 }
 .live-chat-compose {
-  border-color: #c7a0b52c;
-  background: #c7a0b507;
+  border-color: #9ae6b42c;
+  background: #9ae6b407;
 }
 .live-chat-compose button {
-  background: #c7a0b525;
-  color: #d9b4c3;
+  background: #9ae6b425;
+  color: #9ae6b4;
 }
 .companion-memory h3,
 .emotion-writing > label,
 .live-scores strong {
-  color: #d8bec9;
+  color: #dce4e1;
 }
 .memory-description,
 .emotional-state,
 .song-letter > p {
-  color: #b79aa8;
+  color: #afc2c9;
 }
 .live-emotion-panel {
   background:
-    radial-gradient(ellipse at 50% 30%, #8d526019, transparent 70%), #1b1219a0;
+    radial-gradient(ellipse at 50% 30%, #9ae6b419, transparent 70%), #101a17a0;
 }
 .live-scores b {
-  background: linear-gradient(90deg, #ad8794, #ddbec9);
+  background: linear-gradient(90deg, #afc2c9, #c8ff32);
 }
 .live-mood-choices button[aria-pressed="true"] {
-  color: #dfc7d0;
-  border-color: #c9a0b255;
-  background: #bb879d20;
+  color: #dce4e1;
+  border-color: #9ae6b455;
+  background: #9ae6b420;
 }
 .live-melo .meet-button {
   border-radius: 8px;
-  background: #eee4e9;
-  color: #291f25;
+  background: #dce4e1;
+  color: #07100c;
 }
 .live-melo .meet-button > span {
-  color: #9c7185;
+  color: #657d91;
 }
 .live-melo .meet-button:hover {
   box-shadow: none;
-  background: #f9eff4;
+  background: #f2f6f2;
 }
 .live-melo .frequency-options > .selected {
-  border-bottom-color: #d6b0c0;
+  border-bottom-color: #9ae6b4;
 }
 .live-melo .frequency-options > .selected strong {
-  color: #e4cbd7;
+  color: #9ae6b4;
 }
 .live-melo .space-memory {
-  border-color: #cba2b029;
-  background: linear-gradient(155deg, #5937413c, #1b0e16b0);
+  border-color: #afc2c929;
+  background: linear-gradient(155deg, #2336303c, #101a17b0);
   border-radius: 16px;
 }
 .live-melo .space-memory h3 {
-  color: #cfb7c4;
+  color: #dce4e1;
 }
 .live-melo .journey-keywords strong {
-  color: #c7a0b1;
+  color: #9ae6b4;
 }
 .live-melo .journey-keywords strong:nth-child(2) {
-  color: #baa9c7;
+  color: #afc2c9;
 }
 .live-melo .journey-keywords strong:nth-child(3) {
-  color: #ddc7d4;
+  color: #dce4e1;
 }
 .live-melo .journey-numbers strong {
-  color: #cfaebe;
+  color: #c8ff32;
 }
 .live-melo .your-music-story > p {
-  color: #c8a9b9;
+  color: #dce4e1;
 }
 .live-footer {
-  background: radial-gradient(ellipse at 50% 80%, #8049591c, transparent 60%);
+  background: radial-gradient(ellipse at 50% 80%, #9ae6b41c, transparent 60%);
 }
 .live-footer h2 em {
-  color: #c49fac;
+  color: #9ae6b4;
 }
 .live-footer > .meet-button {
   border-radius: 8px;
 }
 .live-footer > div {
-  color: #a78a98;
+  color: #afc2c9;
 }
 .live-still .video-hero > video {
   transform: none !important;
@@ -545,7 +545,7 @@ body {
   position: fixed;
 }
 .live-nav.is-scrolled {
-  background: #160f16e6;
+  background: #0c1714e6;
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid #d6b2c312;
+  border-bottom: 1px solid #afc2c914;
 }

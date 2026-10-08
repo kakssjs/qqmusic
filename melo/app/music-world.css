@@ -25,13 +25,24 @@
   pointer-events: none;
 }
 .music-world {
-  --world-bg: #050706;
-  --world-fg: #f5f7f4;
-  --world-copy: rgba(245, 247, 244, 0.72);
-  --world-muted: rgba(245, 247, 244, 0.46);
-  --world-green: #c8ff32;
-  --world-mint: #7fffa1;
-  --world-line: rgba(255, 255, 255, 0.08);
+  --melo-bg: #07100c;
+  --melo-bg-soft: #101a17;
+  --melo-ink: #07100c;
+  --melo-deep: #101a17;
+  --melo-cloud: #afc2c9;
+  --melo-fog: #dce4e1;
+  --melo-text: #f2f6f2;
+  --melo-muted: rgba(226, 237, 229, 0.62);
+  --melo-green: #c8ff32;
+  --melo-green-soft: #9ae6b4;
+  --melo-border: rgba(220, 228, 225, 0.12);
+  --world-bg: var(--melo-bg);
+  --world-fg: var(--melo-text);
+  --world-copy: var(--melo-muted);
+  --world-muted: rgba(226, 237, 229, 0.42);
+  --world-green: var(--melo-green);
+  --world-mint: var(--melo-green-soft);
+  --world-line: var(--melo-border);
   color: var(--world-fg);
   background: var(--world-bg);
   font-family:
@@ -213,6 +224,7 @@
 }
 /* Feel: one immersive field, no dashboard cards. */
 .music-world .feel-section {
+  background-color: #0e1915;
   background-image: radial-gradient(
     ellipse at 85% 74%,
     #235f301c,
@@ -396,11 +408,8 @@
 }
 /* Meet: the original IP is a companion, not a new avatar. */
 .music-world .together-section {
-  background-image: radial-gradient(
-    ellipse at 22% 50%,
-    #18482720,
-    transparent 54%
-  );
+  background-color: #101a19;
+  background-image: linear-gradient(180deg, #657d911f, transparent 55%), radial-gradient(ellipse at 22% 50%, #18482720, transparent 54%);
 }
 .music-world .together-layout {
   display: grid;
@@ -638,8 +647,19 @@
   padding: 0;
   margin: 15px 0;
 }
+/* Mix opens the room back up after the intimate listening scene. */
+.music-world .mix-section {
+  background-color: #101a17;
+  background-image: linear-gradient(135deg, #9ae6b40b, transparent 58%), radial-gradient(ellipse at 92% 42%, #657d911c, transparent 50%);
+}
+/* Discover: a wider, editorial music landscape. */
+.music-world .discover-section {
+  background-color: #0d1715;
+  background-image: radial-gradient(ellipse at 8% 10%, #657d9120, transparent 38%), radial-gradient(ellipse at 90% 80%, #9ae6b40b, transparent 45%);
+}
 /* Listen: album art and record grooves, one focal point. */
 .music-world .listen-section {
+  background-color: #030705;
   background-image: radial-gradient(
     ellipse at 50% 43%,
     #28592b24,
@@ -931,10 +951,11 @@
 }
 /* Memory: time coordinates, light dots and floating words. */
 .music-world .remember-section {
+  background-color: #101a1b;
   background-image: radial-gradient(
     ellipse at 72% 64%,
-    #174f2720,
-    transparent 60%
+    #657d9128,
+    transparent 62%
   );
 }
 .music-world .memory-layout {
@@ -1109,9 +1130,10 @@
 }
 /* Journey: a visual path built from the listener's real moments. */
 .music-world .journey-section {
+  background-color: #101a1b;
   background-image:
-    radial-gradient(ellipse at 20% 35%, #7fffa10b, transparent 55%),
-    radial-gradient(ellipse at 90% 70%, #66e5ff09, transparent 45%);
+    radial-gradient(ellipse at 20% 35%, #9ae6b411, transparent 55%),
+    radial-gradient(ellipse at 90% 70%, #afc2c91e, transparent 45%);
 }
 .music-world .journey-heading .world-title {
   font-size: clamp(36px, 4vw, 66px);
@@ -1664,11 +1686,12 @@
   padding-top: 70px;
   padding-bottom: 70px;
   isolation: isolate;
+  background: linear-gradient(128deg, #344c5a 0%, #1b302f 48%, #0b1512 100%);
 }
 .music-world .ending-aura {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 34% 56%, #4fea8b16, transparent 50%);
+  background: radial-gradient(ellipse at 34% 56%, #afc2c930, transparent 52%);
   z-index: -1;
   animation: world-aura 10s ease-in-out infinite;
 }

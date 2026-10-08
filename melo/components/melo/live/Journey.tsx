@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import { moods, type LiveMelo, type MeloRecord } from "./useLiveMelo";
 import { tracks } from "../useMeloAudio";
-import { PersonalityPanel } from './CompanionExtras';
-import {uniqueMoments} from '../../../data/experience';
+import { PersonalityPanel } from "./CompanionExtras";
+import { uniqueMoments } from "../../../data/experience";
 
 type JourneyFilter = "all" | "listening" | "checkin" | "conversation" | "story";
 
@@ -49,9 +49,9 @@ function momentDetails(record: MeloRecord) {
   }
   if (record.type === "favorite") {
     return {
-      label: record.payload.liked===false ? "取消收藏" : "收藏旋律",
+      label: record.payload.liked === false ? "取消收藏" : "收藏旋律",
       title: record.payload.track
-        ? `${record.payload.liked===false?'取消收藏':'收藏了'}《${trackTitle(record.payload.track)}》`
+        ? `${record.payload.liked === false ? "取消收藏" : "收藏了"}《${trackTitle(record.payload.track)}》`
         : "收藏了一段旋律",
       icon: <Heart size={15} aria-hidden="true" />,
     };
@@ -100,7 +100,9 @@ export function Journey({ melo }: { melo: LiveMelo }) {
     (sum, e) => sum + (e.payload.seconds || 0),
     0,
   );
-  const moments = uniqueMoments(melo.records).filter((e) => e.type === "checkin");
+  const moments = uniqueMoments(melo.records).filter(
+    (e) => e.type === "checkin",
+  );
   const nights = new Set(
     listening
       .filter((e) => {
@@ -116,6 +118,28 @@ export function Journey({ melo }: { melo: LiveMelo }) {
   const words = story?.keywords?.filter(Boolean).slice(0, 3);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const monthName = new Intl.DateTimeFormat("en-US", { month: "long" })
+    .format(now)
+    .toUpperCase();
+  const allMonthMoments = moments
+    .filter((event) => {
+      const date = new Date(event.payload.momentAt || event.createdAt);
+      return (
+        date.getFullYear() === now.getFullYear() &&
+        date.getMonth() === now.getMonth()
+      );
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.payload.momentAt || b.createdAt).getTime() -
+        new Date(a.payload.momentAt || a.createdAt).getTime(),
+    );
+  const monthMomentCount = allMonthMoments.length;
+  const monthMoments = allMonthMoments.slice(0, 3);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthListeningSeconds = listening
+    .filter((event) => new Date(event.createdAt) >= monthStart)
+    .reduce((sum, event) => sum + (event.payload.seconds || 0), 0);
   const weekStart = new Date(today);
   weekStart.setDate(today.getDate() - 6);
   const weekEnd = new Date(today);
@@ -200,10 +224,77 @@ export function Journey({ melo }: { melo: LiveMelo }) {
   return (
     <section id="journey" className="world-section journey-section">
       <div className="world-section-meta reveal">
-        <span>05 / Journey</span>
+        <span>08 / JOURNEY</span>
         <span>每一段旋律，都算数</span>
       </div>
-      <PersonalityPanel melo={melo}/>
+      <header className="monthly-journal-intro reveal">
+        <div>
+          <p className="world-label">
+            MONTHLY MUSIC JOURNAL · YOUR {monthName}
+          </p>
+          <h2>
+            <span>{String(now.getMonth() + 1).padStart(2, "0")}</span>
+            {monthName}
+          </h2>
+          <p className="monthly-journal-line">
+            {monthMomentCount
+              ? `这个月，你留下了 ${monthMomentCount} 段心情记忆。${monthListeningSeconds ? `音乐陪你停留了 ${Math.floor(monthListeningSeconds / 60)} 分钟。` : "每一段愿意分享的心情，都有自己的位置。"}`
+              : "这个月的音乐故事，正在等你留下一刻真实的心情。"}
+          </p>
+          <small>
+            只呈现你真实留下的记录 · {Math.floor(monthListeningSeconds / 60)}{" "}
+            MINUTES OF SOUND
+          </small>
+        </div>
+        <span className="monthly-journal-orbit" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+      </header>
+      <div className="monthly-moments reveal">
+        <div className="monthly-moments-heading">
+          <span>THREE MOMENTS</span>
+          <small>这个月被留下来的音乐瞬间</small>
+        </div>
+        {monthMomentCount ? (
+          <ol>
+            {monthMoments.map((event, i) => {
+              const date = new Date(event.payload.momentAt || event.createdAt);
+              return (
+                <li key={event.id}>
+                  <span>0{i + 1}</span>
+                  <time dateTime={event.createdAt}>
+                    {date.toLocaleDateString("zh-CN", {
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </time>
+                  <p>
+                    “
+                    {event.payload.text ||
+                      event.payload.content ||
+                      "一段留给自己的音乐时刻"}
+                    ”
+                  </p>
+                  <small>
+                    {event.payload.journey
+                      ? `${event.payload.journey.from} → ${event.payload.journey.targetLabel}`
+                      : moods.find(([id]) => id === event.payload.mood)?.[1] ||
+                        "一个真实瞬间"}
+                  </small>
+                  <a href="#memory">回到这段记忆 ↗</a>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p className="monthly-moments-empty">
+            和 Melo 聊聊，或完成一条音乐旅程，这里会留下真实发生的片段。
+          </p>
+        )}
+      </div>
+      <PersonalityPanel melo={melo} />
       <div className="journey-heading reveal">
         <p className="world-label">My Music Journey</p>
         <h2 className="world-title">
