@@ -4,6 +4,19 @@ import { ArrowUpRight } from "lucide-react";
 import { moods, type LiveMelo } from "./useLiveMelo";
 import { JourneyGoals } from "../../music/MoodJourney";
 export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
+  const signals: Array<{ label: string; value: number }> = [
+    { label: "Energy", value: melo.signal.energy ?? 35 },
+    {
+      label: "Warmth",
+      value: melo.audio.song.scenes.includes("healing") ? 80 : 45,
+    },
+    { label: "Tempo", value: melo.audio.song.energy },
+    { label: "Space", value: 100 - melo.audio.song.energy },
+  ].map(({ label, value }) => ({
+    label,
+    value: Math.max(0, Math.min(100, Math.round(value))),
+  }));
+
   return (
     <section id="emotion" className="world-section feel-section">
       <div className="world-section-meta reveal">
@@ -43,8 +56,8 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
               <ArrowUpRight size={17} />
             </button>
             <button
-            className="world-text-button"
-            aria-label="记住这一刻"
+              className="world-text-button"
+              aria-label="记住这一刻"
               disabled={!!melo.busy || !melo.ready}
               onClick={() => void melo.saveMoment()}
             >
@@ -71,15 +84,35 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
           </p>
           <div className="emotion-insight" aria-live="polite">
             <span className="world-label">此刻的你</span>
-            <h3>{melo.scores ? moods.find(([id])=>id===melo.mood)?.[1] : '先听你说，再慢慢理解'}</h3>
-            {melo.currentMoment && <p>{melo.currentMoment.payload.secondary} · {melo.currentMoment.payload.scene}</p>}
-            <p>{melo.reason || '分享一句现在的感受，Melo 会把理解和音乐连在一起。'}</p>
-            {melo.scores && <>
-              <p className="world-fineprint">这些结果是音乐推荐信号，不是心理健康诊断。</p>
-              <p className="journey-goal-prompt">听完一段音乐，你希望更接近哪一种状态？</p>
-              <JourneyGoals melo={melo} />
-              <a className="world-text-button" href="#music">先听此刻的推荐 ↗</a>
-            </>}
+            <h3>
+              {melo.scores
+                ? moods.find(([id]) => id === melo.mood)?.[1]
+                : "先听你说，再慢慢理解"}
+            </h3>
+            {melo.currentMoment && (
+              <p>
+                {melo.currentMoment.payload.secondary} ·{" "}
+                {melo.currentMoment.payload.scene}
+              </p>
+            )}
+            <p>
+              {melo.reason ||
+                "分享一句现在的感受，Melo 会把理解和音乐连在一起。"}
+            </p>
+            {melo.scores && (
+              <>
+                <p className="world-fineprint">
+                  这些结果是音乐推荐信号，不是心理健康诊断。
+                </p>
+                <p className="journey-goal-prompt">
+                  听完一段音乐，你希望更接近哪一种状态？
+                </p>
+                <JourneyGoals melo={melo} />
+                <a className="world-text-button" href="#music">
+                  先听此刻的推荐 ↗
+                </a>
+              </>
+            )}
           </div>
         </div>
         <div
@@ -108,7 +141,25 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
               </div>
             ))}
           </div>
-          <div className="music-signal"><span>YOUR MUSIC SIGNAL</span>{[['Energy',melo.signal.energy||35],['Warmth',melo.audio.song.scenes.includes('healing')?80:45],['Tempo',melo.audio.song.energy],['Space',100-melo.audio.song.energy]].map(([label,value])=><div key={label}><small>{label}</small><i style={{width:`${value}%`}}/></div>)}</div>
+          <div className="music-signal" aria-label="音乐信号">
+            <span>YOUR MUSIC SIGNAL</span>
+            {signals.map(({ label, value }) => (
+              <div className="music-signal-row" key={label}>
+                <span className="music-signal-label">{label}</span>
+                <div
+                  className="music-signal-track"
+                  role="progressbar"
+                  aria-label={label}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={value}
+                >
+                  <i style={{ width: `${value}%` }} aria-hidden="true" />
+                </div>
+                <output className="music-signal-value">{value}%</output>
+              </div>
+            ))}
+          </div>
           <span className="frequency-caption">Your emotional frequency</span>
           <p className="emotional-state">
             {melo.reason || "还没有分析。等你愿意，Melo 会认真听。"}
