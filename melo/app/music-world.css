@@ -338,32 +338,48 @@
 }
 .live-chat-compose {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 15px;
-  border-bottom: 1px solid #c3d2c677;
-  padding: 16px 0;
+  border: 1px solid #bed5c78c;
+  border-radius: 18px;
+  background: #d3e8dc0e;
+  padding: 18px;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.live-chat-compose:focus-within {
+  border-color: var(--melo-green);
+  background: #d3e8dc14;
+  box-shadow: 0 0 0 3px #c8ff3214;
 }
 .live-chat-compose textarea {
   width: 100%;
-  min-height: 75px;
+  min-width: 0;
+  min-height: 90px;
   resize: vertical;
   border: 0;
   background: none;
   font-size: 16px;
   line-height: 1.8;
+  color: #f4f7f3;
+  outline: none;
 }
 .live-chat-compose textarea::placeholder {
   color: #b7c9c1;
 }
 .live-chat-compose > button {
-  width: 44px;
+  width: auto;
   height: 44px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 550;
   flex-shrink: 0;
   background: var(--melo-green);
   color: #07100c;
-  border-radius: 50%;
+  border-radius: 999px;
 }
 .live-chat-compose > button:disabled {
   background: #263b32;
@@ -844,60 +860,83 @@
 }
 .record-space {
   position: relative;
-  max-width: 650px !important;
+  isolation: isolate;
+  width: 100%;
+  max-width: 360px !important;
   margin: 42px auto !important;
-  padding: 0 70px 0 0;
+  padding: 0 76px 0 0;
 }
 .record-cover {
   position: relative;
+  z-index: 1;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 1;
+  background: #17251e;
+  border: 1px solid #b5cec42b;
   box-shadow: 0 25px 70px #0005;
 }
 .record-cover > img {
-  width: 100%;
-  height: 100%;
+  display: block;
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: calc(100% - 24px);
+  height: 59%;
   object-fit: cover;
+}
+.record-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, #17251e00 58%, #17251e 68%);
+  pointer-events: none;
 }
 .record-cover > div {
   position: absolute;
-  left: 7%;
-  bottom: 7%;
+  z-index: 1;
+  left: 16px;
+  bottom: 14px;
   text-align: left;
   color: white;
-  right: 7%;
-  text-shadow: 0 2px 18px #000;
+  right: 16px;
 }
 .record-cover > div > span {
-  font-size: 11px;
+  font-size: 8px;
   letter-spacing: 0.14em;
 }
 .record-cover h3 {
-  font-size: clamp(32px, 4vw, 54px);
+  font-size: 22px;
   font-weight: 450;
+  line-height: 1.25;
+  margin: 6px 0 5px;
+  overflow-wrap: anywhere;
 }
 .record-cover small {
-  font-size: 14px;
+  font-size: 10px;
 }
 .record-cover > b {
   position: absolute;
-  right: 25px;
-  top: 20px;
-  font-size: 25px;
+  z-index: 1;
+  right: 19px;
+  top: 17px;
+  font-size: 15px;
   color: #e2eccd;
   font-weight: 400;
 }
 .vinyl-record {
   position: absolute;
   right: 0;
-  top: 5%;
-  width: 80%;
-  height: 80%;
+  top: 8px;
+  width: 76%;
+  height: auto;
+  aspect-ratio: 1;
   border-radius: 50%;
-  background: repeating-radial-gradient(#0a1410 0 2px, #233127 3px 4px);
+  background: radial-gradient(circle, #0a100d 0 17%, transparent 18%), repeating-radial-gradient(#080d0a 0 2px, #253029 3px 4px);
+  box-shadow: 5px 12px 30px #0008;
   display: grid;
   place-items: center;
-  z-index: -1;
+  z-index: 0;
   border: 1px solid #b5cec440;
 }
 .vinyl-record > span {
@@ -1331,7 +1370,25 @@
 .music-search button {
   font-size: 14px;
   white-space: nowrap;
-  color: var(--scene-accent);
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #245536;
+  color: #f4f7f3;
+  border: 1px solid #245536;
+}
+.music-search button:disabled {
+  background: #9db4a5;
+  border-color: #718d7b;
+  color: #263d30;
+  opacity: 1;
+}
+.music-search button:enabled:hover {
+  background: #173d25;
+}
+.music-search button:focus-visible {
+  outline: 2px solid #245536;
+  outline-offset: 3px;
 }
 .music-search small,
 .search-status {

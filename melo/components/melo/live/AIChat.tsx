@@ -178,6 +178,9 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             </div>
           )}
           <VoiceChat melo={melo} onMode={setVoiceMode} />
+          <label className="chat-text-label" htmlFor="melo-chat-input">
+            文字聊聊 <span>· 在下方输入</span>
+          </label>
           <form
             className="live-chat-compose"
             onSubmit={(e) => {
@@ -186,8 +189,9 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             }}
           >
             <textarea
+              id="melo-chat-input"
               aria-label="给 Melo 的消息"
-              placeholder="把今天的心情，说给 Melo 听…"
+              placeholder="点击这里，输入你想对 Melo 说的话…"
               maxLength={1500}
               value={melo.chatDraft}
               onChange={(e) => melo.setChatDraft(e.target.value)}
@@ -207,6 +211,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
               disabled={!!melo.busy || !melo.ready || !melo.chatDraft.trim()}
             >
               <ArrowUp size={21} />
+              <span>发送</span>
             </button>
           </form>
           <p className="live-chat-note">
