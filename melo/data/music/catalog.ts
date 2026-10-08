@@ -2,9 +2,9 @@ export type CoreMood = 'calm' | 'tired' | 'sad' | 'bright' | 'focus';
 export type Composition = { notes: number[]; melody: number[]; tempo: number; voice: number; pulse: number };
 export type Track = {
   id: string; title: string; name: string; artist: string; cover: string;
-  source: 'melo-original' | 'licensed-demo' | 'qq-music'; audioUrl?: string; previewUrl?: string; officialUrl?: string;
+  source: 'melo-original' | 'licensed-demo' | 'qq-music' | 'user-upload'; audioUrl?: string; previewUrl?: string; officialUrl?: string;
   duration: number; moods: string[]; energy: number; scenes: string[]; styles: string[];
-  reason: string; copyrightType: 'original' | 'licensed' | 'official-link';
+  reason: string; copyrightType: 'original' | 'licensed' | 'official-link' | 'user-provided';
   subtitle: string; color: string; tempo: number; coreMood: CoreMood; composition?: Composition;
 };
 export type Playlist = { id: string; title: string; subtitle: string; tracks: string[]; generatedAt: string; reason: string };
@@ -32,7 +32,25 @@ const originals: [string,string,CoreMood,number,string[],string[],string,number[
  ['forest','雾中散步','tired',32,['rain','commute','healing'],['lofi','ambient'],'柔软低频与稀疏鼓点，陪你走过安静的雾色森林。',[82.41,123.47,164.81],[329.63,293.66,246.94,329.63,392,329.63],2.7,0,.4],
  ['aurora','极光梦游','bright',74,['night','energy'],['electronic','beat'],'闪烁的合成器与流动节奏，让夜晚也有一点轻盈的力量。',[185,277.18,369.99],[739.99,622.25,554.37,830.61,739.99,987.77],1.5,3,.9],
 ];
-export const playableTracks: Track[] = originals.map(([id,title,coreMood,energy,scenes,styles,reason,notes,melody,tempo,voice,pulse],i)=>({id,title,name:title,artist:'Melo Original',cover:cover(title,i),source:'melo-original',audioUrl:`/qqmusic/music/audio/${id}.wav`,duration:90,moods:[coreMood,...scenes.filter(s=>['healing','anxious','lonely'].includes(s))],energy,scenes,styles,reason,copyrightType:'original',subtitle:reason.split('，')[0],color:colors[i%4],tempo,coreMood,composition:{notes,melody,tempo,voice,pulse}}));
+export const originalTracks: Track[] = originals.map(([id,title,coreMood,energy,scenes,styles,reason,notes,melody,tempo,voice,pulse],i)=>({id,title,name:title,artist:'Melo Original',cover:cover(title,i),source:'melo-original',audioUrl:`/qqmusic/music/audio/${id}.wav`,duration:90,moods:[coreMood,...scenes.filter(s=>['healing','anxious','lonely'].includes(s))],energy,scenes,styles,reason,copyrightType:'original',subtitle:reason.split('，')[0],color:colors[i%4],tempo,coreMood,composition:{notes,melody,tempo,voice,pulse}}));
+const uploads: [string,string,string,number,CoreMood,number,string][] = [
+ ['jia-yi-bing-ding','甲乙丙丁 (你我怎么两清)','李佳薇',211,'sad',42,'给那些难以两清的心事，留一首歌的时间。'],
+ ['summer','夏天','李玖哲',226,'bright',62,'留一段时间，听一听你带来的夏天。'],
+ ['profile','侧脸','于果',218,'sad',38,'把没说完的话，暂时交给这一首。'],
+ ['dust','烟火里的尘埃','华晨宇',321,'sad',48,'戴上耳机，给自己一点安静的空间。'],
+ ['zhou-outro','周 Outro','周深',233,'calm',32,'在熟悉的声音里，慢慢收回思绪。'],
+ ['fall','堕','Zyboy忠宇',183,'sad',46,'让旋律陪你停留一会儿。'],
+ ['unsent-57','第57次取消发送','休眠火山',205,'tired',28,'那些犹豫的瞬间，也值得被听见。'],
+];
+export const uploadedTracks: Track[] = uploads.map(([id,title,artist,duration,coreMood,energy,reason],i)=>({
+ id:`upload-${id}`,title,name:title,artist,cover:cover(title,i+8),source:'user-upload',
+ audioUrl:`/qqmusic/music/audio/imported/${id}.${id==='zhou-outro'?'m4a':'mp3'}`,
+ duration,moods:[coreMood],energy,scenes:['night','commute'],styles:['pop'],reason,
+ copyrightType:'user-provided',subtitle:reason,color:colors[i%4],tempo:2,coreMood,
+}));
+export const playableTracks: Track[] = [...originalTracks,...uploadedTracks];
+export const trackAudioLabel=(t:Track)=>t.source==='user-upload'?'用户提供音频':t.source==='qq-music'?'QQ MUSIC · 官方搜索':'MELO ORIGINAL';
+export const trackDuration=(t:Track)=>`${Math.floor(t.duration/60)}:${String(t.duration%60).padStart(2,'0')}`;
 // Editorial metadata only. Covers are Melo-created art, not the artists' album artwork.
 // Search links deliberately avoid inventing song IDs, streaming rights or version-specific durations.
 const official: [string,string,CoreMood,number,string[],string[]][]=[
@@ -47,3 +65,4 @@ const official: [string,string,CoreMood,number,string[],string[]][]=[
 ];
 export const catalog: Track[]=[...playableTracks,...official.map(([title,artist,coreMood,energy,scenes,styles],i):Track=>({id:`qq-${i}`,title,name:title,artist,cover:cover(title,i+16),source:'qq-music',officialUrl:`https://y.qq.com/n/ryqq/search?w=${encodeURIComponent(title+' '+artist)}`,duration:0,moods:[coreMood],energy,scenes,styles,reason:`编辑选曲 · ${scenes.includes('night')?'夜晚':'路上'}也可以换一种声音；到 QQ 音乐查找官方版本。`,copyrightType:'official-link',subtitle:'QQ 音乐官方搜索 · 本站不提供音频',color:colors[i%4],tempo:2,coreMood}))];
 export const findTrack=(id?:string)=>catalog.find(t=>t.id===id);
+

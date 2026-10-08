@@ -1,4 +1,5 @@
 "use client";
+import { trackAudioLabel, trackDuration } from "../../../data/music/catalog";
 import { QQMusicIcon } from "../QQMusicIcon";
 import {
   Heart,
@@ -83,7 +84,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
             loading="lazy"
           />
           <div>
-            <span>Melo / original sound</span>
+            <span>{a.song.source === "user-upload" ? a.song.artist : "Melo / original sound"}</span>
             <h3>{a.song.name}</h3>
             <small>{a.song.subtitle}</small>
           </div>
@@ -184,7 +185,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
             />
           </div>
         </div>
-        <p className="world-fineprint">Melo 原创氛围音乐 · 90 秒的小小陪伴</p>
+        <p className="world-fineprint">{trackAudioLabel(a.song)} · {trackDuration(a.song)}</p>
         {a.error && <p role="alert">{a.error}</p>}
       </div>
       {melo.currentMoment && (
@@ -195,3 +196,4 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
     </section>
   );
 }
+

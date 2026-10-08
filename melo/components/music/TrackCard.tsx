@@ -1,6 +1,6 @@
 "use client";
 import { Play, ArrowUpRight } from "lucide-react";
-import type { Track } from "../../data/music/catalog";
+import { trackAudioLabel, trackDuration, type Track } from "../../data/music/catalog";
 import type { LiveMelo } from "../melo/live/useLiveMelo";
 export function TrackCard({
   track: t,
@@ -54,7 +54,7 @@ export function TrackCard({
           </button>
         )}
       </div>
-      <small>{official ? "QQ MUSIC · 官方搜索" : "MELO ORIGINAL · 1:30"}</small>
+      <small>{official ? trackAudioLabel(t) : `${trackAudioLabel(t)} · ${trackDuration(t)}`}</small>
       <h3>{t.title}</h3>
       <p className="track-artist">{t.artist}</p>
       <p className="track-reason">{reason || t.reason}</p>
