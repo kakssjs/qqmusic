@@ -13,7 +13,11 @@ import {
   SheetTrigger,
   SheetClose,
 } from "../../ui/sheet";
-import { useLiveMelo, type AIConnectionState } from "./useLiveMelo";
+import {
+  useLiveMelo,
+  type AIConnectionState,
+  type AIModelState,
+} from "./useLiveMelo";
 import { MeloHero } from "../MeloHero";
 import { AIChat } from "./AIChat";
 import { EmotionAnalysis } from "./EmotionAnalysis";
@@ -30,18 +34,25 @@ const nav = [
 ];
 function ConnectionStatus({
   state,
+  modelState,
   className,
   onRetry,
   style,
 }: {
   state: AIConnectionState;
+  modelState: AIModelState;
   className: string;
   onRetry: () => void;
   style?: CSSProperties;
 }) {
   const labels: Record<AIConnectionState, string> = {
     checking: "连接中…",
-    configured: "AGNES AI",
+    configured:
+      modelState === "ready"
+        ? "最近已回复"
+        : modelState === "error"
+          ? "模型异常"
+          : "AI 待验证",
     unconfigured: "AI 未配置",
     offline: "连接失败 · 重试",
   };
@@ -184,6 +195,7 @@ export default function MeloExperience() {
             </button>
             <ConnectionStatus
               state={melo.connectionState}
+              modelState={melo.modelState}
               className="live-connect"
               onRetry={() => void melo.load()}
             />
@@ -248,6 +260,7 @@ export default function MeloExperience() {
                 </nav>
                 <ConnectionStatus
                   state={melo.connectionState}
+                  modelState={melo.modelState}
                   className="menu-connection"
                   onRetry={() => void melo.load()}
                   style={{ transitionDelay: menu ? "320ms" : "0ms" }}

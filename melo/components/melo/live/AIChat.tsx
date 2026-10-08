@@ -67,7 +67,11 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
                     ? "正在连接…"
                     : melo.connectionState === "unconfigured"
                       ? "AI 服务尚未配置"
-                      : "正在这里，听你说"}
+                      : melo.modelState === "ready"
+                        ? "最近回复成功"
+                        : melo.modelState === "error"
+                          ? "模型调用失败"
+                          : "已配置 · 待验证"}
                 </small>
               )}
             </div>
@@ -174,7 +178,11 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
               ? "AI 服务尚未配置；你仍可体验情绪选择与音乐。"
               : melo.connectionState === "offline"
                 ? "AI 服务暂时连接不上；可点击上方重试，或继续听音乐。"
-                : "只属于你的对话空间"}
+                : melo.modelState === "ready"
+                  ? "最近一次成功回复已保存在云端。"
+                  : melo.modelState === "error"
+                    ? "服务已配置，但最近一次模型调用失败；请查看提示信息。"
+                    : "服务端已配置；首次成功回复后会显示模型状态。"}
             {melo.connected && <span>Shift + Enter 换行</span>}
           </p>
         </div>

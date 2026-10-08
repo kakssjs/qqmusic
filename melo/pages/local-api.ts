@@ -6,7 +6,7 @@ let connecting: Promise<string> | undefined;
 export function backendAddress() {
   configuration ??= fetch('/qqmusic/melo-backend.json',{cache:'no-store'}).then(async r=>{
     if(!r.ok)return '';
-    const {apiBase}=await r.json();
+    const {apiBase}=await r.json() as {apiBase?:string};
     if(!apiBase)return '';
     const url=new URL(apiBase);
     if(url.protocol!=='https:')throw new Error('后端需要有效的 HTTPS 地址。');
@@ -21,8 +21,8 @@ async function session(base:string) {
   const current=localStorage.getItem(sessionKey);if(current)return current;
   connecting ??= fetch(base+'/api/session').then(async r=>{
     if(!r.ok)throw new Error('无法连接云端会话。');
-    const data=await r.json();if(!/^[a-f0-9]{64}$/.test(data.token))throw new Error('云端会话格式无效。');
-    localStorage.setItem(sessionKey,data.token);return data.token as string;
+    const data=await r.json() as {token?:string};if(typeof data.token!=='string'||!/^[a-f0-9]{64}$/.test(data.token))throw new Error('云端会话格式无效。');
+    localStorage.setItem(sessionKey,data.token);return data.token;
   }).finally(()=>{connecting=undefined;});
   return connecting;
 }

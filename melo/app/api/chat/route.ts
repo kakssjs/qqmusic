@@ -4,7 +4,6 @@ import {
   events,
   identity,
   routeError,
-  saveEvent,
 } from "../../../lib/melo-server";
 export async function POST(request: Request) {
   try {

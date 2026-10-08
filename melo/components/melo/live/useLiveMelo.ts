@@ -20,6 +20,7 @@ export type MeloRecord = {
   createdAt: string;
 };
 export type AIConnectionState = "checking" | "configured" | "unconfigured" | "offline";
+export type AIModelState = "unverified" | "ready" | "error";
 export const moods = [
   ["calm", "平静"],
   ["tired", "疲惫"],
@@ -33,6 +34,7 @@ export function useLiveMelo() {
   const [ready, setReady] = useState(false);
   const [connected, setConnected] = useState(false);
   const [connectionState, setConnectionState] = useState<AIConnectionState>("checking");
+  const [modelState, setModelState] = useState<AIModelState>("unverified");
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState("");
@@ -80,9 +82,19 @@ export function useLiveMelo() {
       setReady(true);
       setConnected(data.aiConnected);
       setConnectionState(data.aiConnected ? "configured" : "unconfigured");
+      const lastReply = data.events.find(
+        (event) => event.type === "message" && event.payload.role === "assistant",
+      );
+      const replyAt = lastReply ? Date.parse(lastReply.createdAt) : Number.NaN;
+      const recentlyReplied =
+        Number.isFinite(replyAt) &&
+        replyAt <= Date.now() &&
+        Date.now() - replyAt < 24 * 60 * 60 * 1000;
+      setModelState(data.aiConnected && recentlyReplied ? "ready" : "unverified");
     } catch (e) {
       setConnected(false);
       setConnectionState("offline");
+      setModelState("unverified");
       setError((e as Error).message);
     }
   }
@@ -190,10 +202,12 @@ export function useLiveMelo() {
       });
       const data = (await r.json()) as { error?: string; reply?: string };
       if (!r.ok) throw new Error(data.error);
+      setModelState("ready");
       setExpression(expressionForMessage(message, data.reply));
       setChatDraft("");
       await load();
     } catch (e) {
+      setModelState("error");
       setExpression(previousExpression);
       setError((e as Error).message);
     } finally {
@@ -282,6 +296,7 @@ export function useLiveMelo() {
     ready,
     connected,
     connectionState,
+    modelState,
     error,
     setError,
     status,
