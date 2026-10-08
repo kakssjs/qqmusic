@@ -13,7 +13,7 @@ try {
   const ctx=await browser.newContext({viewport:{width,height:width>1000?960:900},acceptDownloads:true,reducedMotion:'reduce'});
   const page=await ctx.newPage(); page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
   page.on('response',r=>{if(r.url().includes('/api/')||r.status()>=400)report.network.push({url:r.url(),status:r.status()});});
-  const target=new URL(base);if(mode==='demo')target.searchParams.set('demo','1');
+  const target=new URL(base);if(mode==='demo')target.searchParams.set('demo','1');if(process.env.MELO_PREVIEW_BYPASS)target.searchParams.set('_vercel_share',process.env.MELO_PREVIEW_BYPASS);
   await page.goto(target.href,{waitUntil:'networkidle'});
   assert.equal(await page.locator('.memory-node').count(),0,'new visitor has no invented memories');
   await page.getByRole('link',{name:'开始和 Melo 聊聊',exact:true}).click();
@@ -32,9 +32,9 @@ try {
   await page.getByLabel('音乐播放进度').fill('35');await page.waitForTimeout(300);assert(+await page.getByLabel('音乐播放进度').inputValue()>34);
   await page.getByLabel('音量',{exact:true}).fill('0.31');
   await page.getByRole('button',{name:'下一首',exact:true}).click();await page.getByRole('button',{name:'上一首',exact:true}).click();
-  await page.getByRole('button',{name:'收藏当前音乐'}).click();await page.waitForTimeout(500);assert.equal(await page.getByRole('button',{name:'收藏当前音乐'}).getAttribute('aria-pressed'),'true');
-  await page.getByRole('button',{name:'收藏当前音乐'}).click();await page.waitForTimeout(500);assert.equal(await page.getByRole('button',{name:'收藏当前音乐'}).getAttribute('aria-pressed'),'false');
-  await page.getByRole('button',{name:'收藏当前音乐'}).click();await page.waitForTimeout(500);
+  await page.getByRole('button',{name:'收藏当前音乐'}).click();await page.waitForFunction(()=>document.querySelector('[aria-label="收藏当前音乐"]')?.getAttribute('aria-pressed')==='true');
+  await page.getByRole('button',{name:'收藏当前音乐'}).click();await page.waitForFunction(()=>document.querySelector('[aria-label="收藏当前音乐"]')?.getAttribute('aria-pressed')==='false');
+  await page.getByRole('button',{name:'收藏当前音乐'}).click();await page.waitForFunction(()=>document.querySelector('[aria-label="收藏当前音乐"]')?.getAttribute('aria-pressed')==='true');
   await page.getByRole('button',{name:'暂停音乐',exact:true}).click();await page.waitForTimeout(800);
   await page.getByRole('link',{name:'查看这次记忆',exact:true}).click();
   await page.locator('.memory-node summary').first().click();assert((await page.locator('.memory-details').first().innerText()).includes('Melo 当时的回应'));

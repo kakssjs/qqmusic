@@ -55,6 +55,7 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
               >
                 <time dateTime={e.createdAt}>
                   {new Date(e.createdAt).toLocaleDateString("zh-CN", {
+                    year: "numeric",
                     month: "short",
                     day: "2-digit",
                   })}
@@ -67,7 +68,7 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
                   </span>
                   <h3>“{e.payload.text || e.payload.content}”</h3>
                   <p className="memory-track">陪伴歌曲：《{tracks.find(t=>t.id===(e.payload.track||e.payload.mood))?.name||'晚风'}》</p>
-                  <details><summary>查看这个瞬间</summary><div className="memory-details"><dl><dt>当时说过的话</dt><dd>{e.payload.text||e.payload.content}</dd><dt>Melo 当时的回应</dt><dd>{e.payload.reply||'这一刻，你选择用音乐陪自己一会。'}</dd><dt>当时情绪</dt><dd>{moods.find(m=>m[0]===e.payload.mood)?.[1]||'尚未分析'} · {e.payload.secondary||'你愿意分享的瞬间'}</dd><dt>那一天的歌</dt><dd>{tracks.find(t=>t.id===(e.payload.track||e.payload.mood))?.name||'晚风'}</dd><dt>收藏状态</dt><dd>{isFavorite(melo.records,e.payload.track||e.payload.mood||'calm')?'现在仍在收藏中':'现在没有收藏'}</dd></dl><small>{e.payload.pending?'本机暂存 · 等待同步':'已经留下'} · {e.payload.source==='demo'?'预设演示记录':'你的真实记录'}</small></div></details>
+                  <details><summary>查看这个瞬间</summary><div className="memory-details"><dl><dt>当时说过的话</dt><dd>{e.payload.text||e.payload.content}</dd><dt>Melo 当时的回应</dt><dd>{e.payload.reply||'这一刻，你选择用音乐陪自己一会。'}</dd><dt>当时情绪</dt><dd>{moods.find(m=>m[0]===e.payload.mood)?.[1]||'尚未分析'} · {e.payload.secondary||'你愿意分享的瞬间'}</dd><dt>那一天的歌</dt><dd>{tracks.find(t=>t.id===(e.payload.track||e.payload.mood))?.name||'晚风'}</dd><dt>当时收藏状态</dt><dd>{e.payload.liked?'已收藏':'未收藏'}</dd><dt>现在收藏状态</dt><dd>{isFavorite(melo.records,e.payload.track||e.payload.mood||'calm')?'现在仍在收藏中':'现在没有收藏'}</dd></dl><small>{e.payload.pending?'本机暂存 · 等待同步':'已经留下'} · {e.payload.source==='demo'?'预设演示记录':'你的真实记录'}</small></div></details>
                   <button
                     className="world-text-button"
                     onClick={() => {
@@ -143,3 +144,4 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
     </section>
   );
 }
+

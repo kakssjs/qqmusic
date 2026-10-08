@@ -1,8 +1,4 @@
-@font-face {
-  font-family: MeloSans;
-  src: local("Inter"), local("Arial");
-  font-display: swap;
-}
+
 * {
   box-sizing: border-box;
 }
@@ -153,3 +149,4 @@ html[data-motion="reduced"] *:after {
     scroll-behavior: auto !important;
   }
 }
+
