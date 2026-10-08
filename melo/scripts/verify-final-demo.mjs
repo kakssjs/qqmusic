@@ -45,6 +45,8 @@ try {
   const copyBtn=page.getByRole('button',{name:'复制音乐签文案'});assert(await copyBtn.isEnabled());await copyBtn.click();await page.waitForTimeout(250);assert((await page.locator('.daily-sign').innerText()).includes('复制')||await page.locator('textarea').count()>0);
   await page.reload({waitUntil:'networkidle'});await page.waitForTimeout(1200);assert(await page.locator('.memory-node').count()>0,'snapshot persists after reload');
   assert.equal(await page.getByRole('button',{name:'收藏当前音乐'}).getAttribute('aria-pressed'),'true','latest favorite persists');
+  if(width===1440){await page.getByLabel('给 Melo 的消息').fill('你还记得我一开始说今天有点累吗？用一句话告诉我你记住了什么。');await page.getByRole('button',{name:'发送给 Melo',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-flow-ready="true"]'));assert(/累|疲|慢|休息/.test(await page.locator('.live-message.assistant').last().innerText()));report.contextRecall=true;}
+  await page.getByRole('button',{name:'生成我的音乐故事',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.journey-story-copy h3')?.textContent.includes('真实瞬间'));report.storyGenerated=true;
   const layout=await page.evaluate(async()=>{await document.fonts.ready;return {width:innerWidth,doc:document.documentElement.scrollWidth,font:document.fonts.check('16px Inter'),localApis:performance.getEntriesByType('resource').filter(r=>r.name.includes('/api/')&&r.name.includes('localhost')).length};});
   assert(layout.doc<=width);assert(layout.font);assert.equal(layout.localApis,0);
   await page.locator('#chat').scrollIntoViewIfNeeded();await page.screenshot({path:`${output}/chat-${mode}-${width}.png`});

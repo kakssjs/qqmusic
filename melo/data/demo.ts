@@ -81,7 +81,8 @@ export function demoRequest(url: string, options: RequestInit = {}) {
       ...contextHints(text),
     });
   if (url === "/api/chat") {
-    const past = records.find((e) => e.type === "checkin");
+    const moments=uniqueMoments(records).filter(e=>e.type==='checkin');
+    const past = /一开始/.test(text)?moments.at(-1):moments[0];
     const reply =
       /记得|上次/.test(text) && past
         ? `记得你说过「${past.payload.text}」。那次我们听了这段旋律。今天也想从安静一点开始吗？`
