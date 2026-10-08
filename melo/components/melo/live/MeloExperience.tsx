@@ -25,6 +25,7 @@ import { MusicRecommendation } from "./MusicRecommendation";
 import { MemorySpace } from "./MemorySpace";
 import { Journey } from "./Journey";
 import { Contact } from "./Contact";
+import { CompanionExtras } from './CompanionExtras';
 const nav = [
   ["聊聊", "chat"],
   ["情绪", "emotion"],
@@ -270,19 +271,23 @@ export default function MeloExperience() {
           </div>
         </header>
         <main>
+          {melo.demo&&<aside className="demo-banner" role="status">DEMO MODE · 预设演示，AI 回应为演示脚本，记录独立保存在本机。<a href="?#chat">退出演示，使用真实 AI</a></aside>}
           <MeloHero reduced={noMotion} melo={melo} />
           <div className="music-world" data-reduced={noMotion}>
-          <EmotionAnalysis melo={melo} />
           <AIChat melo={melo} />
+          <EmotionAnalysis melo={melo} />
           <MusicRecommendation melo={melo} />
           <MemorySpace melo={melo} />
           <Journey melo={melo} />
+          <CompanionExtras melo={melo} />
           <Contact />
           </div>
         </main>
         {melo.error && (
           <div className="live-toast error" role="alert">
             <p>{melo.error}</p>
+            <button disabled={!!melo.busy} onClick={melo.retry}>重新尝试</button>
+            {!melo.demo && <a href="?demo=1#chat">体验预设演示</a>}
             <button aria-label="关闭错误提示" onClick={() => melo.setError("")}>
               <X size={16} />
             </button>

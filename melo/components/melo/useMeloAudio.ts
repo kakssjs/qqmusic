@@ -70,8 +70,10 @@ export function useMeloAudio() {
   const buffers = useRef(new Map<number, AudioBuffer>());
   const active = useRef(false);
   const index = useRef(0);
+  const generation = useRef(0);
   const duration = 90;
   function stop() {
+    generation.current += 1;
     if (source.current) {
       source.current.onended = null;
       source.current.stop();
@@ -82,6 +84,7 @@ export function useMeloAudio() {
     setPlaying(false);
   }
   async function play(which = index.current, position = offset.current) {
+    const ticket = ++generation.current;
     try {
       if (!context.current) {
         context.current = new AudioContext();
@@ -93,7 +96,10 @@ export function useMeloAudio() {
       }
       const ctx = context.current;
       await ctx.resume();
+      if (ticket !== generation.current) return;
       stop();
+      index.current = which;
+      setTrack(which);
       let b = buffers.current.get(which);
       if (!b) {
         const rate = 22050;
@@ -132,7 +138,7 @@ export function useMeloAudio() {
       started.current = ctx.currentTime;
       s.start(0, offset.current);
       active.current = true;
-      lastTick.current = performance.now();
+      lastTick.current = ctx.currentTime;
       setPlaying(true);
       setError("");
       s.onended = () => {
@@ -179,8 +185,8 @@ export function useMeloAudio() {
   useEffect(() => {
     const timer = setInterval(() => {
       if (active.current && context.current) {
-        const now = performance.now();
-        setListened((v) => v + Math.max(0, (now - lastTick.current) / 1000));
+        const now = context.current.currentTime;
+        setListened((v) => v + Math.max(0, now - lastTick.current));
         lastTick.current = now;
         setProgress(
           Math.min(
@@ -205,6 +211,7 @@ export function useMeloAudio() {
     };
   }, []);
   return {
+    play,
     listened,
     track,
     song: tracks[track],

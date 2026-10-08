@@ -13,7 +13,7 @@ export function MeloScene({ expression, setExpression, reduced, busy = false }: 
     <MeloCharacter expression={expression} setExpression={setExpression} reduced={reduced} busy={busy}/>
     <svg className="cloud-music-ribbons" viewBox="0 0 700 700" aria-hidden="true"><defs><filter id="ribbon-glow"><feGaussianBlur stdDeviation="3"/></filter></defs><g fill="none" stroke="#d2fff0" strokeWidth="2"><path d="M40 540 C230 620 650 375 560 310 C490 270 315 352 370 420 C420 475 610 470 625 365"/><path d="M50 550 C200 610 605 392 570 345 C520 298 300 373 380 437" opacity=".5"/></g><path d="M40 540 C230 620 650 375 560 310 C490 270 315 352 370 420" fill="none" stroke="#a6ffe2" strokeWidth="8" opacity=".4" filter="url(#ribbon-glow)"/></svg>
     <div className="scene-platform"><span/><span/></div>
-    <MusicCompanion playing={expression==='listen'} reduced={reduced} greet={()=>setExpression('wink')}/>
+    <MusicCompanion working={busy} playing={expression==='listen'} reduced={reduced} greet={()=>setExpression('wink')}/>
     <div className="melo-speech" aria-live="polite"><span>MELO / 音音</span><p>{expressions.find(e=>e.id===expression)?.line}</p></div>
     <div className="scene-status"><MusicWave active={expression==='listen'} reduced={reduced}/><span>{expressions.find(e=>e.id===expression)?.label} · {expression.toUpperCase()}</span></div>
     {expression==='love' && <div className="scene-love" aria-hidden="true">♡ <span>♡</span> ♡</div>}

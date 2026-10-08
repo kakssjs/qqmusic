@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import MeloExperience from "../components/melo/live/MeloExperience";
 import { backendAddress } from "./local-api";
+import { demoEnabled } from '../data/demo';
 import "../app/globals.css";
 import "./pages.css";
 
@@ -20,13 +21,16 @@ function Notice() {
         if (active) setMode("unavailable");
       });
 
-    return () => {
+
+  return () => {
       active = false;
     };
   }, []);
 
+  if(demoEnabled())return <aside className="pages-notice">Melo · 预设演示 · 记录独立保存在此浏览器</aside>;
   return (
     <aside className="pages-notice" role="status" aria-live="polite">
+      {demoEnabled() && 'Melo · 演示记录只保存在此浏览器 · '}
       {mode === "checking" && "Melo · 正在确认记忆存储方式"}
       {mode === "cloud" && "Melo · 云端记忆已配置"}
       {mode === "browser" && "Melo 网页版 · 记忆保存在此浏览器"}

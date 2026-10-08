@@ -14,7 +14,7 @@ body {
   margin: 0;
   background: #050505;
   color: #f5f0fa;
-  font-family: MeloSans, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  font-family: Inter, "Helvetica Neue", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 button,

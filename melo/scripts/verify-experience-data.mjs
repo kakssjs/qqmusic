@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {uniqueMoments,isFavorite,mergeRecords,personality,contextHints} from '../data/experience.ts';
+const event=(id,type,payload,second=0)=>({id,type,payload,createdAt:new Date(2026,9,8,12,0,second).toISOString()});
+const records=[event('first','checkin',{momentId:'session-one',mood:'tired',track:'tired',text:'有点累'}),event('next','checkin',{momentId:'session-one',mood:'tired',track:'calm',text:'有点累'},1)];
+assert.equal(uniqueMoments(records).length,1);assert.equal(uniqueMoments(records)[0].payload.track,'calm');
+const likes=[event('like','favorite',{track:'calm',liked:true}),event('unlike','favorite',{track:'calm',liked:false},1)];
+assert.equal(isFavorite(likes,'calm'),false);assert.equal(isFavorite(likes,'bright'),false);
+const merged=mergeRecords([event('listening-total','listening',{seconds:15})],[event('receipt','listening',{seconds:10,track:'calm'})]);
+assert.equal(merged.reduce((sum,r)=>sum+(r.payload.seconds||0),0),15);
+assert.equal(personality(records).weekMoments.length,1);assert.equal(personality([]).enough,false);
+assert.equal(contextHints('有点累').scene,'场景待了解');assert.equal(contextHints('比赛之后想安静').scene,'比赛之后 · 想安静一会');
+console.log('PASS: grouped moments, reversible favorites, no double-counted listening, honest empty profile and context');

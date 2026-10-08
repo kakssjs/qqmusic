@@ -5,7 +5,7 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
   return (
     <section id="emotion" className="world-section feel-section">
       <div className="world-section-meta reveal">
-        <span>01 / Feel</span>
+        <span>02 / Feel</span>
         <span>每一种心情，都有自己的频率</span>
       </div>
       <div className="feel-layout">
@@ -67,6 +67,13 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
           <p className="world-fineprint">
             也可以自己选择。你的感受，由你定义。
           </p>
+          <div className="emotion-insight" aria-live="polite">
+            <span className="world-label">此刻的你</span>
+            <h3>{melo.scores ? moods.find(([id])=>id===melo.mood)?.[1] : '先听你说，再慢慢理解'}</h3>
+            {melo.currentMoment && <p>{melo.currentMoment.payload.secondary} · {melo.currentMoment.payload.scene}</p>}
+            <p>{melo.reason || '分享一句现在的感受，Melo 会把理解和音乐连在一起。'}</p>
+            {melo.scores && <><p className="world-fineprint">这是音乐氛围的主观适配信号，不是情绪诊断或概率。</p><a className="world-text-button" href="#music">所以，为你选了《{melo.audio.song.name}》 ↗</a></>}
+          </div>
         </div>
         <div
           className={

@@ -1,1 +1,35 @@
-{"$schema":"https://openapi.vercel.sh/vercel.json","framework":null,"rewrites":[{"source":"/qqmusic/:path*","destination":"/:path*"}]}
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "functions": {
+    "api/proxy.mjs": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "destination": "/api/proxy?route=session",
+      "source": "/api/session"
+    },
+    {
+      "destination": "/api/proxy?route=chat",
+      "source": "/api/chat"
+    },
+    {
+      "destination": "/api/proxy?route=emotion",
+      "source": "/api/emotion"
+    },
+    {
+      "destination": "/api/proxy?route=story",
+      "source": "/api/story"
+    },
+    {
+      "destination": "/api/proxy?route=health",
+      "source": "/api/health"
+    },
+    {
+      "destination": "/:path*",
+      "source": "/qqmusic/:path*"
+    }
+  ]
+}

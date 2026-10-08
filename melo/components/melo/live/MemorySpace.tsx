@@ -2,13 +2,15 @@
 import { useState } from "react";
 import { Trash2, Play, ArrowUpRight } from "lucide-react";
 import { moods, type LiveMelo } from "./useLiveMelo";
+import { tracks } from '../useMeloAudio';
+import { isFavorite,uniqueMoments } from '../../../data/experience';
 export function MemorySpace({ melo }: { melo: LiveMelo }) {
   const [confirm, setConfirm] = useState(false);
-  const items = melo.records
+  const items = uniqueMoments(melo.records)
     .filter(
       (e) =>
         e.type === "checkin" ||
-        (e.type === "message" && e.payload.role === "user"),
+        (e.type === "message" && e.payload.role === "user" && !melo.records.some(r=>r.type==='checkin'&&r.payload.text===e.payload.content)),
     )
     .slice(0, 12)
     .reverse();
@@ -64,17 +66,19 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
                       "你说过"}
                   </span>
                   <h3>“{e.payload.text || e.payload.content}”</h3>
+                  <p className="memory-track">陪伴歌曲：《{tracks.find(t=>t.id===(e.payload.track||e.payload.mood))?.name||'晚风'}》</p>
+                  <details><summary>查看这个瞬间</summary><div className="memory-details"><dl><dt>当时说过的话</dt><dd>{e.payload.text||e.payload.content}</dd><dt>Melo 当时的回应</dt><dd>{e.payload.reply||'这一刻，你选择用音乐陪自己一会。'}</dd><dt>当时情绪</dt><dd>{moods.find(m=>m[0]===e.payload.mood)?.[1]||'尚未分析'} · {e.payload.secondary||'你愿意分享的瞬间'}</dd><dt>那一天的歌</dt><dd>{tracks.find(t=>t.id===(e.payload.track||e.payload.mood))?.name||'晚风'}</dd><dt>收藏状态</dt><dd>{isFavorite(melo.records,e.payload.track||e.payload.mood||'calm')?'现在仍在收藏中':'现在没有收藏'}</dd></dl><small>{e.payload.pending?'本机暂存 · 等待同步':'已经留下'} · {e.payload.source==='demo'?'预设演示记录':'你的真实记录'}</small></div></details>
                   <button
                     className="world-text-button"
                     onClick={() => {
-                      melo.chooseMood(e.payload.mood || "calm");
+                      melo.replay(e);
                       document
                         .querySelector<HTMLAnchorElement>(".music-revisit-link")
                         ?.click();
                     }}
                   >
                     <Play size={12} />
-                    再听一次这个瞬间
+                    再听一次这段心情
                   </button>
                 </div>
               </article>
@@ -84,12 +88,10 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
               <span className="memory-dot" />
               <small>Now / 第一段回忆</small>
               <h3>
-                从你愿意分享的
-                <br />
-                这一刻开始。
+                第一颗记忆还没有亮起。
               </h3>
-              <a href="#emotion" className="world-text-button">
-                留下第一段心情 <ArrowUpRight size={16} />
+              <a href="#chat" className="world-text-button">
+                和 Melo 留下第一个瞬间 <ArrowUpRight size={16} />
               </a>
             </div>
           )}
@@ -115,6 +117,7 @@ export function MemorySpace({ melo }: { melo: LiveMelo }) {
         回到音乐
       </a>
       <div className="memory-ownership">
+        {melo.records.some(e=>e.payload.pending)&&<button onClick={()=>void melo.syncPending()}>重试同步本机记录</button>}
         <p>这些记忆，始终属于你。</p>
         {confirm ? (
           <div role="group" aria-label="确认清空记录">

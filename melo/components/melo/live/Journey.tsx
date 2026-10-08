@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { moods, type LiveMelo, type MeloRecord } from "./useLiveMelo";
 import { tracks } from "../useMeloAudio";
+import { PersonalityPanel } from './CompanionExtras';
+import {uniqueMoments} from '../../../data/experience';
 
 type JourneyFilter = "all" | "listening" | "checkin" | "conversation" | "story";
 
@@ -47,9 +49,9 @@ function momentDetails(record: MeloRecord) {
   }
   if (record.type === "favorite") {
     return {
-      label: "收藏旋律",
+      label: record.payload.liked===false ? "取消收藏" : "收藏旋律",
       title: record.payload.track
-        ? `收藏了《${trackTitle(record.payload.track)}》`
+        ? `${record.payload.liked===false?'取消收藏':'收藏了'}《${trackTitle(record.payload.track)}》`
         : "收藏了一段旋律",
       icon: <Heart size={15} aria-hidden="true" />,
     };
@@ -98,7 +100,7 @@ export function Journey({ melo }: { melo: LiveMelo }) {
     (sum, e) => sum + (e.payload.seconds || 0),
     0,
   );
-  const moments = melo.records.filter((e) => e.type === "checkin");
+  const moments = uniqueMoments(melo.records).filter((e) => e.type === "checkin");
   const nights = new Set(
     listening
       .filter((e) => {
@@ -146,7 +148,7 @@ export function Journey({ melo }: { melo: LiveMelo }) {
     weekSeconds >= 3600
       ? { value: (weekSeconds / 3600).toFixed(1), unit: "hours" }
       : { value: Math.floor(weekSeconds / 60), unit: "minutes" };
-  const allMoments = melo.records
+  const allMoments = uniqueMoments(melo.records)
     .filter(
       (record) =>
         record.type === "checkin" ||
@@ -201,6 +203,7 @@ export function Journey({ melo }: { melo: LiveMelo }) {
         <span>05 / Journey</span>
         <span>每一段旋律，都算数</span>
       </div>
+      <PersonalityPanel melo={melo}/>
       <div className="journey-heading reveal">
         <p className="world-label">My Music Journey</p>
         <h2 className="world-title">

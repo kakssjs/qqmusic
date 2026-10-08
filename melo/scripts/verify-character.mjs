@@ -98,7 +98,7 @@ try {
   await page.getByRole('link', { name: '音乐', exact: true }).click();
   await page.getByRole('button', { name: '收藏当前音乐' }).click();
   await page.waitForFunction(() => document.querySelector('.melo-character')?.dataset.expression === 'love');
-  assert.equal(await page.getByRole('button', { name: '收藏当前音乐' }).getAttribute('aria-pressed'), 'true');
+  await page.waitForFunction(() => document.querySelector('[aria-label="收藏当前音乐"]')?.getAttribute('aria-pressed') === 'true');
   await page.getByRole('link', { name: '旅程', exact: true }).click();
   await page.route('**/api/story', route => route.request().method()==='OPTIONS' ? route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'Content-Type,X-Melo-Session'}}) : route.fulfill({status:200,headers:{'access-control-allow-origin':'*'},contentType:'application/json',body:JSON.stringify({event:{id:'test-story',type:'story',payload:{story:'一段验证用的旋律故事。'},createdAt:new Date().toISOString()}})}));
   await page.getByRole('button', { name: '生成我的音乐故事' }).click();

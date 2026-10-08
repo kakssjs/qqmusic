@@ -4,6 +4,7 @@ const sessionKey = 'melo-cloud-session-v1';
 let configuration: Promise<string> | undefined;
 let connecting: Promise<string> | undefined;
 export function backendAddress() {
+  if(location.hostname.endsWith('.vercel.app'))return Promise.resolve(location.origin);
   configuration ??= fetch('/qqmusic/melo-backend.json',{cache:'no-store'}).then(async r=>{
     if(!r.ok)return '';
     const {apiBase}=await r.json() as {apiBase?:string};
@@ -19,7 +20,7 @@ export function backendAddress() {
 }
 async function session(base:string) {
   const current=localStorage.getItem(sessionKey);if(current)return current;
-  connecting ??= fetch(base+'/api/session').then(async r=>{
+  connecting ??= fetch(base+'/api/session',{signal:AbortSignal.timeout(12000)}).then(async r=>{
     if(!r.ok)throw new Error('无法连接云端会话。');
     const data=await r.json() as {token?:string};if(typeof data.token!=='string'||!/^[a-f0-9]{64}$/.test(data.token))throw new Error('云端会话格式无效。');
     localStorage.setItem(sessionKey,data.token);return data.token;
@@ -40,7 +41,9 @@ export async function pagesRequest(url: string, options: RequestInit = {}) {
     if(base){
       const token=await session(base);
       const headers=new Headers(options.headers);headers.set('X-Melo-Session',token);
-      return await fetch(base+url,{...options,headers});
+      const response=await fetch(base+url,{...options,headers});
+      if(response.status===401){localStorage.removeItem(sessionKey);const fresh=await session(base);headers.set('X-Melo-Session',fresh);return fetch(base+url,{...options,headers});}
+      return response;
     }
     if (url !== '/api/session') return Response.json({error:'GitHub Pages 不提供 AI 服务。请通过页面底部「AI 完整在线版」使用聊天与 AI 分析。'}, {status:503});
     const method = options.method || 'GET';

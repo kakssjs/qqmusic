@@ -1,0 +1,58 @@
+{
+  "url": "http://127.0.0.1:5173/qqmusic/",
+  "mode": "demo",
+  "at": "2026-10-08T01:03:33.378Z",
+  "passed": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "completeFlow": true,
+      "persisted": true,
+      "audio": true,
+      "layout": {
+        "width": 1440,
+        "doc": 1440,
+        "font": true,
+        "localApis": 0
+      }
+    },
+    {
+      "width": 390,
+      "completeFlow": true,
+      "persisted": true,
+      "audio": true,
+      "layout": {
+        "width": 390,
+        "doc": 390,
+        "font": true,
+        "localApis": 0
+      }
+    },
+    {
+      "width": 430,
+      "completeFlow": true,
+      "persisted": true,
+      "audio": true,
+      "layout": {
+        "width": 430,
+        "doc": 430,
+        "font": true,
+        "localApis": 0
+      }
+    },
+    {
+      "width": 768,
+      "completeFlow": true,
+      "persisted": true,
+      "audio": true,
+      "layout": {
+        "width": 768,
+        "doc": 768,
+        "font": true,
+        "localApis": 0
+      }
+    }
+  ],
+  "errors": [],
+  "network": []
+}

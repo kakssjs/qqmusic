@@ -1,5 +1,5 @@
 .live-melo {
-  font-family: "Geist", system-ui, "Microsoft YaHei", sans-serif;
+  font-family: Inter, system-ui, "Microsoft YaHei", sans-serif;
 }
 .video-hero {
   height: 100svh;
@@ -43,7 +43,7 @@
   margin: 0;
 }
 .video-hero .meet-title h1 {
-  font-family: "Geist", sans-serif;
+  font-family: Inter, sans-serif;
   font-size: clamp(64px, 7vw, 104px);
   font-weight: 400;
   letter-spacing: -0.055em;
@@ -142,7 +142,7 @@
   position: absolute;
 }
 .live-nav .wordmark {
-  font-family: "Geist", sans-serif;
+  font-family: Inter, sans-serif;
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.04em;
@@ -199,7 +199,7 @@
   color: #1f2937;
 }
 .menu-brand {
-  font-family: "Geist", sans-serif;
+  font-family: Inter, sans-serif;
   font-size: 29px;
   font-weight: 600;
   letter-spacing: -1.5px;
@@ -248,7 +248,7 @@
   animation: meloOverlayOut 0.3s both;
 }
 .live-heading h2 em {
-  font-family: "Geist", sans-serif;
+  font-family: Inter, sans-serif;
   font-style: normal;
   font-weight: 350;
   color: #c7a7b1;
@@ -539,7 +539,7 @@
   }
 }
 body {
-  font-family: "Geist", system-ui, "Microsoft YaHei", sans-serif;
+  font-family: Inter, system-ui, "Microsoft YaHei", sans-serif;
 }
 .live-nav {
   position: fixed;
