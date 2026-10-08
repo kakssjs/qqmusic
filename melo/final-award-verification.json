@@ -1,0 +1,233 @@
+{
+  "at": "2026-10-08T02:15:24.127567+00:00",
+  "releaseCommit": "c4acfaf416aa9d380b0342ffa9c6972ce33488da",
+  "preview": "https://melo-qqmusic-7p5puvlm0-quite10086.vercel.app/",
+  "production": "https://melo-qqmusic.vercel.app/",
+  "passed": true,
+  "checks": [
+    {
+      "id": "01",
+      "name": "Hero正常",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "02",
+      "name": "Melo七表情正常",
+      "passed": true,
+      "evidence": "verification/award-v4/music-regressions.json"
+    },
+    {
+      "id": "03",
+      "name": "Chat真实AI",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "04",
+      "name": "Emotion真实AI",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "05",
+      "name": "推荐至少3首",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "06",
+      "name": "Catalog不少于20条",
+      "passed": true,
+      "evidence": "scripts/verify-music-catalog.mjs + verification/award-v4/award-demo-online.json"
+    },
+    {
+      "id": "07",
+      "name": "5种情绪不同结果",
+      "passed": true,
+      "evidence": "scripts/verify-music-catalog.mjs + verification/award-v4/award-demo-online.json"
+    },
+    {
+      "id": "08",
+      "name": "可播放音乐不少于8首",
+      "passed": true,
+      "evidence": "scripts/verify-music-catalog.mjs + verification/award-v4/award-demo-online.json"
+    },
+    {
+      "id": "09",
+      "name": "上下一首",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "10",
+      "name": "进度",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "11",
+      "name": "音量",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "12",
+      "name": "收藏",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "13",
+      "name": "Global Player",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "14",
+      "name": "Discover",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "15",
+      "name": "Melo Mix",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "16",
+      "name": "Memory生成",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "17",
+      "name": "Memory恢复",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "18",
+      "name": "Journey更新",
+      "passed": true,
+      "evidence": "verification/award-v4/music-regressions.json"
+    },
+    {
+      "id": "19",
+      "name": "Today Card",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "20",
+      "name": "Demo Mode",
+      "passed": true,
+      "evidence": "verification/award-v4/award-demo-online.json + failure-recovery.json"
+    },
+    {
+      "id": "21",
+      "name": "Offline fallback",
+      "passed": true,
+      "evidence": "verification/award-v4/music-regressions.json"
+    },
+    {
+      "id": "22",
+      "name": "Mobile 390",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "23",
+      "name": "Desktop 1440",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "24",
+      "name": "reduced motion",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    },
+    {
+      "id": "25",
+      "name": "无严重console error",
+      "passed": true,
+      "evidence": "verification/award-v4/award-real-online.json"
+    }
+  ],
+  "catalog": 24,
+  "playableOriginals": 16,
+  "distinctUIPlayed": [
+    "tired",
+    "forest",
+    "letter",
+    "calm",
+    "sun",
+    "bus",
+    "shore",
+    "mint"
+  ],
+  "originalFileFingerprints": [
+    "d7dbe5a9849fcdf2f3e947b108e850a1fe26b0b4de6cd3346f559fb0f47f24ba",
+    "3ca8ad176ab18162bd627df164f272a5bd7135d68b3e38d59f5ab295ed883eb2",
+    "cf925f8ba454be2e3de3b4b5e4d26906e3d04cb0c8569582c8b9ed0245fc1ea8",
+    "2788025d98f37a049bb5830604d5f1be10f8639ba2e1e4b594743cb120ea31ca",
+    "b255cef0d9830fe3d1fc9543b61b108d2361accd06780e8fe5de60fc7b6171e8",
+    "245348e0aa7dca6035106a0ca6bf23369c97687217a65fbd2b279545b0196aa4",
+    "0a7eeb0a14aae4ce3c344d7d26c648f32dfd69bc5927bdfac2e097a78a00700b",
+    "e72788a2581f0f02471e0762c73b9d6b8e58c0d44da772f0adb834d2f86b1755",
+    "7242679c22aeee01b8f99524499a62143f60b8f0b90a5e478cacc0fc3a3beaac",
+    "a37015cfd53fdd8dc7ae665d86dc85cd7f3f8b30ea639070a0251dd0bf821887",
+    "e37c759bca0b2fc23bf112f154bba66f241f7981e014b3ba721318894dd2762c",
+    "489be21ddf4a94da4f574c78c7644c18e175e10bbc7f61097ec6907164dced7b",
+    "f5fc3ab672ce06de1946c02164d911f815961811c6fcf603e64e0c828ff72677",
+    "4adc001992c2cf6b2f919cb4a23d15356cdcabed296157fe0ad9333d8dae6199",
+    "e7078350949df386c9b57da13cca183f58a078cf41aabef7e7b97fa70b5b4cc4",
+    "bdde40ab8c108544e7ed471e39967fd8c694c41147eb4e70280df880371b0777"
+  ],
+  "extraRegressions": {
+    "happy": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "wink": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "surprise": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "listen": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "calm": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "love": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "care": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "rapidSkip": true,
+    "rapidSeek": true,
+    "freshUserQueueMixRestore": true,
+    "actualThirtySecondFeedback": true,
+    "originalSynthesisFallback": true,
+    "progressivePersonality": true
+  },
+  "limits": [
+    "Phone widths are browser emulation, not physical-device testing",
+    "QQ entries are official search links only; no official music audio API configured",
+    "Playable tracks are distinct Melo-made 90-second synthesized original compositions",
+    "Offline fallback checked by aborting original audio file requests; API error recovery is separate fault injection",
+    "Artwork generated specifically for Melo; not official artist album artwork",
+    "Cloud ECS backend was not redeployed; catalog IDs use compatibility transport"
+  ]
+}

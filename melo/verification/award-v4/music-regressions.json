@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "at": "2026-10-08T02:13:10.210Z",
+  "checks": {
+    "happy": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "wink": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "surprise": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "listen": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "calm": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "love": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "care": {
+      "width": 243.328125,
+      "height": 364.984375
+    },
+    "rapidSkip": true,
+    "rapidSeek": true,
+    "freshUserQueueMixRestore": true,
+    "actualThirtySecondFeedback": true,
+    "originalSynthesisFallback": true,
+    "progressivePersonality": true
+  }
+}
