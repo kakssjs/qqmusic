@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {attachVoice} from './voice.mjs';
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes,createHash} from 'node:crypto';
 import {mkdirSync} from 'node:fs';
@@ -58,6 +59,7 @@ export function createMeloServer(options={}) {
       if(typeof token==='string'&&/^[a-f0-9]{64}$/.test(token)){user=hash(token);if(!db.prepare('SELECT id FROM sessions WHERE id=?').get(user))fail(401,'会话失效，请重新连接。');}
       else if(req.method==='GET'&&url==='/api/session'&&!token){const token=randomBytes(32).toString('hex');user=hash(token);db.prepare('INSERT INTO sessions VALUES(?,?)').run(user,new Date().toISOString());return reply(200,{token,events:[],aiConnected:!!key,user:{name:'音乐旅人'}});}
       else fail(401,'请先建立音乐会话。');
+      if(url==='/api/voice-ticket'&&req.method==='POST'){if(++rate.ai>10)fail(429,'语音连接过于频繁，请稍后再试。');return reply(200,{ticket:voice.issue(user),url:options.voiceUrl||process.env.VOICE_PUBLIC_URL||'wss://123.56.102.46/api/voice'});}
       if(url==='/api/session'&&req.method==='GET')return reply(200,{events:history(user),aiConnected:!!key,user:{name:'音乐旅人'}});
       if(url==='/api/session'&&req.method==='DELETE'){db.prepare('DELETE FROM events WHERE user_id=?').run(user);return reply(200,{ok:true});}
       if(url==='/api/session'&&req.method==='POST'){
@@ -90,6 +92,7 @@ export function createMeloServer(options={}) {
       }finally{locks.delete(user);}
     }catch(e){reply(e.status||500,{error:e.status?e.message:'服务暂时不可用，请重试。'});}
   });
+  const voice=attachVoice(server,{origins,save,history,appId:options.voiceAppId,accessKey:options.voiceAccessKey});
   server.on('close',()=>db.close());return server;
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))createMeloServer().listen(Number(process.env.PORT||8080),process.env.HOST||'127.0.0.1',()=>console.log('Melo backend ready'));

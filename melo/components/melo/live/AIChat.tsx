@@ -1,10 +1,13 @@
 "use client";
 import { QQMusicIcon } from "../QQMusicIcon";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ArrowUp } from "lucide-react";
 import type { LiveMelo } from "./useLiveMelo";
 import { CharacterPresence } from "../CharacterPresence";
+import { VoiceChat } from "./VoiceChat";
+import type { CharacterMode } from "../../../lib/character-mode";
 export function AIChat({ melo }: { melo: LiveMelo }) {
+  const [voiceMode, setVoiceMode] = useState<CharacterMode | null>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const messages = melo.records
     .filter((e) => e.type === "message")
@@ -27,7 +30,10 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
       <div className="together-layout">
         <div className="together-portrait reveal">
           <div className="portrait-aura" />
-          <CharacterPresence melo={melo} className="talk-character" />
+          <CharacterPresence
+            melo={voiceMode ? { ...melo, mode: voiceMode } : melo}
+            className="talk-character"
+          />
           <div className="portrait-caption">
             <span className="world-live-dot" />
             Melo is here for you
@@ -171,6 +177,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
               )}
             </div>
           )}
+          <VoiceChat melo={melo} onMode={setVoiceMode} />
           <form
             className="live-chat-compose"
             onSubmit={(e) => {

@@ -527,3 +527,68 @@
 .pages-notice button {
   pointer-events: auto;
 }
+
+/* Voice starts only from an explicit user click. */
+.voice-chat {
+  margin-top: 24px;
+  border-top: 1px solid #d5e7de30;
+  padding: 20px 0;
+  color: var(--scene-text, #edf5ef);
+}
+.voice-entry,
+.voice-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #c8edda65;
+  border-radius: 99px;
+  padding: 12px 18px;
+  background: #d5efdb12;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.voice-chat small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #c6d8d0;
+  margin-top: 10px;
+}
+.voice-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #d2fc9b;
+}
+.voice-state i {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background: #a9ed72;
+}
+.voice-captions {
+  max-height: 240px;
+  overflow: auto;
+  line-height: 1.8;
+  font-size: 16px;
+}
+.voice-captions p {
+  margin: 12px 0;
+}
+.voice-captions small {
+  color: #a8d9be;
+}
+.voice-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.voice-error {
+  font-size: 14px;
+  color: #f1ccb8;
+  line-height: 1.8;
+  margin: 12px 0;
+}
