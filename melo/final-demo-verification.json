@@ -1,58 +1,270 @@
 {
-  "url": "http://127.0.0.1:5173/qqmusic/",
-  "mode": "demo",
-  "at": "2026-10-08T01:03:33.378Z",
-  "passed": true,
-  "viewports": [
-    {
-      "width": 1440,
-      "completeFlow": true,
-      "persisted": true,
-      "audio": true,
-      "layout": {
-        "width": 1440,
-        "doc": 1440,
-        "font": true,
-        "localApis": 0
-      }
+  "passed": false,
+  "phase": "preview-passed-production-pending",
+  "buildCommit": "a92332c266b992a740f4101bbf305aee0902dacb",
+  "preview": {
+    "demo": {
+      "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/",
+      "mode": "demo",
+      "at": "2026-10-08T01:15:49.626Z",
+      "passed": true,
+      "viewports": [
+        {
+          "width": 1440,
+          "completeFlow": true,
+          "persisted": true,
+          "audio": true,
+          "layout": {
+            "width": 1440,
+            "doc": 1440,
+            "font": true,
+            "localApis": 0
+          }
+        },
+        {
+          "width": 390,
+          "completeFlow": true,
+          "persisted": true,
+          "audio": true,
+          "layout": {
+            "width": 390,
+            "doc": 390,
+            "font": true,
+            "localApis": 0
+          }
+        },
+        {
+          "width": 430,
+          "completeFlow": true,
+          "persisted": true,
+          "audio": true,
+          "layout": {
+            "width": 430,
+            "doc": 430,
+            "font": true,
+            "localApis": 0
+          }
+        },
+        {
+          "width": 768,
+          "completeFlow": true,
+          "persisted": true,
+          "audio": true,
+          "layout": {
+            "width": 768,
+            "doc": 768,
+            "font": true,
+            "localApis": 0
+          }
+        }
+      ],
+      "errors": [],
+      "network": [],
+      "contextRecall": true,
+      "storyGenerated": true
     },
-    {
-      "width": 390,
-      "completeFlow": true,
-      "persisted": true,
-      "audio": true,
-      "layout": {
-        "width": 390,
-        "doc": 390,
-        "font": true,
-        "localApis": 0
-      }
-    },
-    {
-      "width": 430,
-      "completeFlow": true,
-      "persisted": true,
-      "audio": true,
-      "layout": {
-        "width": 430,
-        "doc": 430,
-        "font": true,
-        "localApis": 0
-      }
-    },
-    {
-      "width": 768,
-      "completeFlow": true,
-      "persisted": true,
-      "audio": true,
-      "layout": {
-        "width": 768,
-        "doc": 768,
-        "font": true,
-        "localApis": 0
-      }
+    "real": {
+      "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/",
+      "mode": "real",
+      "at": "2026-10-08T01:15:39.236Z",
+      "passed": true,
+      "viewports": [
+        {
+          "width": 1440,
+          "completeFlow": true,
+          "persisted": true,
+          "audio": true,
+          "layout": {
+            "width": 1440,
+            "doc": 1440,
+            "font": true,
+            "localApis": 0
+          }
+        },
+        {
+          "width": 390,
+          "completeFlow": true,
+          "persisted": true,
+          "audio": true,
+          "layout": {
+            "width": 390,
+            "doc": 390,
+            "font": true,
+            "localApis": 0
+          }
+        }
+      ],
+      "errors": [],
+      "network": [
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/chat",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/emotion",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/chat",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/emotion",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/chat",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/emotion",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/story",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/chat",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/emotion",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/chat",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/emotion",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 201
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/session",
+          "status": 200
+        },
+        {
+          "url": "https://melo-qqmusic-hgc41at9m-quite10086.vercel.app/api/story",
+          "status": 200
+        }
+      ],
+      "contextRecall": true,
+      "storyGenerated": true
     }
-  ],
-  "errors": [],
-  "network": []
+  },
+  "checks": {
+    "noFrontendKeys": true,
+    "sevenExpressions": true,
+    "failureRecovery": true,
+    "demoIsolation": true
+  },
+  "limits": [
+    "Phone viewport tested in Chromium; physical phone lock-screen audio not verified.",
+    "Older aggregate-only cloud listening cannot be assigned to individual days on another browser."
+  ]
 }

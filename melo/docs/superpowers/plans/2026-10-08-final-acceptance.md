@@ -14,14 +14,15 @@ Spec: user attachment 1846b638-4d3c-4f09-87a9-e28c7c9469a9.
 - F: static sample dialogue, cross-origin font families, fixed storage notice, prose without next-step action.
 
 ## Tasks (execute inline; user's full brief authorizes implementation and release)
-- [ ] 1 RED fresh visitor audit and final E2E expecting onboarding, demo/normal linked data, audio, undo favorite, replay and reload persistence.
-- [ ] 2 Shared records/client: bounded requests/session recovery, cloud/local receipts, demo isolation, snapshot & recommendation state; test separation/failure semantics.
-- [ ] 3 Existing hook: send+emotion+snapshot; context/quick direction; genuine audio gestures; un/favorite latest event; restore snapshot; dated listening.
-- [ ] 4 UI: chat-first short onboarding; Feeling detail and reasons; alternatives/original lyrics; Memory detail/replay; grounded personality/week/sign; at most two proactive prompts.
-- [ ] 5 Unify self-hosted fonts, add same-origin Vercel backend proxy; preserve video and Hero geometry.
-- [ ] 6 Build, typecheck, existing interaction regression and final E2E at 390/430/768/1440, error/retry/offline, download, fonts/assets.
+- [x] 1 RED fresh visitor audit and final E2E expecting onboarding, demo/normal linked data, audio, undo favorite, replay and reload persistence.
+- [x] 2 Shared records/client: bounded requests/session recovery, cloud/local receipts, demo isolation, snapshot & recommendation state; test separation/failure semantics.
+- [x] 3 Existing hook: send+emotion+snapshot; context/quick direction; genuine audio gestures; un/favorite latest event; restore snapshot; dated listening.
+- [x] 4 UI: chat-first short onboarding; Feeling detail and reasons; alternatives/original lyrics; Memory detail/replay; grounded personality/week/sign; at most two proactive prompts.
+- [x] 5 Unify self-hosted fonts, add same-origin Vercel backend proxy; preserve video and Hero geometry.
+- [x] 6 Build, typecheck, existing interaction regression and final E2E at 390/430/768/1440, error/retry/offline, download, fonts/assets.
 - [ ] 7 Push feature branch; deploy Preview, fresh visitor real AI and explicit Demo flows with no route mocks; inspect console/network. Publish only after passed checks; repeat full production E2E; GitHub sync.
 
 Review focus: cloud unavailable retains draft; demo cannot overwrite normal history; no fabricated numerical probabilities; snapshots survive reload with exact track/reply; favorites undo persists; aggregate listening not double-counted; original audio buffering can't race on rapid skips.
 
 Baseline 2026-10-08: production anonymous chat/session 200, care expression, no onboarding, song remains calm despite tired message; original font families inconsistent. Evidence D:/chatgpt/qqmusic/final-acceptance/baseline.json.
+
