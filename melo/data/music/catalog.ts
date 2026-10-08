@@ -9,10 +9,10 @@ export type Track = {
 };
 export type Playlist = { id: string; title: string; subtitle: string; tracks: string[]; generatedAt: string; reason: string };
 const colors = ['#637e8d','#91b7ad','#c4d4ce','#b7ba92'];
-function cover(title: string, i: number) {
-  const c=colors[i%4];
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640"><defs><radialGradient id="g"><stop stop-color="${c}"/><stop offset="1" stop-color="#142c32"/></radialGradient><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="3" seed="${i+1}"/><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="640" height="640" fill="url(#g)"/><g fill="none" stroke="#e2f1e5" stroke-opacity=".23">${Array.from({length:9},(_,k)=>`<ellipse cx="${200+i*13%200}" cy="${250+i*29%170}" rx="${55+k*32}" ry="${25+k*18}" transform="rotate(${i*13},320,320)"/>`).join('')}</g><circle cx="${420-i*17%240}" cy="160" r="${55+i*4}" fill="#c8ff32" opacity=".16"/><rect width="640" height="640" filter="url(#n)" opacity=".065"/><text x="42" y="60" fill="#e7f1e8" font-family="sans-serif" font-size="18" letter-spacing="6">MELO / SOUND ${String(i+1).padStart(2,'0')}</text><text x="42" y="554" fill="#f0f6ee" font-family="sans-serif" font-size="38">${title}</text><text x="42" y="597" fill="#c8ff32" font-family="sans-serif" font-size="15" letter-spacing="4">A LITTLE SOUND. A LITTLE COMPANY.</text></svg>`;
-  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+// Melo-created cloud, water, moonlight and mint artwork; not artist album covers.
+function cover(_title: string, i: number) {
+  const scenes=[2,1,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+  return `/qqmusic/music/covers/scene-${String(scenes[i%16]).padStart(2,'0')}.webp`;
 }
 const originals: [string,string,CoreMood,number,string[],string[],string,number[],number[],number,number,number][] = [
  ['calm','晚风','calm',24,['night','healing'],['ambient','piano'],'平静和弦与缓慢旋律，给夜晚留一点空白。',[130.81,196,261.63],[523.25,587.33,659.25,587.33,523.25,440],3,0,0],
@@ -27,6 +27,10 @@ const originals: [string,string,CoreMood,number,string[],string[],string,number[
  ['sun','口袋里的太阳','bright',68,['healing','commute'],['acoustic','beat'],'暖色拨弦和轻巧节拍，给今天一点重新开始的光。',[164.81,246.94,329.63],[659.25,493.88,587.33,659.25,783.99,659.25],1.8,2,.7],
  ['orbit','慢跑行星','bright',92,['energy','commute'],['electronic','beat'],'明亮合成器与稳定鼓点，陪脚步找回自己的速度。',[196,293.66,392],[783.99,659.25,587.33,783.99,880,987.77],1.1,3,1.2],
  ['shore','留给明天的海','calm',34,['night','healing','lonely'],['ambient','minimal'],'舒展的长音与潮汐感低频，为一天留一个柔软结尾。',[87.31,130.81,174.61],[349.23,392,440,523.25,440,392,349.23,261.63],4.2,0,.1],
+ ['snow','雪山来信','focus',40,['study','work','night'],['minimal','piano'],'清澈琴键与低缓长音，像雪山把纷扰隔在远处。',[92.5,138.59,185],[369.99,415.3,493.88,415.3,369.99,277.18],2.8,1,.2],
+ ['petal','白花浮过','calm',20,['healing','anxious'],['ambient','acoustic'],'轻盈拨弦像花瓣落在水上，留一段不用着急的时间。',[155.56,233.08,311.13],[622.25,466.16,415.3,466.16,311.13,415.3],3.6,2,0],
+ ['forest','雾中散步','tired',32,['rain','commute','healing'],['lofi','ambient'],'柔软低频与稀疏鼓点，陪你走过安静的雾色森林。',[82.41,123.47,164.81],[329.63,293.66,246.94,329.63,392,329.63],2.7,0,.4],
+ ['aurora','极光梦游','bright',74,['night','energy'],['electronic','beat'],'闪烁的合成器与流动节奏，让夜晚也有一点轻盈的力量。',[185,277.18,369.99],[739.99,622.25,554.37,830.61,739.99,987.77],1.5,3,.9],
 ];
 export const playableTracks: Track[] = originals.map(([id,title,coreMood,energy,scenes,styles,reason,notes,melody,tempo,voice,pulse],i)=>({id,title,name:title,artist:'Melo Original',cover:cover(title,i),source:'melo-original',audioUrl:`/qqmusic/music/audio/${id}.wav`,duration:90,moods:[coreMood,...scenes.filter(s=>['healing','anxious','lonely'].includes(s))],energy,scenes,styles,reason,copyrightType:'original',subtitle:reason.split('，')[0],color:colors[i%4],tempo,coreMood,composition:{notes,melody,tempo,voice,pulse}}));
 // Editorial metadata only. Covers are Melo-created art, not the artists' album artwork.
@@ -41,5 +45,5 @@ const official: [string,string,CoreMood,number,string[],string[]][]=[
  ['小幸运','田馥甄','calm',46,['healing'],['pop']],
  ['光年之外','G.E.M. 邓紫棋','bright',76,['energy'],['pop','electronic']],
 ];
-export const catalog: Track[]=[...playableTracks,...official.map(([title,artist,coreMood,energy,scenes,styles],i):Track=>({id:`qq-${i}`,title,name:title,artist,cover:cover(title,i+12),source:'qq-music',officialUrl:`https://y.qq.com/n/ryqq/search?w=${encodeURIComponent(title+' '+artist)}`,duration:0,moods:[coreMood],energy,scenes,styles,reason:`编辑选曲 · ${scenes.includes('night')?'夜晚':'路上'}也可以换一种声音；到 QQ 音乐查找官方版本。`,copyrightType:'official-link',subtitle:'QQ 音乐官方搜索 · 本站不提供音频',color:colors[i%4],tempo:2,coreMood}))];
+export const catalog: Track[]=[...playableTracks,...official.map(([title,artist,coreMood,energy,scenes,styles],i):Track=>({id:`qq-${i}`,title,name:title,artist,cover:cover(title,i+16),source:'qq-music',officialUrl:`https://y.qq.com/n/ryqq/search?w=${encodeURIComponent(title+' '+artist)}`,duration:0,moods:[coreMood],energy,scenes,styles,reason:`编辑选曲 · ${scenes.includes('night')?'夜晚':'路上'}也可以换一种声音；到 QQ 音乐查找官方版本。`,copyrightType:'official-link',subtitle:'QQ 音乐官方搜索 · 本站不提供音频',color:colors[i%4],tempo:2,coreMood}))];
 export const findTrack=(id?:string)=>catalog.find(t=>t.id===id);

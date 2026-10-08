@@ -52,7 +52,7 @@ try{
   for(const section of ['music','mix','discover','memory']){await page.locator('#'+section).scrollIntoViewIfNeeded();await page.waitForTimeout(150);await page.screenshot({path:`${output}/${section}-${mode}-${width}.png`});}
   report.viewports.push({width,freshVisitor:true,realAI:mode==='real',chatEmotion:true,recommendations:4,mix:6,globalPlayer:true,memoryRestore:true,refresh:true,myMelo:true,sharing:true,keyboardRail:true,reducedMotion:true,noOverflow:true});await ctx.close();
  }
- const fingerprints=playableTracks.map(t=>{const b=fs.readFileSync(`public/music/audio/${t.id}.wav`);assert.equal(b.toString('ascii',0,4),'RIFF');assert(b.length>2000000);return createHash('sha256').update(b).digest('hex');});assert.equal(new Set(fingerprints).size,12);report.checks.originalFileFingerprints=fingerprints;
+ const fingerprints=playableTracks.map(t=>{const b=fs.readFileSync(`public/music/audio/${t.id}.wav`);assert.equal(b.toString('ascii',0,4),'RIFF');assert(b.length>2000000);return createHash('sha256').update(b).digest('hex');});assert.equal(new Set(fingerprints).size,playableTracks.length);report.checks.originalFileFingerprints=fingerprints;
  assert.equal(report.errors.length,0);assert.equal(report.networkFailures.length,0);report.passed=true;
 }catch(e){report.failure=e.message;throw e;}finally{fs.writeFileSync(`${output}/award-${mode}-${base.includes('127.0.0.1')?'local':'online'}.json`,JSON.stringify(report,null,2));await browser.close();console.log(JSON.stringify({...report,checks:{...report.checks,originalFileFingerprints:undefined}},null,2));}
 

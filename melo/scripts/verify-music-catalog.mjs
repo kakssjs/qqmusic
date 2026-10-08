@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { catalog, playableTracks } from '../data/music/catalog.ts';
-import { recommend, parseIntent, buildMix, preferencesFromRecords } from '../lib/music/recommendation.ts';
+import { recommend, parseIntent, buildMix, preferencesFromRecords, differentTracks } from '../lib/music/recommendation.ts';
 assert(catalog.length >= 20);
 assert(playableTracks.length >= 12);
 assert.equal(new Set(catalog.map(t => t.id)).size,catalog.length);
@@ -15,4 +15,5 @@ assert(parseIntent('雨天坐公交').scenes.includes('commute'));
 assert.equal(parseIntent('赶作业，想专注').mood,'focus');
 const prefs=preferencesFromRecords([{id:'a',type:'favorite',createdAt:'2026-10-08',payload:{track:'calm',catalogTrackId:'mint',liked:true}},{id:'b',type:'favorite',createdAt:'2026-10-09',payload:{track:'calm',catalogTrackId:'mint',liked:false}}]);
 assert(!prefs.likedTracks.includes('mint'));
+assert(differentTracks({...prefs,likedStyles:['ambient','piano','acoustic','electronic','beat']},playableTracks).length>0);
 console.log(JSON.stringify({passed:true,catalog:catalog.length,playable:playableTracks.length,moods:results.length,checks:12}));

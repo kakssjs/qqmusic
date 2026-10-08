@@ -48,4 +48,4 @@ export const mixStages=stages;
 export function whyTrack(t:Track,s:MusicSignal) {
   return [t.reason, s.scenes?.some(x=>t.scenes.includes(x))?'匹配你这次表达中的场景。':`音乐能量 ${t.energy}% · ${t.styles.join(' / ')}`,s.preferences?.likedStyles.some(x=>t.styles.includes(x))?'你收藏过相似声音，给熟悉感留一点位置。':'第一次相遇，先从这段声音开始。'];
 }
-export function differentTracks(p:Preferences) {const familiar=p.likedStyles.length?p.likedStyles:p.recentTracks.flatMap(id=>findTrack(id)?.styles||[]);return [...catalog].sort((a,b)=>a.styles.filter(x=>familiar.includes(x)).length-b.styles.filter(x=>familiar.includes(x)).length||b.energy-a.energy).slice(0,6);}
+export function differentTracks(p:Preferences,pool:Track[]=catalog) {const familiar=p.likedStyles.length?p.likedStyles:p.recentTracks.flatMap(id=>findTrack(id)?.styles||[]);return [...pool].sort((a,b)=>a.styles.filter(x=>familiar.includes(x)).length-b.styles.filter(x=>familiar.includes(x)).length||b.energy-a.energy).slice(0,6);}

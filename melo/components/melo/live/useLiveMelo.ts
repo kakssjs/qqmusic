@@ -92,7 +92,11 @@ export function useLiveMelo() {
     const intent=parseIntent(text,moodHint,values),list=recommend({...intent,preferences},6,catalog);
     setSearchResults(list);setSearching(false);setExpression('surprise');
   }
-  function surprise(){const list=differentTracks(preferences).filter(t=>t.source!=='qq-music');direction(list[0].id,list.map(t=>t.id));setStatus(preferences.recentTracks.length||preferences.likedTracks.length?'这次，试一种与你最近不同的声音。':'第一次见面，先试一段明亮的陌生声音。');}
+  function surprise(){const list=differentTracks(preferences,tracks);if(!list.length)return;direction(list[0].id,list.map(t=>t.id));setStatus(preferences.recentTracks.length||preferences.likedTracks.length?'这次，试一种与你最近不同的声音。':'第一次见面，先试一段明亮的陌生声音。');}
+  const musicRestored=useRef(false);
+  function musicKey(){return 'melo-music-v4:'+(demoEnabled()?'demo':localStorage.getItem('melo-cloud-session-v1')||'browser');}
+  function restoreMusic(){try{const p=JSON.parse(localStorage.getItem(musicKey())||'null');if(p&&tracks.some(t=>t.id===p.track)){if(Array.isArray(p.queue))audio.setQueue(p.queue);audio.select(tracks.findIndex(t=>t.id===p.track));if(p.mix?.tracks?.length===6&&p.mix.tracks.every((id:string)=>tracks.some(t=>t.id===id)))setMix(p.mix);mixVariation.current=p.variation||0;}}catch{}musicRestored.current=true;}
+  useEffect(()=>{if(!ready||!musicRestored.current)return;try{localStorage.setItem(musicKey(),JSON.stringify({track:audio.song.id,queue:audio.queue,mix,variation:mixVariation.current}));}catch{}},[ready,audio.song.id,audio.queue,mix]);
   useEffect(() => {
     recordsRef.current = records;
   }, [records]);
@@ -198,6 +202,8 @@ export function useLiveMelo() {
       setStorageMode("local");
       setError("Melo 暂时连不上云端。输入会保留，音乐和本机记忆仍可使用。");
       retryRef.current = () => void load();
+    } finally {
+      restoreMusic();
     }
   }
   useEffect(() => {
@@ -434,6 +440,7 @@ export function useLiveMelo() {
         const e = await write("checkin", {
           ...currentMoment.payload,
           momentId: currentMoment.payload.momentId || currentMoment.id,
+          momentAt: currentMoment.payload.momentAt || currentMoment.createdAt,
           liked: !liked,
         });
         setCurrentMoment(e);
@@ -477,6 +484,7 @@ export function useLiveMelo() {
       updateRecords([]);
       setCurrentMoment(null);
       setMix(buildMix({mood:'calm'}));
+      try{localStorage.removeItem(musicKey());}catch{}
       setFlowReady(false);
       setStatus("你的记录已清空。");
     } catch (e) {

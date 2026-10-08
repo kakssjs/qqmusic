@@ -21,6 +21,7 @@ export function useMeloAudio() {
   const started = useRef(0);
   const buffers = useRef(new Map<number, AudioBuffer>());
   const active = useRef(false);
+  const wantsPlayback = useRef(false);
   const index = useRef(0);
   const generation = useRef(0);
   const duration = tracks[track].duration;
@@ -52,6 +53,7 @@ export function useMeloAudio() {
     setPlaying(false);
   }
   async function play(which = index.current, position = offset.current) {
+    wantsPlayback.current = true;
     const ticket = ++generation.current;
     if(!tracks[which])return;
     try {
@@ -100,6 +102,7 @@ export function useMeloAudio() {
         setPlaying(false);
         const q=queueRef.current,at=q.indexOf(tracks[index.current].id);
         if(q.length>1&&at>=0&&at<q.length-1)void play(Math.max(0,tracks.findIndex(t=>t.id===q[at+1])),0);
+        else wantsPlayback.current=false;
       };
     } catch {
       setError("声音暂时无法启动，请再次点击播放。");
@@ -108,10 +111,11 @@ export function useMeloAudio() {
     }
   }
   function toggle() {
-    if (active.current) {
+    if (wantsPlayback.current) {
+      wantsPlayback.current=false;
       offset.current = Math.min(
         duration,
-        offset.current + (context.current!.currentTime - started.current),
+        offset.current + (active.current&&context.current ? context.current.currentTime - started.current : 0),
       );
       stop();
       setProgress(offset.current);
@@ -119,7 +123,7 @@ export function useMeloAudio() {
   }
   function select(which: number) {
     if(!tracks[which])return;
-    const wasPlaying = active.current;
+    const wasPlaying = wantsPlayback.current;
     stop();
     index.current = which;
     setTrack(which);
@@ -128,7 +132,7 @@ export function useMeloAudio() {
     if (wasPlaying) void play(which, 0);
   }
   function seek(position: number) {
-    const wasPlaying = active.current;
+    const wasPlaying = wantsPlayback.current;
     stop();
     offset.current = Math.max(0,Math.min(duration-.1,position));
     setProgress(position);
