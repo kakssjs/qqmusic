@@ -1,4 +1,5 @@
 "use client";
+import { ContestMusicLibrary } from "./ContestMusicLibrary";
 import { trackAudioLabel, trackDuration } from "../../../data/music/catalog";
 import { QQMusicIcon } from "../QQMusicIcon";
 import {
@@ -193,6 +194,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
           查看这次记忆
         </a>
       )}
+      <ContestMusicLibrary />
     </section>
   );
 }

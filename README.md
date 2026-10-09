@@ -4,26 +4,39 @@ Melo — AI 音乐陪伴伙伴，让音乐听懂你的情绪。
 
 ## 在线体验
 
-- 网站：https://melo-qqmusic.vercel.app/
-- 比赛演示：https://melo-qqmusic.vercel.app/?demo=1
-- GitHub Pages：https://kakssjs.github.io/qqmusic/
+- [Melo 在线网站](https://melo-qqmusic.vercel.app/)
+- [比赛预设演示](https://melo-qqmusic.vercel.app/?demo=1)
+- [GitHub 仓库](https://github.com/kakssjs/qqmusic)
+- [GitHub Pages](https://kakssjs.github.io/qqmusic/)
 
-V4：十二段可完整播放的独立原创声音、八个真实歌曲官方搜索条目、透明推荐、六段 Melo Mix、五条 Discover、全局播放器、Now Playing、常驻伙伴、MY MELO、记忆与今日音乐卡。真实歌曲在 QQ 音乐官方页面查找，本站没有第三方全曲播放权限。
+项目包括情绪对话、实时语音、音乐旅程、播放器、Melo Mix、发现、记忆和音乐日记。现有曲库保留 16 段原创音乐、7 首用户提供歌曲与编辑选曲，并新增官方赛事参考歌单的 156 首歌曲目录，支持按曲名或歌手搜索、打开 QQ 音乐官方歌曲页。
 
-源码在 `melo/`；Vercel/GitHub Pages 发布内容在 `docs/`；现有 Node/SQLite 阿里云服务源码在 `backend/`。Secrets 只在服务器环境中，仓库不包含真实密钥或数据库。
+赛事参考目录仅包含歌曲元数据和官方链接，播放由 QQ 音乐提供。比赛预设演示使用单独存储的预设回应；正常模式通过阿里云后端提供真实 AI 对话和记忆。
+
+## 项目结构
+
+- `melo/`：完整 React 前端源码、角色素材、音乐资源与构建脚本。
+- `backend/`：Node/SQLite 后端、AI 服务和实时语音服务源码。
+- `docs/`：Vercel/GitHub Pages 发布页面、静态资源与 Vercel API 代理。
+- `start-melo-local.mjs`、`打开Melo本地网站.cmd`：Windows 本地预览启动入口。
+
+真实密钥、环境变量和个人会话数据库保存在服务器环境中。
 
 ## 本地运行
 
-进入 melo，安装依赖后使用原有开发方式，或运行静态预览：
+需要 Node.js 22.13 或更高版本；后端使用 Node.js 24 或更高版本。
 
 ```sh
+cd melo
 npm install
 npx vite build --config vite.pages.config.mjs
-npx vite preview --config vite.pages.config.mjs --port 5173
+npx vite preview --config vite.pages.config.mjs --host 127.0.0.1 --port 4173
 ```
 
-预览路径 `/qqmusic/?demo=1`。正常模式需要可访问的后端；Demo 使用明确标注的预设回应，独立存储。
+访问 `http://127.0.0.1:4173/qqmusic/`。完成安装和构建后，Windows 可直接双击根目录的 `打开Melo本地网站.cmd`。
 
-## 验证
+## 发布
 
-`melo/final-award-verification.json` 为 V4 实际验收汇总；早期 verification JSON 是历史版本证据，不代表当前新功能。详细说明见 `melo/README.md`。
+Vercel 项目 `melo-qqmusic` 连接本仓库的 `main` 分支，以 `docs/` 作为发布目录。修改前端后，重新执行静态构建，将 `melo/dist-pages/` 内的页面与资源复制到 `docs/`，保留 `docs/api/` 和 `docs/vercel.json`，再提交到 GitHub。
+
+Vercel 同源 API 代理连接现有阿里云服务；后端代码更新需要另外部署到服务器。后端配置见 `backend/README.md`，前端功能说明与历史验收记录见 `melo/README.md`。
