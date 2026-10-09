@@ -1,6 +1,6 @@
 "use client";
 import { Play, Pause, LoaderCircle, ArrowUpRight } from "lucide-react";
-import { trackAudioLabel, trackDuration, type Track } from "../../data/music/catalog";
+import { trackDuration, type Track } from "../../data/music/catalog";
 import type { LiveMelo } from "../melo/live/useLiveMelo";
 export function TrackCard({
   track: t,
@@ -58,7 +58,7 @@ export function TrackCard({
           </button>
         )}
       </div>
-      <small>{official ? trackAudioLabel(t) : `${trackAudioLabel(t)} · ${trackDuration(t)}`}</small>
+      <small>{official ? "QQ 音乐" : trackDuration(t)}</small>
       {loading && <p role="status">正在加载歌曲，首次播放需要一点时间…</p>}
       {current && melo.audio.error && <p role="alert">{melo.audio.error}</p>}
       <h3>{t.title}</h3>

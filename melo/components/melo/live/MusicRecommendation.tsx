@@ -1,5 +1,4 @@
 "use client";
-import { ContestMusicLibrary } from "./ContestMusicLibrary";
 import { trackAudioLabel, trackDuration } from "../../../data/music/catalog";
 import { QQMusicIcon } from "../QQMusicIcon";
 import {
@@ -85,7 +84,7 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
             loading="lazy"
           />
           <div>
-            <span>{a.song.source === "user-upload" ? a.song.artist : "Melo / original sound"}</span>
+            <span>{a.song.source !== "melo-original" ? a.song.artist : "Melo / original sound"}</span>
             <h3>{a.song.name}</h3>
             <small>{a.song.subtitle}</small>
           </div>
@@ -194,7 +193,6 @@ export function MusicRecommendation({ melo }: { melo: LiveMelo }) {
           查看这次记忆
         </a>
       )}
-      <ContestMusicLibrary />
     </section>
   );
 }

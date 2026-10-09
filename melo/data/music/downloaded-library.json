@@ -1,0 +1,54 @@
+[
+  {
+    "id": "library-002rHZVv3avEmY",
+    "title": "古蜀回响",
+    "artist": "INTO1",
+    "audioUrl": "/qqmusic/music/audio/library/library-002rHZVv3avEmY.mp3",
+    "duration": 280,
+    "sourceSite": "https://1music.cc/",
+    "moods": [],
+    "energy": 50
+  },
+  {
+    "id": "library-00363v9P40qCBG",
+    "title": "烟花",
+    "artist": "永彬Ryan.B",
+    "audioUrl": "/qqmusic/music/audio/library/library-00363v9P40qCBG.mp3",
+    "duration": 204,
+    "sourceSite": "https://1music.cc/",
+    "moods": [],
+    "energy": 50
+  },
+  {
+    "id": "qq-0",
+    "title": "稻香",
+    "artist": "周杰伦",
+    "audioUrl": "/qqmusic/music/audio/library/qq-0.mp3",
+    "duration": 223,
+    "sourceSite": "https://1music.cc/",
+    "moods": [
+      "bright"
+    ],
+    "energy": 65
+  },
+  {
+    "id": "library-000DW5Yy0enRLa",
+    "title": "等你上车",
+    "artist": "沙一汀EL · 赵让",
+    "audioUrl": "/qqmusic/music/audio/library/library-000DW5Yy0enRLa.mp3",
+    "duration": 186,
+    "sourceSite": "https://1music.cc/",
+    "moods": [],
+    "energy": 50
+  },
+  {
+    "id": "library-001l4UPC43IYUd",
+    "title": "枉游",
+    "artist": "国风集 · 陆深",
+    "audioUrl": "/qqmusic/music/audio/library/library-001l4UPC43IYUd.mp3",
+    "duration": 227,
+    "sourceSite": "https://1music.cc/",
+    "moods": [],
+    "energy": 50
+  }
+]

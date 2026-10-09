@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { recommend, parseIntent, preferencesFromRecords, buildMix } from '../lib/music/recommendation.ts';
+import { playableTracks } from '../data/music/catalog.ts';
+const choices = ['calm','tired','sad','bright','focus'].map(mood => recommend({mood, hour:12})[0].id);
+assert.equal(new Set(choices).size, 5);
+const vocal = recommend(parseIntent('今天开心，想听人声', 'bright', [10,10,80]));
+assert(['user-upload','external-download'].includes(vocal[0].source));
+const rejected = recommend(parseIntent('晚风不好听，不要再推荐晚风', 'calm'));
+assert(!rejected.some(t => t.title === '晚风'));
+const prefs = preferencesFromRecords([{id:'a',type:'checkin',createdAt:new Date().toISOString(),payload:{track:'calm'}}]);
+assert(prefs.recentTracks.includes('calm'));
+assert.notEqual(recommend({mood:'calm',hour:12,preferences:prefs})[0].id, 'calm');
+assert(vocal.every(t => playableTracks.some(p => p.id === t.id) && t.audioUrl));
+const unavailable = { mood:'calm', excludedIds:playableTracks.map(t=>t.id) };
+assert.deepEqual(buildMix(unavailable).tracks, []);
+const oneSong = {mood:'calm', excludedIds:playableTracks.filter(t=>t.id!=='upload-summer').map(t=>t.id)};
+assert.deepEqual(buildMix(oneSong).tracks, ['upload-summer']);
+console.log('Verified distinct moods, vocal preference, disliked-song exclusion and recent recommendation rotation.');

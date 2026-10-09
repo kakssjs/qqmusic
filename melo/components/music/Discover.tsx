@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
-import { catalog, originalTracks, uploadedTracks } from "../../data/music/catalog";
+import { uploadedTracks, downloadedTracks, playableTracks, catalog } from "../../data/music/catalog";
 import { differentTracks, recommend } from "../../lib/music/recommendation";
 import type { LiveMelo } from "../melo/live/useLiveMelo";
 import { DiscoverRail } from "./DiscoverRail";
-import { HeroTrackCard, CompactTrackRow } from "./TrackCard";
+import { StandardTrackCard, HeroTrackCard, CompactTrackRow } from "./TrackCard";
 
 export function Discover({ melo }: { melo: LiveMelo }) {
   const [query, setQuery] = useState("");
-  const featured = recommend(melo.signal, 1, catalog)[0];
+  const [visibleCount, setVisibleCount] = useState(12);
+  const library = [...downloadedTracks, ...catalog.filter(track => track.source === "qq-music")];
+  const featured = recommend(melo.signal, 1, playableTracks)[0];
   const spotlights = [
     {
       title: "LATE NIGHT",
@@ -16,7 +18,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
       track: recommend(
         { mood: "tired", energy: 24, scenes: ["night"], hour: 23 },
         1,
-        catalog,
+        playableTracks,
       )[0],
     },
     {
@@ -25,7 +27,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
       track: recommend(
         { mood: "focus", energy: 48, scenes: ["focus"] },
         1,
-        catalog,
+        playableTracks,
       )[0],
     },
     {
@@ -34,7 +36,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
       track: recommend(
         { mood: "bright", energy: 78, scenes: ["day"] },
         1,
-        catalog,
+        playableTracks,
       )[0],
     },
   ];
@@ -47,7 +49,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
       tracks: recommend(
         { mood: "calm", preferences: melo.preferences },
         6,
-        catalog,
+        playableTracks,
       ),
     },
     {
@@ -55,7 +57,7 @@ export function Discover({ melo }: { melo: LiveMelo }) {
       caption: melo.preferences.recentTracks.length
         ? "暂时走出最近听过的声音。"
         : "第一次见面，先把不同的声音放在你面前。",
-      tracks: differentTracks(melo.preferences),
+      tracks: differentTracks(melo.preferences, playableTracks),
     },
   ];
 
@@ -119,16 +121,13 @@ export function Discover({ melo }: { melo: LiveMelo }) {
             id="music-search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="想听适合雨天坐公交的……"
+            placeholder="搜索歌名、歌手，或说说你想听的感觉……"
             maxLength={1000}
           />
           <button disabled={!query.trim() || melo.searching}>
             {melo.searching ? "正在找声音…" : "找一组音乐 ↗"}
           </button>
         </div>
-        <small>
-          {originalTracks.length} 段原创与 {uploadedTracks.length} 首你带来的歌可完整播放；更多歌曲可前往 QQ 音乐官方搜索。封面为 Melo 氛围创作。
-        </small>
       </form>
       {melo.searchStatus && (
         <p role="status" className="search-status">
@@ -138,12 +137,19 @@ export function Discover({ melo }: { melo: LiveMelo }) {
       {melo.searchResults.length > 0 && (
         <DiscoverRail
           title="Melo 找到了这些声音"
-          caption={`关于「${query}」的六个答案`}
+          caption="找到喜欢的声音，就从这一首开始。"
           tracks={melo.searchResults}
           melo={melo}
         />
       )}
       <DiscoverRail title="你带来的歌" caption="熟悉的声音，留在你的小小音乐空间。" tracks={uploadedTracks} melo={melo} />
+      <div className="integrated-library">
+        <header><h3>更多声音</h3><p>熟悉的旋律，也有还没遇见的歌。</p></header>
+        <div className="integrated-library-grid">
+          {library.slice(0, visibleCount).map(track=><StandardTrackCard key={track.id} track={track} melo={melo}/>)}
+        </div>
+        {visibleCount < library.length && <button className="world-text-button" onClick={()=>setVisibleCount(n=>n+12)}>再看看更多歌曲 ↓</button>}
+      </div>
       {rails.map((rail) => (
         <DiscoverRail key={rail.title} {...rail} melo={melo} />
       ))}

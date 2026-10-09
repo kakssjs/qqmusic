@@ -84,7 +84,7 @@ export function Playlist({ melo }: { melo: LiveMelo }) {
                               {mixStages[index]} · 音乐能量 {track.energy}%
                             </small>
                             <h3>{track.title}</h3>
-                            <p>Melo Original · {track.reason}</p>
+                            <p>{track.artist} · {track.reason}</p>
                           </div>
                           <b>↗</b>
                         </button>

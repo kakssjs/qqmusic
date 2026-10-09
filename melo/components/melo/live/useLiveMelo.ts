@@ -342,6 +342,9 @@ export function useLiveMelo() {
   }
   async function searchMusic(text: string) {
     if (!text.trim() || searching) return;
+    const query = text.trim().toLocaleLowerCase();
+    const matches = catalog.filter(t=>`${t.title} ${t.artist}`.toLocaleLowerCase().includes(query));
+    if (matches.length) {setSearchResults(matches);setSearchStatus(`找到 ${matches.length} 首匹配的歌曲`);return;}
     setSearching(true);
     let moodHint = mood,
       values: number[] | undefined;
@@ -478,6 +481,7 @@ export function useLiveMelo() {
       event: MeloRecord;
       mood: string;
       reply: string;
+      trackId?: string;
       reason: string;
       values: number[];
     };
@@ -635,8 +639,10 @@ export function useLiveMelo() {
     text: string,
     reply = "",
     id = crypto.randomUUID(),
+    analysis?: { mood: string; values: number[]; reason: string },
+    selectedTrackId?: string,
   ) {
-    const d = await json("/api/emotion", { text: text.slice(0, 1000) });
+    const d = analysis || await json("/api/emotion", { text: text.slice(0, 1000) });
     if (
       !moods.some(([m]) => m === d.mood) ||
       !Array.isArray(d.values) ||
@@ -651,8 +657,13 @@ export function useLiveMelo() {
       mood: d.mood,
       preferences: preferencesFromRecords(recordsRef.current),
     };
-    const list = recommend(nextSignal),
+    const list = recommend(nextSignal, 24),
       nextMix = buildMix(nextSignal);
+    if (!list.length) throw new Error("当前可播放的歌曲中，没有符合这次要求的声音。可以换一种风格试试。");
+    if (selectedTrackId) {
+      const chosen = list.find((t) => t.id === selectedTrackId);
+      if (chosen) list.splice(0, list.length, chosen, ...list.filter((t) => t.id !== chosen.id));
+    }
     setMix(nextMix);
     setMusicDirection(undefined);
     audio.setQueue(list.map((t) => t.id));
@@ -689,15 +700,17 @@ export function useLiveMelo() {
     text: string,
     reply: string,
     id = crypto.randomUUID(),
+    analysis?: { mood: string; values: number[]; reason: string },
+    selectedTrackId?: string,
   ) {
     if (busyRef.current) return;
     busyRef.current = true;
     setBusy("emotion");
     setError("");
     setExpression("listen");
-    retryRef.current = () => void analyzeText(text, reply, id);
+    retryRef.current = () => void analyzeText(text, reply, id, analysis, selectedTrackId);
     try {
-      await understand(text, reply, id);
+      await understand(text, reply, id, analysis, selectedTrackId);
       setStatus("这段心情和音乐，已一起留下。");
     } catch (e) {
       setError((e as Error).message);
@@ -723,9 +736,19 @@ export function useLiveMelo() {
     chatId.current = { text: message, id };
     retryRef.current = () => void send(message);
     try {
-      const d = await json("/api/chat", { message, id });
+      const analysis = await json("/api/emotion", { text: message.slice(0, 1000) });
+      if (!moods.some(([m]) => m === analysis.mood) || !Array.isArray(analysis.values) || analysis.values.length !== 3)
+        throw new Error("这次心情理解没有完成，请重试。");
+      const candidates = recommend({ ...parseIntent(message, analysis.mood, analysis.values), mood: analysis.mood, preferences: preferencesFromRecords(recordsRef.current) }, 24);
+      if (!candidates.length) throw new Error("目前没有符合这次要求的可播放歌曲，可以换一种风格试试。");
+      const d = await json("/api/chat", { message, id, musicContext: {
+        mood: analysis.mood, reason: analysis.reason,
+        candidates: candidates.map(({ id, title, artist, reason, styles, scenes }) => ({ id, title, artist, reason: [reason, styles.join(" / "), scenes.join(" / ")].filter(Boolean).join("；") })),
+      } });
       if (typeof d.reply !== "string" || !d.reply.trim())
         throw new Error("Melo 没有听清，再说一次好吗？");
+      if (!demoEnabled() && !candidates.some(t => t.id === d.trackId))
+        throw new Error("这次回应没有选出可播放的歌曲，请稍后再试。你仍可以直接选择音乐。");
       setModelState("ready");
       setSpeaking(true);
       setConnected(true);
@@ -752,7 +775,7 @@ export function useLiveMelo() {
       setExpression(expressionForMessage(message, d.reply));
       setBusy("emotion");
       try {
-        await understand(message, d.reply, id + "-moment");
+        await understand(message, d.reply, id + "-moment", analysis, d.trackId);
         chatId.current = null;
         retryRef.current = null;
         setStatus("Melo 已把你说的话，连同这首歌一起记住。");
@@ -761,7 +784,7 @@ export function useLiveMelo() {
           "对话已收到，情绪理解暂时没完成。可以重试理解，或自己选择音乐。",
         );
         retryRef.current = () =>
-          void analyzeText(message, d.reply, id + "-moment");
+          void analyzeText(message, d.reply, id + "-moment", analysis, d.trackId);
         setExpression(expressionForMessage(message, d.reply));
       }
     } catch (e) {

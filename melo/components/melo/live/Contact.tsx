@@ -23,7 +23,7 @@ export function Contact({ melo }: { melo: LiveMelo }) {
           <span>长期记忆</span>
         </div>
         <p>
-          原创氛围声音，可以在这里听。真实歌曲，前往 QQ 音乐官方入口。
+          从此刻的感受出发，让音乐在这里陪你。
           <br />
           Melo 陪你找到声音，也记住声音背后的你。
         </p>

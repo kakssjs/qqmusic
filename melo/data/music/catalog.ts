@@ -1,10 +1,12 @@
+import downloadedSongs from "./downloaded-library.json" with { type: "json" };
+import librarySongs from "../../components/melo/live/contest-playlist.json" with { type: "json" };
 export type CoreMood = 'calm' | 'tired' | 'sad' | 'bright' | 'focus';
 export type Composition = { notes: number[]; melody: number[]; tempo: number; voice: number; pulse: number };
 export type Track = {
   id: string; title: string; name: string; artist: string; cover: string;
-  source: 'melo-original' | 'licensed-demo' | 'qq-music' | 'user-upload'; audioUrl?: string; previewUrl?: string; officialUrl?: string;
+  source: 'melo-original' | 'licensed-demo' | 'qq-music' | 'user-upload' | 'external-download'; audioUrl?: string; previewUrl?: string; officialUrl?: string;
   duration: number; moods: string[]; energy: number; scenes: string[]; styles: string[];
-  reason: string; copyrightType: 'original' | 'licensed' | 'official-link' | 'user-provided';
+  reason: string; copyrightType: 'original' | 'licensed' | 'official-link' | 'user-provided' | 'external';
   subtitle: string; color: string; tempo: number; coreMood: CoreMood; composition?: Composition;
 };
 export type Playlist = { id: string; title: string; subtitle: string; tracks: string[]; generatedAt: string; reason: string };
@@ -48,8 +50,9 @@ export const uploadedTracks: Track[] = uploads.map(([id,title,artist,duration,co
  duration,moods:[coreMood],energy,scenes:['night','commute'],styles:['pop'],reason,
  copyrightType:'user-provided',subtitle:reason,color:colors[i%4],tempo:2,coreMood,
 }));
-export const playableTracks: Track[] = [...originalTracks,...uploadedTracks];
-export const trackAudioLabel=(t:Track)=>t.source==='user-upload'?'用户提供音频':t.source==='qq-music'?'QQ MUSIC · 官方搜索':'MELO ORIGINAL';
+export const downloadedTracks: Track[] = downloadedSongs.map((t,i)=>({id:t.id,title:t.title,name:t.title,artist:t.artist,cover:cover(t.title,i+8),source:'external-download',audioUrl:t.audioUrl,duration:t.duration,moods:t.moods,energy:t.energy,scenes:[],styles:['pop'],reason:`${t.title} · ${t.artist}`,copyrightType:'external',subtitle:t.title,color:colors[i%4],tempo:2,coreMood:t.moods.includes('bright')?'bright':'calm'}));
+export const playableTracks: Track[] = [...originalTracks,...uploadedTracks,...downloadedTracks];
+export const trackAudioLabel=(t:Track)=>t.source==='user-upload'?'用户提供音频':t.source==='qq-music'?'QQ MUSIC · 官方搜索':t.source==='external-download'?'音乐':'MELO ORIGINAL';
 export const trackDuration=(t:Track)=>`${Math.floor(t.duration/60)}:${String(t.duration%60).padStart(2,'0')}`;
 // Editorial metadata only. Covers are Melo-created art, not the artists' album artwork.
 // Search links deliberately avoid inventing song IDs, streaming rights or version-specific durations.
@@ -63,6 +66,7 @@ const official: [string,string,CoreMood,number,string[],string[]][]=[
  ['小幸运','田馥甄','calm',46,['healing'],['pop']],
  ['光年之外','G.E.M. 邓紫棋','bright',76,['energy'],['pop','electronic']],
 ];
-export const catalog: Track[]=[...playableTracks,...official.map(([title,artist,coreMood,energy,scenes,styles],i):Track=>({id:`qq-${i}`,title,name:title,artist,cover:cover(title,i+16),source:'qq-music',officialUrl:`https://y.qq.com/n/ryqq/search?w=${encodeURIComponent(title+' '+artist)}`,duration:0,moods:[coreMood],energy,scenes,styles,reason:`编辑选曲 · ${scenes.includes('night')?'夜晚':'路上'}也可以换一种声音；到 QQ 音乐查找官方版本。`,copyrightType:'official-link',subtitle:'QQ 音乐官方搜索 · 本站不提供音频',color:colors[i%4],tempo:2,coreMood}))];
+export const libraryTracks: Track[] = librarySongs.map((song,i)=>({id:`library-${song.id}`,title:song.name,name:song.name,artist:song.artist,cover:cover(song.name,i),source:"qq-music",officialUrl:`https://y.qq.com/n/ryqq_v2/songDetail/${song.id}`,duration:0,moods:[],energy:50,scenes:[],styles:[],reason:`${song.artist} · 在 QQ 音乐中听完整歌曲。`,copyrightType:"official-link",subtitle:"QQ 音乐",color:colors[i%4],tempo:2,coreMood:"calm"}));
+export const catalog: Track[]=[...libraryTracks.filter(t=>!downloadedTracks.some(d=>d.id===t.id)),...playableTracks,...official.map(([title,artist,coreMood,energy,scenes,styles],i):Track=>({id:`qq-${i}`,title,name:title,artist,cover:cover(title,i+16),source:'qq-music',officialUrl:`https://y.qq.com/n/ryqq/search?w=${encodeURIComponent(title+' '+artist)}`,duration:0,moods:[coreMood],energy,scenes,styles,reason:`编辑选曲 · ${scenes.includes('night')?'夜晚':'路上'}也可以换一种声音；到 QQ 音乐查找官方版本。`,copyrightType:'official-link',subtitle:'QQ 音乐官方搜索 · 本站不提供音频',color:colors[i%4],tempo:2,coreMood})).filter(t=>!downloadedTracks.some(d=>d.id===t.id))];
 export const findTrack=(id?:string)=>catalog.find(t=>t.id===id);
 
