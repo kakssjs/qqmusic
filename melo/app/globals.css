@@ -6,6 +6,58 @@
 @import "./experience-controls.css";
 @import "./experience-responsive.css";
 
+/* Shared, visible input surfaces across chat, feelings, and music search. */
+.live-chat-compose,
+.feeling-input textarea {
+  border: 1px solid #bed5c78c;
+  border-radius: 18px;
+  background: #d3e8dc0e;
+}
+.feeling-input label {
+  color: #f4f7f3;
+  font-size: 16px;
+  font-weight: 550;
+  margin-bottom: 14px;
+}
+.feeling-input label span {
+  color: #b7c9c1;
+  font-weight: 400;
+}
+.feeling-input textarea {
+  display: block;
+  min-height: 132px;
+  padding: 18px;
+  color: #f4f7f3;
+  font-size: 16px;
+  line-height: 1.8;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.feeling-input textarea::placeholder {
+  color: #b7c9c1;
+}
+.feeling-input textarea:focus-visible {
+  border-color: var(--melo-green);
+  background: #d3e8dc14;
+  box-shadow: 0 0 0 3px #c8ff3214;
+  outline: none;
+}
+.music-search input {
+  border: 1px solid #537361;
+  border-radius: 18px;
+  background: #e6eee8;
+  padding: 16px 18px;
+  color: #142d21;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.music-search input::placeholder {
+  color: #476452;
+}
+.music-search input:focus-visible {
+  border-color: #245536;
+  box-shadow: 0 0 0 3px #24553620;
+  outline: none;
+}
 /* Hide scrollbar chrome while retaining mouse, touch, and keyboard scrolling. */
 html,
 body,

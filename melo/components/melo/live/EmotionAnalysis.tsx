@@ -23,13 +23,13 @@ export function EmotionAnalysis({ melo }: { melo: LiveMelo }) {
             从今天的一个小瞬间，找到适合此刻的旋律。
           </p>
           <div className="feeling-input">
-            <label htmlFor="live-emotion">此刻，你感觉怎么样？</label>
+            <label htmlFor="live-emotion">写下此刻的心情 <span>· 点击下方输入</span></label>
             <textarea
               id="live-emotion"
               maxLength={1000}
               value={melo.note}
               onChange={(e) => melo.setNote(e.target.value)}
-              placeholder="今天有点累，也有一点不甘心……"
+              placeholder="在这里写下来，例如：今天有点累，也有一点不甘心……"
             />
           </div>
           <div className="world-actions">
