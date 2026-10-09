@@ -10,7 +10,13 @@ export function Discover({ melo }: { melo: LiveMelo }) {
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(12);
   const library = [...downloadedTracks, ...catalog.filter(track => track.source === "qq-music")];
-  const featured = recommend(melo.signal, 1, playableTracks)[0];
+  const [featured, setFeatured] = useState(() =>
+    playableTracks[Math.floor(Math.random() * playableTracks.length)],
+  );
+  function changeFeatured() {
+    const choices = playableTracks.filter(track => track.id !== featured?.id);
+    if (choices.length) setFeatured(choices[Math.floor(Math.random() * choices.length)]);
+  }
   const spotlights = [
     {
       title: "LATE NIGHT",
@@ -80,14 +86,12 @@ export function Discover({ melo }: { melo: LiveMelo }) {
 
       <div className="discover-feature">
         <div className="discover-feature-copy">
-          <small>FEATURED · SLOW CITY</small>
-          <h3>{melo.currentMoment?.payload.scene || "雨夜公交"}</h3>
-          <p>
-            {melo.currentMoment
-              ? "从你刚刚留下的心情出发，看看这首声音是否合适。"
-              : "有时候下雨不是坏天气，只是城市把节奏放慢了。"}
-          </p>
-          <a href="#music">去听今晚的推荐 ↗</a>
+          <small>FEATURED · A LITTLE DISCOVERY</small>
+          <h3>{featured?.title}</h3>
+          <p>{featured?.reason}</p>
+          <button className="world-text-button" onClick={changeFeatured}>
+            换一首 ↻
+          </button>
         </div>
         {featured && (
           <HeroTrackCard
