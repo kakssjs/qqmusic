@@ -6,6 +6,24 @@
 @import "./experience-controls.css";
 @import "./experience-responsive.css";
 
+/* The ice scene dissolves into the exact opening color of the chat scene. */
+.cloud-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: clamp(150px, 23vh, 260px);
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(180deg, #31485300 0%, #31485314 20%, #31485355 45%, #314853bb 73%, #314853f2 91%, #314853 100%);
+}
+.together-section {
+  padding-top: clamp(48px, 6vw, 88px);
+}
+@media (max-width: 760px) {
+  .cloud-hero::after { height: 150px; }
+  .together-section { padding-top: 44px; }
+}
+
 /* Shared, visible input surfaces across chat, feelings, and music search. */
 .live-chat-compose,
 .feeling-input textarea {
