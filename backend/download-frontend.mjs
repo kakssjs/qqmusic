@@ -5,7 +5,7 @@ const [manifestFile,root,revision]=process.argv.slice(2);
 if(!/^[a-f0-9]{40}$/.test(revision))throw Error('Invalid revision');
 const manifest=JSON.parse(await readFile(manifestFile,'utf8'));
 let index=0,completed=0;
-await Promise.all(Array.from({length:5},async()=>{
+await Promise.all(Array.from({length:2},async()=>{
   while(index<manifest.length){
     const item=manifest[index++];
     if(item.path.includes('..')||path.isAbsolute(item.path))throw Error('Invalid path');
@@ -14,14 +14,15 @@ await Promise.all(Array.from({length:5},async()=>{
     await mkdir(path.dirname(target),{recursive:true});
     try {if(createHash('sha256').update(await readFile(target)).digest('hex')===item.sha256){completed++;continue;}} catch {}
     let success=false;
-    for(let attempt=0;attempt<3;attempt++){
+    for(let attempt=0;attempt<8;attempt++){
       try{
-        const response=await fetch(`https://raw.githubusercontent.com/kakssjs/qqmusic/${revision}/docs/${item.path}`,{signal:AbortSignal.timeout(300000)});
+        const source=attempt%2===0?`https://raw.githubusercontent.com/kakssjs/qqmusic/${revision}/docs/${item.path}`:`https://cdn.jsdelivr.net/gh/kakssjs/qqmusic@${revision}/docs/${item.path}`;
+        const response=await fetch(source,{signal:AbortSignal.timeout(300000)});
         if(!response.ok)throw Error(`HTTP ${response.status}`);
         const bytes=Buffer.from(await response.arrayBuffer());
         if(createHash('sha256').update(bytes).digest('hex')!==item.sha256)throw Error('Checksum mismatch');
         await writeFile(target,bytes);success=true;break;
-      }catch(error){if(attempt===2)throw Error(`${item.path}: ${error.message}`);}
+      }catch(error){if(attempt===7)throw Error(`${item.path}: ${error.message} ${error.cause?.message||''}`);await new Promise(resolve=>setTimeout(resolve,2000));}
     }
     if(success&&++completed%20===0)console.log(`Downloaded ${completed}/${manifest.length}`);
   }
