@@ -12,10 +12,11 @@ await Promise.all(Array.from({length:5},async()=>{
     const target=path.resolve(root,item.path);
     if(!target.startsWith(path.resolve(root)+path.sep))throw Error('Invalid target');
     await mkdir(path.dirname(target),{recursive:true});
+    try {if(createHash('sha256').update(await readFile(target)).digest('hex')===item.sha256){completed++;continue;}} catch {}
     let success=false;
     for(let attempt=0;attempt<3;attempt++){
       try{
-        const response=await fetch(`https://raw.githubusercontent.com/kakssjs/qqmusic/${revision}/docs/${item.path}`,{signal:AbortSignal.timeout(90000)});
+        const response=await fetch(`https://raw.githubusercontent.com/kakssjs/qqmusic/${revision}/docs/${item.path}`,{signal:AbortSignal.timeout(300000)});
         if(!response.ok)throw Error(`HTTP ${response.status}`);
         const bytes=Buffer.from(await response.arrayBuffer());
         if(createHash('sha256').update(bytes).digest('hex')!==item.sha256)throw Error('Checksum mismatch');
