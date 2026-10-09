@@ -1,0 +1,14 @@
+melomusic.space {
+  encode zstd gzip
+  handle /api/* {
+    reverse_proxy 127.0.0.1:8080
+  }
+  handle_path /qqmusic/* {
+    root * C:/ProgramData/Melo/site
+    file_server
+  }
+  handle {
+    root * C:/ProgramData/Melo/site
+    file_server
+  }
+}
