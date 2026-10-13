@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { allowBackgroundVideo } from "../../lib/background-media";
 
 type NetworkInformation = EventTarget & {
   effectiveType?: string;
@@ -15,17 +16,25 @@ export function CloudBackground({ reduced }: { reduced: boolean }) {
   useEffect(() => {
     const connection = (navigator as Navigator & { connection?: NetworkInformation })
       .connection;
+    const pointer = matchMedia("(any-pointer: coarse)");
+    const compact = matchMedia("(max-width: 1366px)");
     const updatePreference = () => {
       const limitedData =
         connection?.saveData ||
         connection?.effectiveType === "slow-2g" ||
         connection?.effectiveType === "2g";
-      setVideoAllowed(!reduced && !limitedData);
+      setVideoAllowed(allowBackgroundVideo({ reduced, limitedData: !!limitedData, touchPoints: navigator.maxTouchPoints || 0, coarsePointer: pointer.matches, compactViewport: compact.matches }));
     };
 
     updatePreference();
     connection?.addEventListener("change", updatePreference);
-    return () => connection?.removeEventListener("change", updatePreference);
+    pointer.addEventListener("change", updatePreference);
+    compact.addEventListener("change", updatePreference);
+    return () => {
+      connection?.removeEventListener("change", updatePreference);
+      pointer.removeEventListener("change", updatePreference);
+      compact.removeEventListener("change", updatePreference);
+    };
   }, [reduced]);
 
   useEffect(() => {
