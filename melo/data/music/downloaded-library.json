@@ -225,5 +225,41 @@
       "bright"
     ],
     "energy": 62
+  },
+  {
+    "id": "qq-2",
+    "title": "旅行的意义",
+    "artist": "陈绮贞",
+    "audioUrl": "/qqmusic/music/audio/library/qq-2.mp3",
+    "duration": 257,
+    "sourceSite": "https://1music.cc",
+    "moods": [
+      "calm"
+    ],
+    "energy": 35
+  },
+  {
+    "id": "library-000V8En93R3Dvd",
+    "title": "像极了",
+    "artist": "永彬Ryan.B",
+    "audioUrl": "/qqmusic/music/audio/library/library-000V8En93R3Dvd.mp3",
+    "duration": 194,
+    "sourceSite": "https://1music.cc",
+    "moods": [
+      "bright"
+    ],
+    "energy": 64
+  },
+  {
+    "id": "library-000vwBZD2IWYwB",
+    "title": "告白前一秒",
+    "artist": "永彬Ryan.B",
+    "audioUrl": "/qqmusic/music/audio/library/library-000vwBZD2IWYwB.mp3",
+    "duration": 210,
+    "sourceSite": "https://1music.cc",
+    "moods": [
+      "bright"
+    ],
+    "energy": 62
   }
 ]
