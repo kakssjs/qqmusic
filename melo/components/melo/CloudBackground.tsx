@@ -99,6 +99,14 @@ export function CloudBackground({ reduced }: { reduced: boolean }) {
           onError={() => setFailed(true)}
         />
       )}
+      {!videoAllowed && !reduced && (
+        <img
+          className="cloud-video cloud-film-animation"
+          src="/qqmusic/hero-clouds-motion.webp"
+          alt=""
+          onError={(event) => { event.currentTarget.style.visibility = "hidden"; }}
+        />
+      )}
       <div className="cloud-mint-light" />
       <div className="cloud-copy-shade" />
       <div className="cloud-ground-light" />
