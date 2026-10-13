@@ -42,6 +42,8 @@ export function VoiceChat({
     callback = useRef(onMode),
     playbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSpokenReply = useRef("");
+  const setupStage = useRef("正在开启麦克风");
+  const [setupLabel, setSetupLabel] = useState("");
   useEffect(() => {
     current.current = melo;
     callback.current = onMode;
@@ -152,11 +154,13 @@ export function VoiceChat({
     setUser("");
     setAnswer("");
     lastSpokenReply.current = "";
+    setupStage.current = "正在开启麦克风";
+    setSetupLabel(setupStage.current);
     current.current.audio.prepare();
     state("connecting");
     setupTimer.current = setTimeout(() => {
       if (id === generation.current) {
-        setError("语音连接超时，请重新开始。");
+        setError(`${setupStage.current}超时，请检查浏览器麦克风权限后重试。`);
         end(false);
       }
     }, 30000);
@@ -168,7 +172,9 @@ export function VoiceChat({
       if (current.current.audio.playing) current.current.audio.toggle();
       const playback = new AudioContext({ sampleRate: 24000 });
       resources.current.playback = playback;
-      await playback.resume();
+      // Request capture while the click is still active. Some embedded browsers
+      // leave resume() pending until capture is granted.
+      const resumed = playback.resume();
       if (id !== generation.current) return;
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -183,6 +189,15 @@ export function VoiceChat({
         return;
       }
       resources.current.stream = stream;
+      setupStage.current = "正在初始化语音音频";
+      setSetupLabel(setupStage.current);
+      await Promise.race([resumed, new Promise((_, reject) => {
+        const timer = setTimeout(() => reject(new Error("浏览器未允许语音音频，请用 Chrome 或 Edge 打开网站后重试。")), 5000);
+        void resumed.finally(() => clearTimeout(timer)).catch(() => {});
+      })]);
+      if (id !== generation.current) return;
+      setupStage.current = "正在连接豆包语音";
+      setSetupLabel(setupStage.current);
       const response = await pagesRequest("/api/voice-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -359,7 +374,7 @@ export function VoiceChat({
         <div className="voice-session">
           <div className="voice-state" role="status">
             <i />
-            {labels[phase]}
+            {phase === "connecting" ? setupLabel : labels[phase]}
           </div>
           <div className="voice-captions" aria-live="polite">
             {user && (
