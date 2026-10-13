@@ -200,5 +200,30 @@
     "sourceSite": "https://www.gequbao.com/music/3771052",
     "moods": [],
     "energy": 50
+  },
+  {
+    "id": "qq-1",
+    "title": "平凡之路",
+    "artist": "朴树",
+    "audioUrl": "/qqmusic/music/audio/library/qq-1.mp3",
+    "duration": 301,
+    "sourceSite": "https://1music.cc",
+    "moods": [
+      "calm",
+      "healing"
+    ],
+    "energy": 48
+  },
+  {
+    "id": "qq-4",
+    "title": "晴天",
+    "artist": "周杰伦",
+    "audioUrl": "/qqmusic/music/audio/library/qq-4.mp3",
+    "duration": 270,
+    "sourceSite": "https://1music.cc",
+    "moods": [
+      "bright"
+    ],
+    "energy": 62
   }
 ]
