@@ -5,7 +5,7 @@ export function transportPayload(payload:MeloRecord['payload']) {
   return {...payload,...(id?{track:findTrack(id)?.coreMood||'calm',catalogTrackId:id}:{})};
 }
 export function normalizeRecord(e:MeloRecord):MeloRecord {
-  return {...e,payload:{...e.payload,track:e.payload.catalogTrackId||e.payload.track}};
+  return {...e,payload:{...e.payload,track:e.payload.catalogTrackId||e.payload.track||e.payload.trackId}};
 }
 export function likedMixes(records:MeloRecord[]):Playlist[] {
   const seen=new Set<string>(),result:Playlist[]=[];

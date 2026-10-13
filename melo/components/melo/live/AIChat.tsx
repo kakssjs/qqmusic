@@ -1,7 +1,8 @@
 "use client";
 import { QQMusicIcon } from "../QQMusicIcon";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ArrowUp } from "lucide-react";
+import { ArrowUpRight, ArrowUp, Play, Pause, SkipForward } from "lucide-react";
+import { playableTracks } from "../../../data/music/catalog";
 import type { LiveMelo } from "./useLiveMelo";
 import { CharacterPresence } from "../CharacterPresence";
 import { VoiceChat } from "./VoiceChat";
@@ -87,7 +88,10 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             data-lenis-prevent
           >
             {messages.length ? (
-              messages.map((e) => (
+              messages.map((e) => {
+                const song = e.payload.role === "assistant" ? playableTracks.find(t => t.id === (e.payload.track || e.payload.trackId)) : undefined;
+                const current = song?.id === melo.audio.song.id;
+                return (
                 <div key={e.id} className={"live-message " + e.payload.role}>
                   <span>{e.payload.role === "assistant" ? "Melo" : "你"}</span>
                   <div>
@@ -98,6 +102,23 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
                         </p>
                       ))}
                     </div>
+                    {song && (
+                      <div className="chat-song-card" aria-label={`Melo 为你选择的歌曲：${song.title}`}>
+                        <img src={song.cover} alt="" width={56} height={56} />
+                        <div className="chat-song-info">
+                          <strong>{song.title}</strong>
+                          <span>{song.artist}</span>
+                          <small>{current && melo.audio.loading ? "正在加载…" : current && melo.audio.playing ? "正在播放" : current && melo.audio.progress > 0 ? "已暂停" : "在这里听，无需离开聊天"}</small>
+                        </div>
+                        <button type="button" className="chat-song-play" aria-label={`${current && melo.audio.playing ? "暂停" : "播放"} ${song.title}`} disabled={current && melo.audio.loading}
+                          onClick={() => current && melo.audio.playing ? melo.pauseChatMusic() : void melo.playChatTrack(song.id)}>
+                          {current && melo.audio.playing ? <Pause size={17} /> : <Play size={17} />}
+                          <span>{current && melo.audio.playing ? "暂停" : "播放"}</span>
+                        </button>
+                        <button type="button" className="chat-song-next" aria-label={`换掉 ${song.title}，让 Melo 重新选歌`} disabled={!!melo.busy || !melo.ready}
+                          onClick={() => void melo.send("换一首")}><SkipForward size={16} /><span>换一首</span></button>
+                      </div>
+                    )}
                     <small>
                       {new Date(e.createdAt).toLocaleTimeString("zh-CN", {
                         hour: "2-digit",
@@ -106,7 +127,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
                     </small>
                   </div>
                 </div>
-              ))
+              );})
             ) : (
               <div className="conversation-opening">
                 <h3>Melo 想先了解一下现在的你。</h3>
@@ -170,13 +191,9 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
               >
                 找回一点能量
               </button>
-              {melo.flowReady && (
-                <a href="#music" className="world-text-button">
-                  听听这首歌
-                </a>
-              )}
             </div>
           )}
+          {melo.chatPlaybackStatus && <p className="chat-playback-status" role="status">{melo.chatPlaybackStatus}</p>}
           <VoiceChat melo={melo} onMode={setVoiceMode} />
           <label className="chat-text-label" htmlFor="melo-chat-input">
             文字聊聊 <span>· 在下方输入</span>
@@ -191,7 +208,7 @@ export function AIChat({ melo }: { melo: LiveMelo }) {
             <textarea
               id="melo-chat-input"
               aria-label="给 Melo 的消息"
-              placeholder="点击这里，输入你想对 Melo 说的话…"
+              placeholder="说说心情，或输入「播放稻香」「放首适合现在的歌」…"
               maxLength={1500}
               value={melo.chatDraft}
               onChange={(e) => melo.setChatDraft(e.target.value)}

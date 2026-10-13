@@ -52,22 +52,38 @@ export function useMeloAudio() {
     active.current = false;
     setPlaying(false);
   }
+  function ensureContext() {
+    if (!context.current) {
+      context.current = new AudioContext();
+      gain.current = context.current.createGain();
+      analyser.current = context.current.createAnalyser();
+      analyser.current.fftSize = 128;
+      gain.current.connect(analyser.current);
+      analyser.current.connect(context.current.destination);
+    }
+    return context.current;
+  }
+  // Called synchronously from Send, while the browser still has a user gesture.
+  function prepare() {
+    try { void ensureContext().resume().catch(() => {}); } catch {}
+  }
+  async function resumeContext(ctx: AudioContext) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([ctx.resume(), new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Audio requires another user gesture')), 1500);
+      })]);
+      if (ctx.state !== 'running') throw new Error('Audio is suspended');
+    } finally { clearTimeout(timer); }
+  }
   async function play(which = index.current, position = offset.current) {
     wantsPlayback.current = true;
     const ticket = ++generation.current;
-    if(!tracks[which])return;
+    if(!tracks[which])return false;
     try {
-      if (!context.current) {
-        context.current = new AudioContext();
-        gain.current = context.current.createGain();
-        analyser.current = context.current.createAnalyser();
-        analyser.current.fftSize = 128;
-        gain.current.connect(analyser.current);
-        analyser.current.connect(context.current.destination);
-      }
-      const ctx = context.current;
-      await ctx.resume();
-      if (ticket !== generation.current) return;
+      const ctx = ensureContext();
+      await resumeContext(ctx);
+      if (ticket !== generation.current) return false;
       stop();
       index.current = which;
       setTrack(which);
@@ -76,7 +92,7 @@ export function useMeloAudio() {
       let b = buffers.current.get(which);
       if (!b) {
         const result=await audioBuffer(ctx,tracks[which]);
-        if(loadTicket!==generation.current)return;
+        if(loadTicket!==generation.current)return false;
         b=result.buffer;buffers.current.set(which,b);
         if(buffers.current.size>4){const oldest=buffers.current.keys().next().value;if(oldest!==undefined&&oldest!==which)buffers.current.delete(oldest);}
       }
@@ -104,12 +120,20 @@ export function useMeloAudio() {
         if(q.length>1&&at>=0&&at<q.length-1)void play(Math.max(0,tracks.findIndex(t=>t.id===q[at+1])),0);
         else wantsPlayback.current=false;
       };
+      return true;
     } catch {
       wantsPlayback.current = false;
       setError("声音暂时无法启动，请再次点击播放。");
       setPlaying(false);
       setLoading(false);
+      return false;
     }
+  }
+  function pause() {
+    wantsPlayback.current = false;
+    offset.current = Math.min(duration, offset.current + (active.current && context.current ? context.current.currentTime - started.current : 0));
+    stop();
+    setProgress(offset.current);
   }
   function toggle() {
     if (wantsPlayback.current) {
@@ -152,7 +176,7 @@ export function useMeloAudio() {
         lastTick.current = now;
         setProgress(
           Math.min(
-            duration,
+            tracks[index.current].duration,
             offset.current + context.current.currentTime - started.current,
           ),
         );
@@ -173,6 +197,7 @@ export function useMeloAudio() {
     };
   }, []);
   return {
+    prepare, pause,
     play,
     loading,hasStarted,queue,setQueue,
     listened,listeningByTrack,

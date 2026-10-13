@@ -15,6 +15,8 @@ export type MeloRecord = {
     role?: string;
     content?: string;
     track?: string;
+    trackId?: string;
+    musicRequest?: string;
     seconds?: number;
     keywords?: string[];
     story?: string;

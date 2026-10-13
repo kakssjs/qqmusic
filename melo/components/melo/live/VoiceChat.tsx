@@ -4,6 +4,8 @@ import { Mic, MicOff, PhoneOff } from "lucide-react";
 import { pagesRequest } from "../../../pages/local-api";
 import type { LiveMelo } from "./useLiveMelo";
 import type { CharacterMode } from "../../../lib/character-mode";
+import { playableTracks } from "../../../data/music/catalog";
+import { voicePlaybackRequest } from "../../../lib/music/chat-playback";
 type Phase =
   "idle" | "connecting" | "listening" | "thinking" | "speaking" | "ending";
 export function VoiceChat({
@@ -39,6 +41,7 @@ export function VoiceChat({
     current = useRef(melo),
     callback = useRef(onMode),
     playbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSpokenReply = useRef("");
   useEffect(() => {
     current.current = melo;
     callback.current = onMode;
@@ -148,6 +151,8 @@ export function VoiceChat({
     setError("");
     setUser("");
     setAnswer("");
+    lastSpokenReply.current = "";
+    current.current.audio.prepare();
     state("connecting");
     setupTimer.current = setTimeout(() => {
       if (id === generation.current) {
@@ -272,9 +277,17 @@ export function VoiceChat({
           } else if (msg.type === "transcript") {
             if (msg.role === "user") {
               setUser(msg.text);
+              const command = voicePlaybackRequest(String(msg.text || ""), msg.final === true, lastSpokenReply.current, playableTracks);
+              if (command) {
+                // Release the microphone before music starts; ignore late voice replies.
+                end(false);
+                void current.current.send(command.message, command.suggestedTrackId);
+                return;
+              }
               if (msg.final) state("thinking");
             } else {
               setAnswer(msg.text);
+              lastSpokenReply.current = String(msg.text || "");
               state("speaking");
             }
           } else if (msg.type === "turn-end") {

@@ -22,6 +22,7 @@ import {
   keepLocal,
 } from "../../../data/demo";
 import { catalog, type Playlist } from "../../../data/music/catalog";
+import { chatMusicIntent, chatMusicCandidates } from "../../../lib/music/chat-playback";
 import {
   recommend,
   parseIntent,
@@ -97,7 +98,7 @@ export function useLiveMelo() {
   const signal = useMemo(
     () => ({
       ...parseIntent(
-        currentMoment?.payload.text || note,
+        currentMoment?.payload.musicRequest || currentMoment?.payload.text || note,
         mood,
         scores || undefined,
       ),
@@ -293,6 +294,30 @@ export function useLiveMelo() {
     [searchResults, setSearchResults] = useState<typeof catalog>([]),
     [searchStatus, setSearchStatus] = useState("");
   const [speaking, setSpeaking] = useState(false);
+  const [chatPlaybackStatus, setChatPlaybackStatus] = useState("");
+  function pauseChatMusic() {
+    audio.pause();
+    setChatPlaybackStatus("音乐已暂停，想继续时告诉我就好。");
+  }
+  function chatControlReply(message: string, content: string, track?: string) {
+    const id = crypto.randomUUID(), now = Date.now();
+    const items: MeloRecord[] = [
+      { id: id + "-reply", type: "message", payload: { role: "assistant", content, track, source: "player" }, createdAt: new Date(now + 1).toISOString() },
+      { id, type: "message", payload: { role: "user", content: message, source: "player" }, createdAt: new Date(now).toISOString() },
+      ...recordsRef.current,
+    ];
+    updateRecords(items);
+    keepLocal(items);
+    setChatDraft("");
+  }
+  async function playChatTrack(id: string, queue = audio.queue) {
+    const index = tracks.findIndex(t => t.id === id);
+    if (index < 0) return;
+    audio.setQueue([id, ...queue.filter(t => t !== id)]);
+    setChatPlaybackStatus(`正在加载《${tracks[index].title}》…`);
+    const started = await audio.play(index, audio.song.id === id ? audio.progress : 0);
+    setChatPlaybackStatus(started ? `正在播放《${tracks[index].title}》` : "点击歌曲卡片的播放按钮，再试一次。");
+  }
   useEffect(() => {
     if (!speaking) return;
     const t = setTimeout(() => setSpeaking(false), 4000);
@@ -641,6 +666,8 @@ export function useLiveMelo() {
     id = crypto.randomUUID(),
     analysis?: { mood: string; values: number[]; reason: string },
     selectedTrackId?: string,
+    selectTrack = true,
+    musicRequest = text,
   ) {
     const d = analysis || await json("/api/emotion", { text: text.slice(0, 1000) });
     if (
@@ -653,7 +680,7 @@ export function useLiveMelo() {
     setScores(d.values);
     setReason(d.reason);
     const nextSignal = {
-      ...parseIntent(text, d.mood, d.values),
+      ...parseIntent(musicRequest, d.mood, d.values),
       mood: d.mood,
       preferences: preferencesFromRecords(recordsRef.current),
     };
@@ -661,13 +688,15 @@ export function useLiveMelo() {
       nextMix = buildMix(nextSignal);
     if (!list.length) throw new Error("当前可播放的歌曲中，没有符合这次要求的声音。可以换一种风格试试。");
     if (selectedTrackId) {
-      const chosen = list.find((t) => t.id === selectedTrackId);
+      const chosen = tracks.find((t) => t.id === selectedTrackId);
       if (chosen) list.splice(0, list.length, chosen, ...list.filter((t) => t.id !== chosen.id));
     }
     setMix(nextMix);
     setMusicDirection(undefined);
-    audio.setQueue(list.map((t) => t.id));
-    audio.select(tracks.findIndex((t) => t.id === list[0].id));
+    if (selectTrack) {
+      audio.setQueue(list.map((t) => t.id));
+      audio.select(tracks.findIndex((t) => t.id === list[0].id));
+    }
     setExpression(expressionForMessage(text, reply));
     const event = await write(
       "checkin",
@@ -675,6 +704,7 @@ export function useLiveMelo() {
         momentId: id,
         mood: d.mood,
         text: text.slice(0, 1000),
+        musicRequest: musicRequest.slice(0, 1000),
         track: list[0].id,
         momentAt: new Date().toISOString(),
         playlist: list.map((t) => t.id),
@@ -702,15 +732,17 @@ export function useLiveMelo() {
     id = crypto.randomUUID(),
     analysis?: { mood: string; values: number[]; reason: string },
     selectedTrackId?: string,
+    selectTrack = true,
+    musicRequest = text,
   ) {
     if (busyRef.current) return;
     busyRef.current = true;
     setBusy("emotion");
     setError("");
     setExpression("listen");
-    retryRef.current = () => void analyzeText(text, reply, id, analysis, selectedTrackId);
+    retryRef.current = () => void analyzeText(text, reply, id, analysis, selectedTrackId, selectTrack, musicRequest);
     try {
-      await understand(text, reply, id, analysis, selectedTrackId);
+      await understand(text, reply, id, analysis, selectedTrackId, selectTrack, musicRequest);
       setStatus("这段心情和音乐，已一起留下。");
     } catch (e) {
       setError((e as Error).message);
@@ -719,9 +751,30 @@ export function useLiveMelo() {
       setBusy("");
     }
   }
-  async function send(input?: string) {
+  async function send(input?: string, suggestedTrackId?: string) {
     const message = (input || chatDraft).trim();
     if (!message || busyRef.current) return;
+    const intent = chatMusicIntent(message);
+    const preflight = chatMusicCandidates(message, signal, tracks, catalog, audio.song.id, suggestedTrackId);
+    if (preflight.unavailable) {
+      setError(`《${preflight.unavailable}》暂时还不能在这里播放。可以从已有歌曲中选一首，或让我按心情挑选。`);
+      return;
+    }
+    setError("");
+    if (intent.action === "pause") {
+      pauseChatMusic();
+      chatControlReply(message, "音乐已暂停。我们可以先聊聊。", audio.song.id);
+      return;
+    }
+    if (intent.action === "resume") {
+      audio.prepare();
+      chatControlReply(message, `继续听《${audio.song.title}》吧。`, audio.song.id);
+      await playChatTrack(audio.song.id);
+      return;
+    }
+    if (intent.action === "play" || intent.action === "next") audio.prepare();
+    const wantsPlay = intent.action === "play" || intent.action === "next";
+    setChatPlaybackStatus("");
     busyRef.current = true;
     setBusy("chat");
     setFlowReady(false);
@@ -734,12 +787,17 @@ export function useLiveMelo() {
         ? chatId.current.id
         : crypto.randomUUID();
     chatId.current = { text: message, id };
-    retryRef.current = () => void send(message);
+    retryRef.current = () => void send(message, suggestedTrackId);
     try {
-      const analysis = await json("/api/emotion", { text: message.slice(0, 1000) });
+      const analysis = intent.action === "next" && scores
+        ? { mood, values: scores, reason }
+        : await json("/api/emotion", { text: message.slice(0, 1000) });
       if (!moods.some(([m]) => m === analysis.mood) || !Array.isArray(analysis.values) || analysis.values.length !== 3)
         throw new Error("这次心情理解没有完成，请重试。");
-      const candidates = recommend({ ...parseIntent(message, analysis.mood, analysis.values), mood: analysis.mood, preferences: preferencesFromRecords(recordsRef.current) }, 24);
+      const musicRequest = intent.action === "next" ? currentMoment?.payload.musicRequest || currentMoment?.payload.text || note : message;
+      const selection = chatMusicCandidates(message, { ...parseIntent(musicRequest, analysis.mood, analysis.values), mood: analysis.mood, preferences: preferencesFromRecords(recordsRef.current) }, tracks, catalog, audio.song.id, suggestedTrackId);
+      if (selection.unavailable) throw new Error(`《${selection.unavailable}》暂时还不能在这里播放。可以从已有歌曲中选一首，或让我按心情挑选。`);
+      const candidates = selection.tracks;
       if (!candidates.length) throw new Error("目前没有符合这次要求的可播放歌曲，可以换一种风格试试。");
       const d = await json("/api/chat", { message, id, musicContext: {
         mood: analysis.mood, reason: analysis.reason,
@@ -749,6 +807,7 @@ export function useLiveMelo() {
         throw new Error("Melo 没有听清，再说一次好吗？");
       if (!demoEnabled() && !candidates.some(t => t.id === d.trackId))
         throw new Error("这次回应没有选出可播放的歌曲，请稍后再试。你仍可以直接选择音乐。");
+      const selectedTrack = candidates.find(t => t.id === d.trackId) || candidates[0];
       setModelState("ready");
       setSpeaking(true);
       setConnected(true);
@@ -758,7 +817,7 @@ export function useLiveMelo() {
         {
           id: id + "-reply",
           type: "message",
-          payload: { role: "assistant", content: d.reply },
+          payload: { role: "assistant", content: d.reply, track: selectedTrack.id },
           createdAt: new Date(Date.now() + 1).toISOString(),
         },
         {
@@ -771,11 +830,16 @@ export function useLiveMelo() {
           (e) => e.id !== id && e.id !== id + "-reply",
         ),
       ]);
+      keepLocal(recordsRef.current);
       setChatDraft("");
       setExpression(expressionForMessage(message, d.reply));
+      // Playback is independent of saving the mood record and never leaves the chat.
+      if (wantsPlay) {
+        await playChatTrack(selectedTrack.id, candidates.map(t => t.id));
+      }
       setBusy("emotion");
       try {
-        await understand(message, d.reply, id + "-moment", analysis, d.trackId);
+        await understand(message, d.reply, id + "-moment", analysis, selectedTrack.id, false, musicRequest);
         chatId.current = null;
         retryRef.current = null;
         setStatus("Melo 已把你说的话，连同这首歌一起记住。");
@@ -784,7 +848,7 @@ export function useLiveMelo() {
           "对话已收到，情绪理解暂时没完成。可以重试理解，或自己选择音乐。",
         );
         retryRef.current = () =>
-          void analyzeText(message, d.reply, id + "-moment", analysis, d.trackId);
+          void analyzeText(message, d.reply, id + "-moment", analysis, selectedTrack.id, false, musicRequest);
         setExpression(expressionForMessage(message, d.reply));
       }
     } catch (e) {
@@ -1045,6 +1109,11 @@ export function useLiveMelo() {
     analyze,
     saveMoment,
     send,
+    playChatTrack,
+    pauseChatMusic,
+    chatPlaybackStatus: chatPlaybackStatus.startsWith("正在播放")
+      ? audio.playing ? `正在播放《${audio.song.title}》` : audio.loading ? `正在加载《${audio.song.title}》…` : `已暂停《${audio.song.title}》`
+      : chatPlaybackStatus,
     favorite,
     liked,
     story,
