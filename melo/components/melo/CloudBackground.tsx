@@ -62,7 +62,7 @@ export function CloudBackground({ reduced }: { reduced: boolean }) {
   }, [videoAllowed]);
 
   return (
-    <div className="cloud-background" aria-hidden="true">
+    <div className={`cloud-background ${!videoAllowed && !reduced ? "cloud-background-motion" : ""}`} aria-hidden="true">
       <svg className="cloud-color-defs" width="0" height="0">
         <defs>
           <filter id="melo-cloud-color" colorInterpolationFilters="sRGB">
