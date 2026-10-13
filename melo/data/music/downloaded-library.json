@@ -261,5 +261,18 @@
       "bright"
     ],
     "energy": 62
+  },
+  {
+    "id": "external-qilixiang-jay",
+    "title": "七里香",
+    "artist": "周杰伦",
+    "audioUrl": "/qqmusic/music/audio/library/external-qilixiang-jay.mp3",
+    "duration": 297,
+    "sourceSite": "https://1music.cc",
+    "moods": [
+      "bright",
+      "calm"
+    ],
+    "energy": 58
   }
 ]
